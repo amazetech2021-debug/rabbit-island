@@ -1797,12 +1797,9 @@ function speak(text, lang){
   TTS.busy = true;
 
   const toBrowser = () => ttsBrowser(text, isEn);
-  const toNeural = () => {
-    if(isEn){ ttsEleven(text, key, toBrowser); return; }
-    if(TTS._dbFail >= 5){ toBrowser(); return; }
-    ttsDoubao(text, key, toBrowser);
-  };
-  ttsDict(text, isEn, key, toNeural);
+  if(isEn){ ttsEleven(text, key, toBrowser); return; }
+  if(TTS._dbFail >= 5){ toBrowser(); return; }
+  ttsDoubao(text, key, toBrowser);
 }
 
 /* 读汉字：带上组词做语境 */
