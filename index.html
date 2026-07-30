@@ -387,8 +387,128 @@ body{
   .rabbit-wrap .rgrid{grid-template-columns:repeat(2,1fr)}
   .rabbit-wrap .rgrowth{order:3;width:100%}
 }
+/* ── 绘本板块 ── */
+:root{--fzh:'Ma Shan Zheng',cursive;--fen:'Lexend',sans-serif}
+.b-lib-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.b-lib-header h2{font-size:20px;font-family:var(--fzh);margin:0}
+.b-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.b-lib-card{cursor:pointer;border-radius:16px;overflow:hidden;border:2px solid var(--line);transition:transform .2s,box-shadow .2s;background:var(--paper)}
+.b-lib-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.b-lib-card-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:linear-gradient(135deg,#E3F2FD,#FFF9C4);display:flex;align-items:center;justify-content:center;font-size:46px;position:relative;overflow:hidden}
+.b-lib-card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.b-lib-card-info{padding:8px 10px}
+.b-lib-card-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-lib-card-title.zh{font-family:var(--fzh);font-size:14px}
+.b-lib-card-title.en{font-family:var(--fen);font-size:13px}
+.b-lib-card-meta{font-size:10px;color:var(--ink-soft);margin-top:2px}
+.b-badge{display:inline-block;font-size:9px;padding:1px 5px;border-radius:6px;margin-left:3px;vertical-align:middle}
+.b-badge-zh{background:#FFE0E0;color:#FF6B6B}
+.b-badge-en{background:#E0F7FA;color:#4ECDC4}
+.b-badge-new{background:#FFF9C4;color:#F57F17}
+.b-filter-row{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--line)}
+.b-filter-row button{padding:5px 12px;font-size:12px;border:none;background:var(--paper);cursor:pointer;font-weight:600;color:var(--ink-soft);transition:all .2s}
+.b-filter-row button.on.zh{background:var(--red);color:#fff}
+.b-filter-row button.on.en{background:var(--blue);color:#fff}
+.b-filter-row button.on.all{background:var(--ink);color:#fff}
+.b-btn-gen{padding:9px 16px;border-radius:20px;border:none;font-size:14px;cursor:pointer;font-family:var(--fzh);color:#fff;transition:all .2s;white-space:nowrap}
+.b-btn-gen.zh{background:var(--red);box-shadow:0 3px 12px rgba(255,107,107,.3)}
+.b-btn-gen.en{background:var(--blue);box-shadow:0 3px 12px rgba(78,205,196,.3)}
+.b-btn-gen:hover{transform:translateY(-1px)}
+/* 生成器 */
+.b-gen-section{background:var(--paper);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.b-gen-section h3{font-size:15px;font-weight:700;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.b-gen-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap}
+.b-gen-row label{font-size:12px;font-weight:600;min-width:58px;color:var(--ink-soft);padding-top:9px}
+.b-gen-row input,.b-gen-row select,.b-gen-row textarea{padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);font-size:13px;flex:1;min-width:120px;outline:none;background:var(--paper);font-family:inherit;transition:border .2s}
+.b-gen-row input:focus,.b-gen-row select:focus,.b-gen-row textarea:focus{border-color:var(--purple)}
+.b-gen-row textarea{min-height:70px;resize:vertical;line-height:1.6}
+.b-theme-chips{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+.b-theme-chip{padding:5px 10px;border-radius:20px;border:1.5px solid var(--line);font-size:12px;cursor:pointer;transition:all .2s;background:var(--paper);white-space:nowrap}
+.b-theme-chip.sel.zh{background:var(--red);color:#fff;border-color:transparent}
+.b-theme-chip.sel.en{background:var(--blue);color:#fff;border-color:transparent}
+.b-custom-toggle{font-size:12px;color:var(--purple);cursor:pointer;text-decoration:underline;padding-top:9px;flex-shrink:0}
+.b-custom-box{display:none;flex:1;min-width:200px}
+.b-custom-box.on{display:block}
+.b-lang-tabs{display:flex;gap:6px;margin-bottom:10px}
+.b-ltab{flex:1;padding:7px;border-radius:10px;text-align:center;cursor:pointer;border:1.5px solid var(--line);font-size:13px;transition:all .2s;background:var(--paper);color:var(--ink-soft)}
+.b-ltab.on.zh{background:var(--red);color:#fff;border-color:var(--red);font-family:var(--fzh);font-size:15px}
+.b-ltab.on.en{background:var(--blue);color:#fff;border-color:var(--blue);font-family:var(--fen);font-weight:700}
+/* 阅读器 */
+.b-rdr-wrap{display:flex;flex-direction:column;height:100%;background:var(--paper);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.b-rdr-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--paper);flex-shrink:0}
+.b-rdr-title{font-size:16px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--fzh);color:var(--brand)}
+.b-rdr-title.en{font-family:var(--fen);font-weight:700;color:var(--blue)}
+.b-pg-ind{font-size:12px;color:var(--ink-soft);background:var(--cream);padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b-rdr-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.b-page-frame{flex:1;display:grid;grid-template-columns:55% 45%;overflow:hidden;min-height:0}
+@media(max-width:600px){.b-page-frame{grid-template-columns:1fr;grid-template-rows:1fr auto}}
+.b-page-illus{position:relative;background:#F5F0EB;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.b-page-illus img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.b-illus-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.b-illus-spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:bSpin .7s linear infinite}
+@keyframes bSpin{to{transform:rotate(360deg)}}
+.b-regen-btn{position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,.85);border:none;border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;backdrop-filter:blur(4px);color:var(--purple)}
+.b-page-right{display:flex;flex-direction:column;padding:18px;overflow:hidden;background:linear-gradient(160deg,#FFFDF7,#FFF8F0)}
+.b-story-wrap{flex:1;display:flex;align-items:center;overflow:auto}
+/* 中文文字 */
+.b-story-zh{font-family:var(--fzh);font-size:26px;line-height:3.2;letter-spacing:2px}
+.b-char-block{display:inline-flex;flex-direction:column;align-items:center;cursor:pointer;border-radius:7px;padding:1px 4px;transition:all .15s;vertical-align:bottom}
+.b-char-block:hover{background:#FFE8D6;transform:scale(1.1)}
+.b-char-block.talk{background:var(--red);animation:bPop .35s ease}
+@keyframes bPop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.b-py{font-size:10px;color:var(--brand);font-style:italic;line-height:1.2;min-height:13px;font-family:'Noto Serif SC',serif;letter-spacing:0}
+.b-hz{font-size:28px;line-height:1}
+.b-epunct{color:var(--ink-soft);display:inline-block;vertical-align:bottom;font-size:22px}
+/* 英文文字 */
+.b-story-en{font-family:var(--fen);font-size:20px;line-height:1.85;color:var(--ink);font-weight:400}
+@media(min-width:768px){.b-story-en{font-size:22px}}
+.b-eword{display:inline;cursor:pointer;border-radius:4px;padding:1px 3px;transition:all .15s}
+.b-eword:hover{background:#D8F8F6;color:var(--blue);border-radius:4px}
+.b-eword.talk{background:var(--blue);color:#fff;animation:bPop .35s ease}
+.b-epunct-en{font-family:var(--fen);color:var(--ink-soft)}
+.b-page-cap{font-size:11px;color:var(--ink-soft);margin-top:8px;text-align:center}
+.b-dots{display:flex;gap:5px;justify-content:center;margin-top:6px}
+.b-dot{width:7px;height:7px;border-radius:50%;background:#DDD;cursor:pointer;transition:background .3s}
+.b-dot.on.zh{background:var(--brand)}.b-dot.on.en{background:var(--blue)}
+/* 阅读器控制 */
+.b-rdr-ctrl{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#FFFAF6;border-top:1px solid var(--line);flex-shrink:0}
+@media(min-width:768px){.b-rdr-ctrl{padding:12px 20px;gap:12px}}
+.b-btn-nav{padding:8px 16px;border-radius:20px;border:1.5px solid var(--line);background:var(--paper);font-size:13px;cursor:pointer;color:var(--ink-soft);transition:all .2s}
+.b-btn-nav:hover{background:#F5F0EB}
+.b-btn-nav:disabled{opacity:.3;cursor:default}
+.b-btn-read{border:none;border-radius:24px;padding:10px 22px;font-size:15px;cursor:pointer;color:#fff;transition:all .2s;flex:1;max-width:160px;box-shadow:0 3px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;gap:6px}
+.b-btn-read.zh{background:var(--brand)}.b-btn-read.en{background:var(--blue)}
+.b-btn-read:hover{transform:scale(1.03)}
+.b-btn-read.playing{animation:bPulse 1s infinite}
+@keyframes bPulse{0%,100%{opacity:1}50%{opacity:.7}}
+/* 词语弹窗 */
+.b-wpopup{display:none;position:fixed;z-index:400;background:var(--paper);border-radius:22px;padding:16px 20px;box-shadow:0 12px 48px rgba(0,0,0,.18);border:1px solid var(--line);min-width:200px;max-width:300px;text-align:center}
+.b-wpopup .b-bigchar{font-size:52px;line-height:1.1;margin-bottom:4px}
+.b-wpopup .b-bigchar.zh{font-family:var(--fzh)}
+.b-wpopup .b-bigchar.en{font-family:var(--fen);font-weight:700;font-size:36px;letter-spacing:-.5px}
+.b-wpopup .b-pylabel{font-size:16px;font-style:italic;margin-bottom:4px}
+.b-wpopup .b-pylabel.zh{color:var(--brand)}
+.b-wpopup .b-pylabel.en{color:var(--blue);font-family:var(--fen)}
+.b-wpopup .b-meaning{font-size:12px;color:var(--ink-soft);line-height:1.6;margin-top:4px;max-width:240px}
+.b-wpopup .b-cn-trans{font-size:14px;color:var(--brand);margin-top:4px;font-family:var(--fzh)}
+.b-wpopup .b-groups{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:8px}
+.b-wpopup .b-groups span{background:#FFF5F5;border:1px solid #FFE0E0;border-radius:8px;padding:3px 9px;font-size:12px;cursor:pointer;color:var(--brand);transition:all .2s}
+.b-wpopup .b-groups span:hover{background:var(--brand);color:#fff}
+.b-wpopup .b-wp-close{position:absolute;top:6px;right:10px;border:none;background:none;cursor:pointer;font-size:14px;color:var(--ink-soft)}
+.b-wpopup .b-wp-actions{display:flex;gap:6px;margin-top:8px;justify-content:center}
+.b-wp-btn{padding:5px 12px;border-radius:20px;border:none;font-size:11px;cursor:pointer;transition:all .2s}
+.b-wp-btn.play{background:var(--blue);color:#fff}.b-wp-btn.zh-play{background:var(--brand);color:#fff}
+/* 加载面板 */
+.b-ld-panel{display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center}
+.b-ld-spinner{width:48px;height:48px;border:4px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:bSpin .6s linear infinite}
+.b-ld-steps{display:flex;flex-direction:column;gap:6px;text-align:left;min-width:280px}
+.b-ld-step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);padding:5px 8px;border-radius:8px}
+.b-ld-step.active{background:#FFF9C4;color:var(--ink);font-weight:600}
+.b-ld-step.done{color:#2E9E6B}
+.b-ld-bar-wrap{width:220px;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.b-ld-bar-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--gold));border-radius:3px;transition:width .4s;width:5%}
+.b-ld-txt{font-size:13px;color:var(--ink-soft)}
 </style>
-</head>
 <body>
 <div class="app">
   <nav class="side" id="side"></nav>
@@ -402,6 +522,18 @@ body{
 </div>
 <div id="toast"></div>
 <div id="modal"><div class="mbox" id="mbox"></div></div>
+<!-- 绘本词语弹窗 -->
+<div class="b-wpopup" id="bWPopup">
+  <button class="b-wp-close" onclick="document.getElementById('bWPopup').style.display='none'">✕</button>
+  <div class="b-bigchar" id="bWpChar"></div>
+  <div class="b-pylabel" id="bWpPy"></div>
+  <div class="b-meaning" id="bWpMean"></div>
+  <div class="b-cn-trans" id="bWpTrans" style="display:none"></div>
+  <div class="b-groups" id="bWpGroups"></div>
+  <div class="b-wp-actions" id="bWpActions"></div>
+</div>
+<script src="zh_dict.js"></script>
+<script src="en_dict.js"></script>
 <script>
 /* ══════════ 学习内容数据 ══════════
    格式： [汉字, 拼音, 图, 组词, 字理小故事]
@@ -2145,6 +2277,7 @@ const PAGES = [
   {k:"en",   n:"英语", e:"🅰️", bg:"#FFC0BC"},
   {k:"poem", n:"古诗", e:"🎵", bg:"#FFDE9E"},
   {k:"think",n:"思维", e:"🧩", bg:"#CFC0A8"},
+  {k:"book", n:"绘本", e:"📖", bg:"#8B5CF6"},
 ];
 let cur = "home";
 function paintSide(){
@@ -2176,7 +2309,7 @@ function render(){
   const p = PAGES.find(x=>x.k===cur);
   $("ptitle").textContent = cur==="home" ? "🐰 开心兔兔养成岛" : p.e+" "+p.n;
   ({home:pgHome, hz:pgHanzi, py:pgPinyin, math:pgMath, en:pgEnglish, poem:pgPoem,
-    think:pgThink})[cur]();
+    think:pgThink, book:pgBook})[cur]();
   scrollTabsIntoView();
 }
 
@@ -3430,6 +3563,449 @@ if(penaltyMsg && !S.dead){
      PET_ART.sick  = 'sick.png';
      PET_ART.gone  = 'gone.png';
    ══════════════════════════════════════════════════════════════ */
+
+/* ══════════ 绘本板块 ══════════ */
+
+// ── 拼音工具 ──
+const B_TONE_FIX={"de5":"de","le5":"le","zhe5":"zhe","ge5":"ge","men5":"men","zi5":"zi","li5":"li","ba5":"ba","ma5":"ma","ne5":"ne","a5":"a","la5":"la"};
+function bToTone(py){
+  if(!py)return'';if(B_TONE_FIX[py])return B_TONE_FIX[py];
+  var m=py.match(/^([a-züv]+)([1-4])$/);if(!m)return py;
+  var base=m[1],num=parseInt(m[2]),toneMap={'a':['ā','á','ǎ','à'],'e':['ē','é','ě','è'],'i':['ī','í','ǐ','ì'],'o':['ō','ó','ǒ','ò'],'u':['ū','ú','ǔ','ù'],'ü':['ǖ','ǘ','ǚ','ǜ'],'v':['ǖ','ǘ','ǚ','ǜ']};
+  var pos=-1;if(/[ae]/.test(base)){pos=base.search(/[ae]/);}else if(/ou/.test(base)){pos=base.indexOf('o');}else{var vowels=base.match(/[iouüv]/g);if(vowels)pos=base.lastIndexOf(vowels[vowels.length-1]);}
+  if(pos<0)return py;var v=base[pos];if(!toneMap[v])return py;
+  return base.slice(0,pos)+toneMap[v][num-1]+base.slice(pos+1);
+}
+function bPyDisplay(rawPy){if(!rawPy)return'';return rawPy.split(' ').map(bToTone).join(' ');}
+
+const B_COMPOUNDS={
+  "一":["一起","一个","一样","一天","第一"],"七":["七月","七彩"],"三":["三个","三月"],"上":["上面","上学"],"下":["下面","下来","下雨"],"不":["不是","不好"],"与":["与众不同","参与"],
+  "且":["并且"],"世":["世界","世纪"],"东":["东方"],"丢":["丢掉","丢失"],"严":["严格","严重","庄严"],"个":["一个","这个"],"中":["中间","中国"],"为":["为什么"],"丽":["华丽"],
+  "久":["永久","长久"],"乐":["快乐","音乐"],"乖":["乖乖","乖巧"],"乘":["乘客","乘法","乘号"],"九":["九月"],"也":["也是","也许"],"习":["学习","练习"],"书":["书本","看书"],
+  "买":["买东西","买菜"],"了":["好了","走了"],"二":["第二","二月"],"云":["云彩","乌云"],"五":["五个","五月"],"京":["北京","南京"],"亭":["小亭子","凉亭"],"亮":["明亮","月亮"],
+  "人":["大人","人们"],"亿":["亿万"],"仍":["仍然"],"从":["从前","从来"],"他":["他们"],"付":["支付","付出"],"以":["所以"],"伞":["雨伞","太阳伞"],"伤":["伤心","受伤"],
+  "但":["但是","不但"],"住":["居住","住在"],"你":["你好","你的"],"使":["使用","天使"],"保":["保护","保证","保安"],"信":["信封","相信","写信"],"修":["修理","修建","修改"],
+  "倍":["加倍","倍数"],"倒":["倒下","倒水"],"候":["时候"],"借":["借书","借钱"],"假":["真假"],"停":["停止","停车"],"健":["健康","健身"],"傲":["骄傲","傲慢"],"兄":["兄弟","兄弟情"],
+  "光":["阳光","光亮"],"兔":["兔子","白兔"],"全":["安全","全部"],"八":["八月"],"六":["六月"],"兰":["兰花","君子兰"],"兴":["高兴","兴奋"],"兽":["野兽","兽医"],"再":["再见","再次"],
+  "写":["写字","写书"],"冬":["冬天","冬季"],"冰":["冰雪","冰水","冰冷"],"冷":["寒冷"],"冻":["冰冻","冻结"],"凉":["凉快","凉爽"],"减":["减法","减少"],"出":["出去","出发","出现"],
+  "刀":["小刀","剪刀","刀子"],"分":["分钟","分别"],"切":["切菜"],"划":["计划","划船","比划"],"刷":["刷牙","刷子"],"削":["削皮","削笔"],"前":["前面","从前","前天"],
+  "力":["力量","力气","能力"],"加":["加法","增加"],"动":["运动"],"助":["帮助","助手"],"勇":["勇敢","勇气","勇士"],"勤":["勤劳","勤奋"],"包":["书包","红包","面包","包围"],
+  "化":["变化","融化"],"北":["北方","北京"],"医":["医生","医院","中医"],"十":["十个","十分"],"千":["一千"],"升":["上升","升起"],"午":["中午","上午"],"单":["简单","单独"],
+  "卖":["卖东西"],"南":["南方","南瓜"],"卡":["卡片","贺卡","刷卡"],"危":["危险","危机"],"厅":["客厅","大厅","饭厅"],"历":["历史","日历","经历"],"厕":["厕所"],"厚":["厚度","深厚"],
+  "原":["草原","原来","原因"],"厨":["厨房","厨师"],"去":["出去","回去","过去"],"又":["又一次"],"友":["朋友","友好","好友","友情"],"双":["一双","双手","双方"],
+  "发":["发现","出发","头发"],"叔":["叔叔"],"只":["一只","只有"],"右":["右边"],"叶":["叶子","树叶","绿叶"],"吃":["吃饭","好吃"],"各":["各种"],"合":["合作","合并","合适"],
+  "同":["同学"],"名":["名字","有名","姓名"],"吓":["吓人","惊吓"],"吞":["吞下"],"告":["告诉","报告","广告"],"周":["一周","周围"],"味":["味道","气味"],"命":["命运"],
+  "和":["和好","和平"],"咬":["咬一口"],"咽":["吞咽","咽喉"],"哈":["哈哈"],"哥":["哥哥","大哥"],"唇":["嘴唇"],"唱":["唱歌","唱片"],"善":["善良","善于","友善"],"喜":["喜欢","喜爱"],
+  "嘴":["嘴巴","嘴唇"],"器":["机器","电器","仪器"],"嚼":["咀嚼"],"四":["四个","四月","四方"],"回":["回家","回来"],"因":["因为","原因"],"园":["公园","花园","菜园","校园"],
+  "困":["困难","困了"],"围":["围巾","包围","周围"],"国":["中国","国家"],"图":["图书","图画","图形"],"圆":["圆形","圆圈"],"土":["土地"],"在":["现在","正在"],
+  "地":["大地","地方","快乐地"],"场":["市场","操场"],"坏":["坏人"],"坑":["泥坑","水坑"],"坡":["山坡","上坡"],"城":["城市","城墙","长城"],"塔":["高塔","宝塔"],"墙":["墙壁","围墙"],
+  "墨":["墨水","笔墨"],"壁":["墙壁","壁画"],"声":["声音","歌声","风声"],"复":["复习","重复"],"夏":["夏天"],"多":["很多","许多"],"夜":["夜晚","黑夜"],"大":["大的","大家","大小"],
+  "天":["天空","今天","每天"],"太":["太阳","太好"],"夫":["丈夫","夫人"],"奋":["奋斗","勤奋","兴奋"],"奶":["牛奶","奶牛","奶奶"],"她":["她们"],"好":["你好","好的","好看"],
+  "如":["如果","比如","如何"],"妇":["妇女","媳妇"],"妈":["妈妈"],"妹":["姐妹"],"始":["开始","起始"],"姐":["姐姐"],"姑":["姑姑","姑娘"],"姨":["阿姨"],"姻":["婚姻","联姻"],
+  "婚":["结婚","婚礼"],"婶":["婶婶"],"嫂":["大嫂","嫂子"],"子":["孩子","兔子","日子"],"字":["文字","汉字"],"孙":["孙子","孙女"],"学":["学习","上学"],"孩":["孩子","小孩"],
+  "守":["守着","守护","遵守"],"安":["安全","安静","平安"],"实":["诚实","真实","实在"],"室":["教室","卧室","室内"],"家":["回家","大家"],"宽":["宽广","宽度"],"密":["秘密","密集","亲密"],
+  "富":["丰富","富贵"],"寒":["寒冷","寒假"],"对":["一对","面对"],"将":["将来","将要","将军"],"小":["小的","小鸟","小心"],"少":["多少","很少"],"尘":["灰尘","尘土"],
+  "尝":["品尝","尝试"],"就":["就是"],"尺":["尺子"],"层":["层次","楼层"],"居":["邻居","居住"],"屋":["房屋","屋顶"],"山":["大山","山上"],"岛":["小岛","岛屿"],"岩":["岩石","岩洞"],
+  "岭":["山岭"],"岸":["岸边","海岸"],"峰":["山顶","高峰","山峰"],"崖":["山崖","悬崖"],"左":["左边"],"巧":["乖巧","巧妙","凑巧"],"巨":["巨大","巨人"],"已":["已经"],
+  "巾":["毛巾","围巾","纸巾"],"币":["硬币","纸币"],"帅":["帅气","元帅"],"师":["老师"],"希":["希望"],"帘":["窗帘","门帘"],"带":["带来","带走"],"帮":["帮助","帮忙"],
+  "常":["经常","非常","常常"],"帽":["帽子","草帽"],"干":["干活","干燥"],"年":["今年","明年"],"并":["并且"],"幸":["幸福","幸运"],"幻":["幻想","梦幻"],"庄":["村庄","庄严"],
+  "床":["床上","起床"],"底":["底下","底部"],"庙":["寺庙","庙会"],"庭":["家庭","庭院"],"康":["健康","康复"],"建":["建筑","建设"],"开":["开心","打开"],"弟":["弟弟","兄弟"],
+  "弱":["弱小","软弱"],"弹":["弹琴","子弹","弹性"],"强":["强大","强壮"],"形":["形状","圆形","方形"],"彩":["彩色","彩虹","色彩"],"影":["影子","电影","影响"],"很":["很好","很多"],
+  "微":["微笑","微小","微风"],"心":["开心","心里"],"忆":["回忆","记忆"],"忘":["忘记","忘了"],"忙":["忙碌","帮忙"],"快":["快乐","飞快"],"念":["想念"],"怒":["愤怒"],
+  "怕":["害怕","可怕"],"思":["思想"],"恨":["可恨"],"息":["消息","休息","信息"],"恶":["邪恶","恶作剧","恶劣"],"悲":["悲伤","悲痛"],"惊":["吃惊","惊讶"],"想":["想念","想法"],
+  "意":["愿意"],"愿":["愿望","愿意"],"懂":["懂得","听懂"],"懒":["懒惰","懒虫"],"我":["我们","我的"],"或":["或许"],"戴":["戴帽子","戴上"],"户":["窗户","户口"],"所":["所以"],
+  "扇":["扇子","电扇"],"手":["手里","双手"],"才":["刚才","才能","天才"],"扔":["扔掉","扔球"],"扫":["扫地","打扫"],"扶":["扶手","扶着"],"找":["找到","寻找"],"把":["一把","把它"],
+  "抓":["抓住","抓手"],"护":["保护","爱护","护士"],"报":["报告","报纸","回报"],"拆":["拆开","拆掉"],"拉":["拉手","拉琴"],"拍":["拍手","拍照"],"择":["选择"],"拾":["拾起","收拾"],
+  "挂":["挂起来","挂在","挂号"],"指":["手指","指甲"],"捡":["捡起","捡东西"],"换":["交换","换衣服"],"搬":["搬家","搬运"],"摆":["摆动","摇摆","摆放"],"摇":["摇头","摇摆","动摇"],
+  "摔":["摔倒","摔跤"],"摸":["摸摸","抚摸"],"撞":["撞到","碰撞"],"擦":["擦桌子","擦干净","擦桌"],"收":["收到","收集","收获"],"救":["救命","救人","拯救"],"教":["教学"],
+  "敢":["勇敢","不敢","敢于"],"数":["数字","数学"],"料":["调料","材料","饮料"],"新":["新的","新年","新鲜"],"方":["方向","正方形","方法"],"日":["日子","生日"],"旦":["元旦","旦夕"],
+  "早":["早上","早晨"],"时":["时候","时间"],"明":["明天","明亮"],"易":["容易","交易"],"星":["星星"],"春":["春天"],"是":["是的","不是"],"晃":["晃荡","晃眼"],"晚":["晚上","夜晚"],
+  "晨":["早晨","清晨"],"景":["风景","景色","景象"],"晴":["晴天","晴朗"],"暑":["暑假","暑热"],"暖":["温暖","暖和"],"曾":["曾经"],"月":["月亮","每月"],"有":["有的","没有"],
+  "朋":["朋友","亲朋"],"服":["舒服","衣服","服务","服装"],"望":["希望","看望"],"木":["木头","树木","木马"],"末":["周末","末尾"],"本":["书本","一本"],"朵":["一朵","花朵","耳朵"],
+  "机":["飞机","手机","机会"],"村":["农村"],"条":["一条"],"来":["出来","回来","过来"],"杯":["杯子","茶杯","酒杯"],"松":["松树","松开","轻松"],"板":["黑板","木板","地板"],
+  "林":["森林","树林","竹林"],"果":["如果","水果"],"枝":["树枝","荔枝"],"柳":["柳树","杨柳"],"树":["大树","树林"],"样":["样子","一样","模样"],"根":["树根","根本","草根"],
+  "桃":["桃子","桃花"],"案":["答案","案子"],"桌":["桌子"],"桥":["大桥","石桥","天桥"],"梅":["梅花","梅子"],"梦":["做梦","梦想"],"梨":["梨子","梨花"],"梯":["楼梯","电梯"],
+  "梳":["梳头","梳子"],"棕":["棕色"],"森":["森林","森严"],"椅":["椅子"],"植":["植物","种植"],"楼":["高楼","楼上","楼房"],"榴":["石榴"],"橙":["橙色","橙子"],
+  "欢":["喜欢","欢乐","欢笑"],"正":["正在","正确","真正"],"死":["死人","死亡"],"毁":["毁坏"],"母":["母亲","父母","字母"],"每":["每天","每个"],"气":["天气","空气"],
+  "水":["水果","水里"],"永":["永远","永久"],"汁":["果汁","墨汁"],"汗":["汗水"],"江":["长江"],"池":["池塘"],"汤":["喝汤","菜汤","汤汁"],"沉":["沉着","下沉"],"沙":["沙子","沙漠"],
+  "没":["没有"],"沫":["泡沫","唾沫"],"河":["河水"],"油":["花生油","加油","油条"],"泉":["泉水","温泉"],"泡":["泡泡","气泡","泡沫"],"波":["波浪","水波"],"泥":["泥土","泥巴"],
+  "泪":["眼泪","泪水"],"洗":["洗脸","洗澡","洗衣"],"洞":["山洞","洞口"],"洪":["洪水","洪亮"],"活":["生活","活泼","活动"],"流":["流水","河流","流动"],"浅":["浅水","深浅"],
+  "浊":["浑浊"],"浪":["浪花","波浪","海浪"],"浮":["漂浮","浮起"],"淌":["流淌"],"深":["深浅","深入"],"清":["清楚","清水","清洁"],"温":["温暖","温度"],"渴":["口渴","渴望"],
+  "湖":["湖水"],"湿":["湿润","潮湿"],"源":["水源","来源"],"溪":["小溪"],"滑":["滑冰","滑滑梯","光滑"],"滚":["滚动","打滚"],"满":["满意","装满","满足"],"滩":["沙滩","海滩"],
+  "滴":["水滴","一滴"],"漂":["漂亮","漂流"],"漏":["漏水"],"漠":["沙漠","荒漠"],"潮":["潮湿","潮水"],"澡":["洗澡"],"火":["火焰","火车"],"灰":["灰色","灰尘"],"炒":["炒菜","炒饭"],
+  "烟":["烟火","烟雾"],"烤":["烤肉","烤火","烤鸭"],"热":["炎热","热闹"],"然":["然而"],"煮":["煮饭","煮熟"],"熊":["熊猫","小熊"],"爬":["爬山","爬行"],"爱":["爱心","可爱"],
+  "父":["父亲","父母"],"爷":["爷爷","老爷","少爷"],"爸":["爸爸"],"片":["一片","叶片"],"牛":["牛奶","小牛"],"物":["礼物","动物","物品"],"牵":["牵手","牵牛花"],"狐":["狐狸"],
+  "狗":["小狗"],"狮":["狮子","舞狮"],"狸":["狐狸"],"狼":["大灰狼","狼狗"],"猫":["小猫","猫咪"],"猴":["猴子","小猴"],"玉":["玉米","白玉"],"玩":["玩耍","好玩"],"现":["发现","现在"],
+  "班":["班级"],"琴":["钢琴","弹琴"],"瓜":["西瓜","南瓜","瓜子"],"瓦":["砖瓦","瓦片"],"瓶":["瓶子","花瓶"],"甜":["甜蜜"],"用":["使用","有用"],"田":["田野","田地","稻田"],
+  "甲":["指甲","龟甲"],"电":["电话","电视","电脑","闪电"],"画":["画画","图画","画家"],"界":["世界","边界","地界"],"疏":["疏远","稀疏"],"疼":["心疼","疼痛"],"病":["生病","病人","看病"],
+  "痒":["发痒","痒痒"],"痛":["痛苦","疼痛"],"瘦":["瘦小","瘦弱"],"白":["白色","白云"],"百":["一百","百万"],"的":["我的","你的"],"皮":["调皮","皮肤","橡皮","树皮"],
+  "盐":["食盐","盐水"],"盒":["盒子","饭盒"],"盘":["盘子","算盘"],"盛":["盛开","盛会"],"相":["相片","相互","相信"],"眉":["眉毛"],"看":["看见","好看"],"真":["真实"],"眼":["眼睛"],
+  "着":["看着","听着"],"睛":["眼睛"],"知":["知道"],"短":["长短"],"矮":["矮小","矮个子"],"石":["石头","石子","宝石"],"矿":["矿石","煤矿","矿物"],"砖":["砖块","砖头"],"砚":["砚台"],
+  "破":["破旧"],"硬":["坚硬","强硬"],"礼":["礼貌","礼物"],"票":["车票","门票","机票"],"福":["幸福","祝福"],"秋":["秋天"],"种":["种子","种类","一种"],"租":["租房子"],
+  "稻":["水稻","稻草"],"穷":["贫穷","穷苦","无穷"],"空":["天空","空间"],"穿":["穿衣","穿过"],"窄":["狭窄","窄小"],"窗":["窗户","门窗","窗帘"],"窝":["鸟窝","狗窝","窝心"],
+  "站":["车站","站立"],"童":["儿童","童年","童话"],"竹":["竹子","竹林"],"笑":["笑容","微笑"],"笔":["铅笔"],"笛":["笛子","竹笛"],"笨":["笨蛋","笨重"],"筑":["建筑","筑路"],
+  "答":["回答","答案"],"简":["简单","简易"],"算":["计算","算术"],"篮":["篮子","篮球"],"米":["米饭","玉米"],"类":["种类","人类","分类"],"粉":["粉色","粉红"],"粗":["粗细","粗心"],
+  "糕":["蛋糕","年糕","雪糕"],"糖":["糖果","白糖"],"紧":["紧张","赶紧","紧握"],"紫":["紫色"],"累":["累了","疲劳"],"红":["红色","红花"],"级":["年级","级别","上级"],
+  "纸":["纸张","折纸","纸巾"],"线":["线条","电线","光线"],"练":["练习","训练"],"细":["细心","粗细","仔细"],"终":["终于","终点"],"经":["经常","经过","经历"],"给":["给你","送给"],
+  "绿":["绿色","绿叶"],"网":["渔网","上网","网络"],"羊":["小羊","山羊"],"美":["美丽","美好"],"翻":["翻开","翻身","翻跟头"],"老":["老师","老人"],"考":["考试","考验"],
+  "者":["或者","作者","学者"],"而":["而且","然而"],"耳":["耳朵","耳机","木耳"],"聪":["聪明","聪慧"],"肉":["吃肉","牛肉","鸡肉","肌肉"],"肚":["肚子","肚皮"],"肩":["肩膀"],
+  "背":["背后","背包"],"胖":["胖子","肥胖"],"胳":["胳膊"],"脏":["脏兮兮","肮脏"],"脑":["电脑","头脑","大脑"],"脚":["脚步","脚下","山脚"],"脸":["脸蛋","洗脸"],"腿":["大腿","小腿"],
+  "膊":["胳膊"],"膝":["膝盖"],"臭":["臭味"],"舅":["舅舅"],"舌":["舌头"],"舒":["舒服","舒适"],"舞":["跳舞","舞蹈"],"良":["良好","善良","优良"],
+  "色":["颜色","红色","绿色","白色","彩色"],"芒":["芒果"],"花":["花朵","小花"],"苗":["树苗","幼苗"],"苦":["辛苦","痛苦"],"茎":["茎叶","根茎"],"茶":["茶水","喝茶","茶叶"],
+  "草":["草地","小草"],"荔":["荔枝"],"荡":["荡秋千","荡漾"],"药":["吃药","药品","中药"],"荷":["荷花","荷叶"],"莓":["草莓","蓝莓"],"莲":["莲花","莲子"],"菊":["菊花"],
+  "菜":["蔬菜","饭菜","青菜"],"萄":["葡萄"],"落":["落下","落叶","降落"],"葡":["葡萄"],"蒸":["蒸饭","蒸汽"],"蓝":["蓝色"],"蕉":["香蕉","芭蕉"],"薄":["厚度薄","薄片"],
+  "藏":["躲藏","捉迷藏"],"虎":["老虎"],"虚":["虚心","谦虚","空虚"],"虹":["彩虹","霓虹"],"虽":["虽然"],"虾":["大虾","龙虾"],"蚁":["蚂蚁"],"蚂":["蚂蚁"],"蛇":["毒蛇"],
+  "蛋":["鸡蛋","蛋糕","脸蛋"],"蛙":["青蛙","蛙泳"],"蛛":["蜘蛛"],"蜂":["蜜蜂","蜂蜜"],"蜓":["蜻蜓"],"蜘":["蜘蛛"],"蜜":["甜蜜","蜜蜂","蜂蜜"],"蜻":["蜻蜓"],"蝴":["蝴蝶"],
+  "蝶":["蝴蝶"],"融":["融化","融合"],"蟹":["螃蟹"],"血":["鲜血","流血"],"街":["街道","大街"],"补":["修补","补充"],"表":["钟表","手表","表示"],"袋":["口袋","袋子"],"袜":["袜子"],
+  "装":["装满","服装","假装"],"裙":["裙子","连衣裙"],"裤":["裤子","长裤"],"西":["西方","西风"],"见":["看见","见面","听见"],"视":["电视","视力"],"角":["三角形","角落","角度"],
+  "计":["计划","设计","计算"],"认":["认识","认真"],"让":["让开","让座"],"议":["会议","讨论","建议"],"记":["记住","笔记"],"讲":["讲话","演讲","讲故事"],"论":["讨论","言论","议论"],
+  "证":["保证","证明"],"识":["认识","识字"],"诉":["告诉","起诉"],"试":["考试","试卷"],"诚":["诚实","诚信","真诚"],"话":["电话"],"说":["说话","听说"],"请":["请坐","请问","邀请"],
+  "读":["读书","朗读","读者"],"课":["上课","课本","课堂"],"调":["调皮","调查","空调"],"谈":["谈话","交谈","谈论"],"谢":["谢谢","感谢"],"谦":["谦虚","谦让"],
+  "豆":["豆子","红豆","绿豆","黄豆"],"象":["大象"],"貌":["礼貌","外貌","面貌"],"贝":["贝壳","宝贝"],"贴":["贴上","贴纸","贴合"],"贵":["贵重","富贵","宝贵"],"走":["走路","走了"],
+  "赶":["赶快","赶来"],"起":["起来","起床","升起"],"跑":["跑步"],"路":["路上","走路","马路"],"跳":["跳舞","跳动"],"踢":["踢球"],"踩":["踩踏","踩水"],"蹲":["蹲下"],
+  "躲":["躲藏","躲雨"],"躺":["躺下","躺着"],"车":["汽车","火车"],"转":["转身","转动"],"软":["柔软","软弱"],"轻":["轻的","轻重","轻松"],"过":["过去","经过","过来"],
+  "运":["运动","搬运","运输"],"近":["附近","远近"],"还":["还书","还是"],"进":["进去","进入","进来","进步"],"远":["远方","遥远"],"追":["追赶","追求","追逐"],"送":["送给"],
+  "逃":["逃跑","逃走"],"选":["选择","挑选"],"道":["知道","道路","味道"],"邮":["邮件","邮寄","邮箱"],"邻":["邻居","邻里"],"都":["都是","都市"],"酒":["白酒","啤酒"],
+  "酱":["酱油","果酱"],"酸":["酸味","辛酸"],"醋":["醋溜","米醋"],"里":["里面","这里","那里"],"重":["重要","轻重","重量"],"野":["野外","田野","野花"],"金":["金色","黄金"],
+  "钟":["钟表","闹钟"],"钢":["钢铁","钢琴"],"钱":["金钱","零钱","花钱"],"铁":["钢铁","铁路"],"银":["银色"],"错":["错误","错了"],"镇":["小镇","城镇","乡镇"],"镜":["镜子","眼镜"],
+  "长":["长短"],"闪":["闪电","闪亮"],"问":["问好","问题"],"闲":["空闲"],"闻":["新闻","听闻名"],"阳":["太阳","阳光"],"阴":["阴天","阴暗","光阴"],"陈":["陈旧"],"降":["下降","降落"],
+  "院":["院子","医院","学院"],"除":["除法","去除"],"险":["危险","风险"],"难":["难过","困难"],"雁":["大雁","雁群"],"雨":["下雨","大雨"],"雪":["下雪","雪花","白雪"],
+  "零":["零食","零花钱"],"雷":["雷声"],"雾":["雾气","大雾"],"震":["地震"],"霜":["冰霜","霜降"],"霞":["晚霞","朝霞"],"露":["露水","露珠"],"静":["安静","平静"],"面":["面条","面包"],
+  "鞋":["鞋子","皮鞋","运动鞋"],"音":["声音","音乐","音响"],"顶":["山顶","头顶","顶峰"],"颗":["一颗"],"题":["题目","问题"],"颜":["颜色","颜面"],"额":["额头"],"风":["风儿","大风"],
+  "飘":["飘扬","飘落"],"飞":["飞翔","飞鸟"],"饮":["饮料","饮水"],"饼":["饼干","大饼"],"饿":["饿了","饥饿"],"馆":["饭馆","图书馆","博物馆"],"香":["香味","花香"],"马":["马儿","小马"],
+  "骄":["骄傲","骄阳"],"骨":["骨头","骨折"],"高":["高兴","高大"],"鱼":["鱼儿","小鱼"],"鲜":["鲜花","新鲜"],"鸟":["小鸟"],"鸽":["鸽子","白鸽"],"鹅":["天鹅","白鹅"],
+  "鹰":["老鹰","鹰眼"],"麦":["小麦","大麦"],"黄":["黄色"],"黑":["黑色","黑夜"],"鼓":["打鼓","鼓励","鼓掌"],"鼻":["鼻子","鼻孔"],"齿":["牙齿"],"龙":["大龙"],"龟":["乌龟","海龟"]
+};
+
+// ── 配置 ──
+const BOOK_CFG={
+  dsKey:'sk-a03b25cee89843ce92a73cce20098c74',
+  dsModel:'deepseek-chat',
+  dsBase:'https://api.deepseek.com',
+  doubaoKey:'ark-6bfb0e74-6ab3-442c-acda-d8dddb01277b-11908',
+  doubaoModel:'doubao-seedream-5-0-260128',
+  imgKey:'sk-aqdggkexnfpivyoksclpzducpwwnntfzishwswcldxkrbpbm',
+  imgModel:'Tongyi-MAI/Z-Image-Turbo',
+  imgSize:'768x576',
+  imgStyle:'watercolor',
+  pinyinMode:'all',
+  fontSize:28,
+};
+const B_IMG_STYLES={
+  watercolor:{en:'soft watercolor texture with gentle pencil outlines, dreamy bokeh background, gentle pastel palette: warm peach, soft sage green, sky blue, buttercream yellow, hand-drawn feel, cozy atmosphere',zh:'柔和水彩质感搭配软铅笔线条，梦幻虚化背景，柔和粉彩色调：蜜桃粉、薄荷绿、天空蓝、奶油黄，手绘质感，温馨氛围'},
+  ghibli:{en:'Studio Ghibli inspired, lush natural scenery with detailed grass and trees, soft golden sunlight filtering through leaves, painterly background with vibrant greens and blues, gentle and nostalgic atmosphere',zh:'吉卜力风格，茂密自然风景、细腻草地树木，温暖金色阳光透过树叶，手绘背景充满生机绿与蓝，温柔怀旧氛围'},
+  crayon:{en:'crayon and colored pencil hand-drawn style, visible crayon texture and strokes, childlike doodle charm, slightly rough paper texture, warm and playful feel',zh:'彩铅与蜡笔手绘风格，可见蜡笔纹理和笔触，童趣涂鸦感，微微粗糙的纸张质感，温暖俏皮'},
+  flat:{en:'flat vector illustration style, bold clean shapes, bright cheerful colors, simple modern design, minimal details, graphic picture book look',zh:'扁平矢量插画风格，大胆简洁色块，明亮欢快色彩，简约现代设计，图形化绘本外观'},
+  chinese:{en:'traditional Chinese ink wash painting style, soft brush strokes and ink textures, elegant muted colors with touches of red and gold, misty mountains and flowing water elements, poetic scroll painting feel',zh:'中国传统水墨画风格，柔和笔触与墨色纹理，淡雅色调点缀朱红与金，云雾山峦流水意境，诗意画卷感'},
+  nordic:{en:'Scandinavian minimalist illustration, clean lines, muted earthy tones, simple geometric shapes, plenty of white space, calm and serene mood',zh:'北欧极简插画风格，干净线条，柔和大地色调，简约几何形状，大量留白，安静平和'},
+  oil:{en:'rich oil painting texture, thick visible brushstrokes, vibrant saturated colors, impressionist light effects, artistic gallery quality',zh:'浓郁油画质感，厚涂可见笔触，鲜艳饱和色彩，印象派光影效果，艺术画廊品质'},
+  collage:{en:'fabric and paper collage style, mixed textures of cloth and paper, handcrafted feel, layered cut-out shapes, warm tactile nursery art',zh:'布艺拼贴与纸艺拼贴风格，布料与纸张混合纹理，手工制作感，层叠剪贴形状，温暖触感儿童房艺术'}
+};
+
+// ── 状态 ──
+let BOOKS=[],IMG_CACHE={},zhLearned=new Set(),enLearned=new Set();
+let curBook=null,curPg=0,bView='library',bIsReading=false,bReadIv=null;
+let _selTheme='',_genLang='zh',_useCustomTheme=false;
+let B_RT=0;
+
+// ── 主题 ──
+const B_THEME_ZH=[
+  {label:'🌿 自然探索',items:['森林冒险','海底世界','太空旅行','沙漠探险','雪山奇遇','热带雨林','北极冰原']},
+  {label:'🔬 科普知识',items:['恐龙时代','宇宙科学','动物世界','植物生长','天气变化','身体奥秘','昆虫世界']},
+  {label:'🏙️ 生活成长',items:['上学第一天','快乐农场','城市探险','美食之旅','医院不可怕','超市购物','旅行日记']},
+  {label:'💝 情感品格',items:['勇敢的心','分享快乐','诚实守信','善良宝贝','情绪管理','好朋友']},
+  {label:'🪄 幻想创意',items:['魔法学院','童话王国','机器人朋友','时间旅行','梦境冒险','音乐魔法']},
+  {label:'🎊 节日文化',items:['春节故事','中秋赏月','端午节的龙','圣诞奇迹','万圣节','生日快乐']},
+];
+const B_THEME_EN=[
+  {label:'🌿 Nature',items:['Forest Adventure','Ocean World','Space Travel','Desert Quest','Snowy Mountain','Rainforest']},
+  {label:'🔬 Science',items:['Dinosaur Age','Astronomy','Animal World','Plants','Weather','Human Body']},
+  {label:'🏙️ Life Skills',items:['First Day of School','Happy Farm','City Life','Food Journey','Brave at Hospital','Market Day']},
+  {label:'💝 Character',items:['Being Brave','Sharing is Caring','Honesty','Kindness','Feelings','Friendship']},
+  {label:'🪄 Fantasy',items:['Magic School','Fairy Tale','Robot Friend','Time Travel','Dream Land','Musical Magic']},
+  {label:'🎊 Holidays',items:['Spring Festival','Christmas Magic','Halloween Fun','Birthday Party']},
+];
+const B_THEME_EMOJI={'森林冒险':'🌳','海底世界':'🌊','太空旅行':'🚀','恐龙时代':'🦕','魔法学院':'🪄','农场':'🐄','沙漠':'🏜️','雪山':'🏔️','春节':'🏮','中秋':'🥮','圣诞':'🎄','Forest':'🌳','Ocean':'🌊','Space':'🚀','Dinosaur':'🦕','Magic':'🪄'};
+const B_THEME_COLOR={'森林冒险':'#388E3C','海底世界':'#0288D1','太空旅行':'#311B92','恐龙时代':'#4E342E','魔法学院':'#7B1FA2'};
+function bThemeEmoji(t){for(var k in B_THEME_EMOJI)if(t&&t.includes(k))return B_THEME_EMOJI[k];return'📖';}
+function bThemeColor(t){for(var k in B_THEME_COLOR)if(t&&t.includes(k))return B_THEME_COLOR[k];return'#388E3C';}
+
+// ── 预设绘本 ──
+const B_PRESET=[
+  {id:1,title:"小兔子的森林冒险",theme:"森林冒险",lang:"zh",pages:[
+    {t:"从前，有一座绿色的大森林。",cap:"绿色大森林"},
+    {t:"森林里住着一只小兔子，小兔子每天都很快乐。",cap:"快乐的小兔子"},
+    {t:"有一天，小兔子在树下发现了一朵小红花。",cap:"小红花和树"},
+    {t:"小兔子开心地把花带回家，送给妈妈。",cap:"送花给妈妈"}
+  ]},
+  {id:2,title:"The Little Rabbit",theme:"Forest Adventure",lang:"en",pages:[
+    {t:"Once upon a time, there was a big green forest.",cap:"big green forest"},
+    {t:"In the forest lived a little rabbit who was very happy every day.",cap:"happy little rabbit"},
+    {t:"One day, the rabbit found a pretty red flower under a big tree.",cap:"red flower under tree"},
+    {t:"The rabbit took the flower home and gave it to Mommy.",cap:"rabbit gives flower"}
+  ]},
+];
+
+// ── 数据初始化 ──
+function bInitData(){
+  try{BOOKS=JSON.parse(localStorage.getItem('lx_books')||'null');}catch(e){}
+  if(!BOOKS||!BOOKS.length)BOOKS=JSON.parse(JSON.stringify(B_PRESET));
+  try{IMG_CACHE=JSON.parse(localStorage.getItem('lx_img_cache')||'{}');}catch(e){IMG_CACHE={};}
+  try{zhLearned=new Set(JSON.parse(localStorage.getItem('lx_zh_learned')||'[]'));}catch(e){zhLearned=new Set();}
+  try{enLearned=new Set(JSON.parse(localStorage.getItem('lx_en_learned')||'[]'));}catch(e){enLearned=new Set();}
+}
+function bSaveBooks(){localStorage.setItem('lx_books',JSON.stringify(BOOKS));}
+function bCacheImg(ck,url){IMG_CACHE[ck]=url;localStorage.setItem('lx_img_cache',JSON.stringify(IMG_CACHE));}
+function bUncacheImg(ck){delete IMG_CACHE[ck];localStorage.setItem('lx_img_cache',JSON.stringify(IMG_CACHE));}
+function bSaveProgress(){localStorage.setItem('lx_zh_learned',JSON.stringify([...zhLearned]));localStorage.setItem('lx_en_learned',JSON.stringify([...enLearned]));}
+
+// ── 图片生成 ──
+function bStyleDesc(){var s=B_IMG_STYLES[BOOK_CFG.imgStyle||'watercolor'];return s||B_IMG_STYLES.watercolor;}
+function bImgPrompt(theme,text,lang,idx){
+  var sd=bStyleDesc(),style='Beautiful childrens picture book illustration, storybook art, '+sd.en+', adorable cute animal characters with big expressive eyes and round faces, warm golden sunlight, lush natural environment with colorful flowers, professional high-quality illustration for ages 3-6, NO text, NO letters, NO numbers, NO speech bubbles';
+  var scene=lang==='zh'?text:(text.length>60?text.slice(0,60):text);
+  return style+'. Scene: '+scene+'. Theme: '+theme+'.';
+}
+function bImgPromptZh(theme,text,idx,lang){
+  var sd=bStyleDesc(),noText='画面中不要出现任何文字、字母、数字或对话框。';
+  if(lang==='en')return 'Beautiful childrens picture book illustration, '+sd.en+', adorable cute animal characters with big expressive eyes and round faces, warm golden sunlight, lush natural environment with colorful flowers, professional high-quality illustration for ages 3-6, NO text, NO letters, NO numbers, NO speech bubbles. Scene: '+text+'. Theme: '+theme+'.';
+  return '温馨儿童绘本插画，'+sd.zh+'，圆润可爱的卡通小动物角色，大眼睛、圆脸、萌系造型，温暖金色阳光透过树叶，丰富的自然环境、彩色小花与柔软草地，高品质专业级儿童插画，适合3-6岁绘本，'+noText+text+'。主题：'+theme+'。';
+}
+function bPollUrl(prompt,bookId,pageIdx){
+  var seed=(bookId*100+pageIdx)%99999;
+  return 'https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)+'?width=768&height=576&seed='+seed+'&nologo=true&model=flux';
+}
+async function bGenImgDoubao(promptZh,bookId,pageIdx){
+  var key=BOOK_CFG.doubaoKey||'';if(!key)return null;
+  try{
+    var r=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({model:BOOK_CFG.doubaoModel||'doubao-seedream-5-0-260128',prompt:promptZh,size:BOOK_CFG.imgSize||'768x576',watermark:false,response_format:'url'})});
+    if(!r.ok)throw new Error('Doubao '+r.status);
+    var d=await r.json();if(d.data&&d.data[0]&&d.data[0].url)return d.data[0].url;
+  }catch(e){console.warn('豆包图片失败:',e.message);}return null;
+}
+async function bGenImgSF(promptZh,bookId,pageIdx){
+  var key=BOOK_CFG.imgKey||'';if(!key)return null;
+  try{
+    var r=await fetch('https://api.siliconflow.cn/v1/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({model:BOOK_CFG.imgModel||'Tongyi-MAI/Z-Image-Turbo',prompt:promptZh,image_size:BOOK_CFG.imgSize||'768x576',num_images:1})});
+    if(!r.ok)throw new Error('SF '+r.status);
+    var d=await r.json();if(d.images&&d.images[0]){
+      if(d.images[0].url)return d.images[0].url;
+      if(d.images[0].b64_json)return'data:image/png;base64,'+d.images[0].b64_json;
+    }
+  }catch(e){console.warn('SF图片失败:',e.message);}return null;
+}
+async function bGenerateImg(prompt,promptZh,bookId,pageIdx){
+  var ck=bookId+'_'+pageIdx;if(IMG_CACHE[ck])return IMG_CACHE[ck];
+  var pollUrl=bPollUrl(prompt,bookId,pageIdx),apiUrl=null;
+  try{
+    apiUrl=await Promise.race([
+      new Promise(function(resolve){var pending=[bGenImgDoubao(promptZh,bookId,pageIdx),bGenImgSF(promptZh,bookId,pageIdx)];pending.forEach(function(p){p.then(function(v){if(!apiUrl&&v){apiUrl=v;resolve(v);}}).catch(function(){});});setTimeout(function(){if(!apiUrl)resolve(null);},10000);})
+    ]);
+  }catch(e){}
+  if(apiUrl){try{bCacheImg(ck,apiUrl);}catch(e){IMG_CACHE[ck]=apiUrl;}return apiUrl;}
+  bCacheImg(ck,pollUrl);return pollUrl;
+}
+
+// ── 文字渲染 ──
+function bRenderZH(text){
+  var h='',pm=BOOK_CFG.pinyinMode||'all',fs=BOOK_CFG.fontSize||28;
+  for(var i=0;i<text.length;i++){
+    var c=text[i];
+    if(/[\u4e00-\u9fff]/.test(c)){
+      var entry=B_ZH_DICT[c],rawPy=entry?entry.py:'',py=bPyDisplay(rawPy);
+      var pyStyle=pm==='none'?'visibility:hidden':pm==='hover'?'opacity:0;transition:opacity .2s':'';
+      h+='<span class="b-char-block" data-c="'+c+'" data-py="'+rawPy+'" onclick="bTapZH(\''+c+'\',event)"><span class="b-py" style="font-size:10px;'+pyStyle+'">'+py+'</span><span class="b-hz" style="font-size:'+fs+'px">'+c+'</span></span>';
+    }else if(/[，。！？；：、""''（）《》【】]/.test(c)){
+      h+='<span class="b-epunct">'+c+'</span>';
+    }else if(c!==' '){
+      h+='<span class="b-epunct">'+c+'</span>';
+    }
+  }
+  return h;
+}
+function bRenderEN(text){
+  var fs=(BOOK_CFG.fontSize||28)*0.75;
+  return text.replace(/([.,!?;:])/g,' $1 ').split(/\s+/).filter(Boolean).map(function(tok){
+    if(/^[.,!?;:]+$/.test(tok))return'<span class="b-epunct-en">'+tok+'</span> ';
+    var k=tok.toLowerCase().replace(/[^a-z']/g,'');
+    if(!k)return'<span class="b-epunct-en">'+tok+'</span> ';
+    return'<span class="b-eword" data-w="'+k+'" data-disp="'+tok.replace(/"/g,'&quot;')+'" style="font-size:'+fs+'px" onclick="bTapEN(this.dataset.w,this.dataset.disp,event)">'+tok+'</span> ';
+  }).join('');
+}
+
+// ── 词语弹窗 ──
+function bPosPopup(pop,ev){
+  pop.style.display='block';var x=0,y=0;
+  if(ev){x=ev.clientX||(ev.touches&&ev.touches[0]?ev.touches[0].clientX:window.innerWidth/2);y=ev.clientY||(ev.touches&&ev.touches[0]?ev.touches[0].clientY:window.innerHeight/2);}
+  else{x=window.innerWidth/2;y=window.innerHeight/2;}
+  var pw=Math.min(280,window.innerWidth-20);pop.style.minWidth=pw+'px';
+  var px=Math.max(10,Math.min(x-pw/2,window.innerWidth-pw-10));
+  var py=Math.max(10,Math.min(y-180,window.innerHeight-230));
+  pop.style.left=px+'px';pop.style.top=py+'px';
+}
+function bSpeakWord(text,lang){
+  try{stopSpeak();}catch(e){}
+  try{speak(text,lang);}catch(e){}
+}
+function bTapZH(c,ev){
+  ev&&ev.stopPropagation();bSpeakWord(c,'zh-CN');zhLearned.add(c);bSaveProgress();
+  var entry=B_ZH_DICT[c]||{},py=bPyDisplay(entry.py||''),pop=$('bWPopup');
+  $('bWpChar').textContent=c;$('bWpChar').className='b-bigchar zh';
+  $('bWpPy').textContent=py;$('bWpPy').className='b-pylabel zh';
+  $('bWpMean').textContent=entry.en||'';$('bWpMean').style.display=entry.en?'block':'none';
+  $('bWpTrans').textContent=entry.zh||'';$('bWpTrans').style.display=entry.zh?'block':'none';
+  var words=B_COMPOUNDS[c]||[],groupsHTML='';
+  if(words.length>0){groupsHTML=words.map(function(w){return'<span onclick="bSpeakWord(\''+w+'\',\'zh-CN\');event.stopPropagation()">'+w+'</span>';}).join('');}
+  $('bWpGroups').innerHTML=groupsHTML;
+  var btnHTML='<button class="b-wp-btn zh-play" onclick="bSpeakWord(\''+c+'\',\'zh-CN\');event.stopPropagation()">🔊 读字</button>';
+  if(words.length>0)btnHTML+='<button class="b-wp-btn zh-play" onclick="bSpeakWord(\''+words[0]+'\',\'zh-CN\');event.stopPropagation()">📖 读词语</button>';
+  $('bWpActions').innerHTML=btnHTML;bPosPopup(pop,ev);
+}
+function bTapEN(k,display,ev){
+  ev&&ev.stopPropagation();var entry=B_EN_DICT[k]||{},zhTrans=entry.zh_def||'',zhClean=zhTrans.replace(/[（(].*/,'').replace(/,.*/,'').trim();
+  bSpeakWord(k,'en-US');enLearned.add(k);bSaveProgress();
+  var kSafe=k.replace(/\\/g,'\\\\').replace(/'/g,"\\'"),zhSafe=(zhClean||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"),pop=$('bWPopup');
+  $('bWpChar').textContent=display||k;$('bWpChar').className='b-bigchar en';
+  $('bWpPy').textContent=entry.ipa?'/'+entry.ipa+'/':'/'+k+'/';$('bWpPy').className='b-pylabel en';
+  $('bWpMean').textContent=entry.en_def||'';$('bWpMean').style.display=entry.en_def?'block':'none';
+  $('bWpTrans').textContent=zhTrans?'中文：'+zhTrans:'';$('bWpTrans').style.display=zhTrans?'block':'none';
+  $('bWpGroups').innerHTML='';
+  $('bWpActions').innerHTML='<button class="b-wp-btn play" onclick="event.stopPropagation();bSpeakWord(\''+kSafe+'\',\'en-US\')">🔊 发音</button>'+(zhTrans?'<button class="b-wp-btn zh-play" onclick="event.stopPropagation();bSpeakWord(\''+zhSafe+'\',\'zh-CN\')">🔊 中文</button>':'');
+  bPosPopup(pop,ev);
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.b-char-block')&&!e.target.closest('.b-eword')&&!e.target.closest('#bWPopup'))$('bWPopup').style.display='none';});
+
+// ── 阅读器 ──
+async function bRenderPg(){
+  if(!curBook)return;B_RT++;var token=B_RT,pg=curPg,book=curBook,p=book.pages[pg],tot=book.pages.length,isEn=book.lang==='en';
+  // 标题
+  $('bRdrTitle').textContent=book.title;$('bRdrTitle').className='b-rdr-title'+(isEn?' en':'');
+  $('bPgInd').textContent=(pg+1)+'/'+tot;
+  $('bPrev').disabled=pg===0;$('bNext').disabled=pg===tot-1;
+  $('bBtnRead').className='b-btn-read '+(isEn?'en':'zh');$('bReadLabel').textContent=isEn?'Read':'朗读';
+  // 记录已学
+  if(isEn){p.t.split(/\s+/).forEach(function(w){var k=w.toLowerCase().replace(/[^a-z]/g,'');if(k)enLearned.add(k);});}
+  else{for(var c of p.t)if(/[\u4e00-\u9fff]/.test(c))zhLearned.add(c);}
+  // 插图
+  var ck=book.id+'_'+pg,emoji=bThemeEmoji(book.theme),bgColor=bThemeColor(book.theme),illusId='bIllus_'+token,illusHTML='';
+  if(IMG_CACHE[ck]){illusHTML='<img src="'+IMG_CACHE[ck]+'" alt="'+(p.cap||'')+'" onerror="this.style.display=\'none\'"><button class="b-regen-btn" onclick="bRegenImg()">🔄 换图</button>';}
+  else{illusHTML='<div class="b-illus-ph" style="background:'+bgColor+'20"><span style="font-size:72px">'+emoji+'</span></div><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.6);gap:8px"><div class="b-illus-spinner"></div><div style="font-size:12px;color:var(--ink-soft)">🎨 AI生成插图...</div></div><button class="b-regen-btn" onclick="bRegenImg()">🔄</button>';}
+  $('bPageIllus').innerHTML='<div id="'+illusId+'" style="width:100%;height:100%;position:relative">'+illusHTML+'</div>';
+  // 文字
+  var storyHTML=isEn?'<div class="b-story-en">'+bRenderEN(p.t)+'</div>':'<div class="b-story-zh">'+bRenderZH(p.t)+'</div>';
+  var dotsHTML='<div class="b-dots">'+book.pages.map(function(_,i){var dotLang=isEn?'en':'zh';return'<div class="b-dot'+(i===pg?' on '+dotLang:'')+'" onclick="curPg='+i+';bRenderPg()"></div>';}).join('')+'</div>';
+  $('bPageRight').innerHTML=storyHTML+'<div class="b-page-cap">'+(isEn?'p.':'第')+(pg+1)+' · '+(p.cap||'')+'</div>'+dotsHTML;
+  // 悬停拼音
+  if(BOOK_CFG.pinyinMode==='hover'){document.querySelectorAll('.b-char-block').forEach(function(el){el.addEventListener('mouseenter',function(){var py=el.querySelector('.b-py');if(py)py.style.opacity='1';});el.addEventListener('mouseleave',function(){var py=el.querySelector('.b-py');if(py)py.style.opacity='0';});});}
+  // 异步加载图片
+  if(!IMG_CACHE[ck]){(function(){var imgPrompt=bImgPrompt(book.theme,p.t,book.lang,pg),imgPromptZh=bImgPromptZh(book.theme,p.t,pg,book.lang),grad='linear-gradient(135deg,'+bgColor+'33 0%,'+bgColor+'11 100%)',el=$('bIllus_'+token);if(!el)return;
+    el.innerHTML='<div style="position:absolute;inset:0;background:'+grad+';display:flex;align-items:center;justify-content:center"><span style="font-size:56px;opacity:.4">'+emoji+'</span></div><button class="b-regen-btn" onclick="bRegenImg()">🔄</button>';
+    bGenerateImg(imgPrompt,imgPromptZh,book.id,pg).then(function(url){if(curBook&&curBook.id===book.id&&curPg===pg){var c=$('bIllus_'+token);if(c)c.innerHTML='<img src="'+url+'" alt="'+(book.pages[pg].cap||'')+'" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><button class="b-regen-btn" onclick="bRegenImg()">🔄</button>';}}).catch(function(){});
+  })();}
+}
+async function bRegenImg(){if(!curBook)return;var p=curBook.pages[curPg],ck=curBook.id+'_'+curPg;bUncacheImg(ck);var el=$('bIllus_'+B_RT);if(el)el.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7);gap:8px;flex-direction:column"><div class="b-illus-spinner"></div><div style="font-size:12px;color:var(--ink-soft)">🎨 重新生成...</div></div><button class="b-regen-btn" onclick="bRegenImg()">🔄</button>';
+  try{var url=await bGenerateImg(bImgPrompt(curBook.theme,p.t,curBook.lang,curPg),bImgPromptZh(curBook.theme,p.t,curPg,curBook.lang),curBook.id,curPg);var el2=$('bIllus_'+B_RT);if(el2&&url)el2.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"><button class="b-regen-btn" onclick="bRegenImg()">🔄 换图</button>';}catch(e){toast('图片生成失败: '+e.message);}}
+function bOpenBook(b){curBook=b;curPg=0;bView='reader';try{stopSpeak();}catch(e){}pgBook();bRenderPg();}
+function bOpenById(id){var b=BOOKS.find(function(x){return x.id===id});if(b)bOpenBook(b);}
+function bChangePg(d){if(!curBook)return;var np=curPg+d;if(np<0||np>=curBook.pages.length)return;curPg=np;try{stopSpeak();}catch(e){}bRenderPg();}
+function bReadAll(){if(!curBook)return;if(bIsReading){try{stopSpeak();}catch(e){}bIsReading=false;$('bReadLabel').textContent=curBook.lang==='en'?'Read':'朗读';return;}var p=curBook.pages[curPg],isEn=curBook.lang==='en';$('bReadLabel').textContent='⏹';bIsReading=true;try{speak(p.t,isEn?'en-US':'zh-CN');}catch(e){bIsReading=false;$('bReadLabel').textContent=isEn?'Read':'朗读';}}
+
+// ── 故事生成 ──
+function bSetGenLang(lang){
+  _genLang=lang;_selTheme='';
+  $('bGltZh').className='b-ltab zh'+(lang==='zh'?' on':'');
+  $('bGltEn').className='b-ltab en'+(lang==='en'?' on':'');
+  $('bBtnGen').className='b-btn-gen '+(lang==='zh'?'zh':'en');
+  $('bBtnGen').textContent=lang==='zh'?'🎨 生成故事':'🎨 Generate Story';
+  $('bGenHero').value=lang==='zh'?'小桃桃':'Lily';
+  bRenderThemes();
+}
+function bRenderThemes(){
+  var groups=_genLang==='zh'?B_THEME_ZH:B_THEME_EN,container=$('bThemeGroups');container.innerHTML='';
+  groups.forEach(function(g){
+    var div=document.createElement('div');div.innerHTML='<div style="font-size:10px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">'+g.label+'</div>';
+    var row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:5px';
+    g.items.forEach(function(item){
+      var btn=document.createElement('button');btn.className='b-theme-chip'+(_selTheme===item?' sel '+_genLang:'');btn.textContent=item;btn.dataset.theme=item;
+      btn.onclick=function(){_selTheme=item;document.querySelectorAll('.b-theme-chip').forEach(function(b){b.className='b-theme-chip';});btn.className='b-theme-chip sel '+_genLang;if(_useCustomTheme)bToggleCustom();};
+      row.appendChild(btn);
+    });div.appendChild(row);container.appendChild(div);
+  });
+}
+function bToggleCustom(){_useCustomTheme=!_useCustomTheme;$('bCustomBox').classList.toggle('on',_useCustomTheme);if(_useCustomTheme){_selTheme='';document.querySelectorAll('.b-theme-chip').forEach(function(b){b.className='b-theme-chip';});$('bCustomText').focus();}}
+async function bGenStory(){
+  var isEn=_genLang==='en',hero=$('bGenHero').value.trim()||(isEn?'Lily':'小桃桃'),np=parseInt($('bGenPages').value)||6;
+  var extra=$('bGenExtra').value.trim(),customContent=$('bCustomText').value.trim();
+  var themeName=_useCustomTheme&&customContent?(isEn?'Custom Story':'自定义故事'):_selTheme||(isEn?'Forest Adventure':'森林冒险');
+  var LD_STEPS=isEn?[{icon:'📝',label:'Sending...'},{icon:'✍️',label:'AI writing...'},{icon:'🎨',label:'Generating illustrations...'},{icon:'✅',label:'Done!'}]:[{icon:'📝',label:'发送请求中...'},{icon:'✍️',label:'AI创作中...'},{icon:'🎨',label:'生成插图中...'},{icon:'✅',label:'完成！'}];
+  var ldEl=$('bLdWrap');ldEl.style.display='flex';ldEl.scrollIntoView({behavior:'smooth'});$('bBtnGen').disabled=true;
+  var setStep=function(i){
+    $('bLdSteps').innerHTML=LD_STEPS.map(function(s,si){return'<div class="b-ld-step'+(si===i?' active':si<i?' done':'')+'"><span>'+s.icon+'</span><span>'+(si<i?'✅ ':'')+s.label+'</span></div>';}).join('');
+    $('bLdFill').style.width=((i+1)/LD_STEPS.length*100)+'%';$('bLdTxt').textContent=LD_STEPS[i].label;
+  };setStep(0);
+  var prompt;if(_useCustomTheme&&customContent){
+    prompt=isEn?'Create a children\'s picture book (ages 3-6) based on this idea: "'+customContent+'". Hero name: "'+hero+'". Exactly '+np+' pages, each page 1-2 simple English sentences.'+(extra?' Additional requirements: '+extra:'')+' Output ONLY a JSON array with no extra text: [{"t":"page text","cap":"caption"},...]':'基于以下故事内容创作一个儿童绘本（3-6岁）：「'+customContent+'」主人公：「'+hero+'」。恰好'+np+'页，每页1-2句简单中文，适合3-6岁。'+(extra?'额外要求：'+extra:'')+'只输出JSON数组，不要任何其他内容：[{"t":"页面文字","cap":"插图描述"},...]';
+  }else{
+    prompt=isEn?'Write a children\'s picture book. Theme: "'+themeName+'". Hero: "'+hero+'". Exactly '+np+' pages, each 1-2 simple sentences, ages 3-6.'+(extra?' Notes: '+extra:'')+' Return ONLY JSON array: [{"t":"text","cap":"caption"},...]':'写一个儿童绘本故事。主题：「'+themeName+'」，主人公：「'+hero+'」，共'+np+'页，每页1-2句简单中文，3-6岁适读。'+(extra?'要求：'+extra:'')+'只输出JSON数组，不要任何其他内容：[{"t":"文字","cap":"插图描述"},...]';
+  }
+  try{setStep(1);
+    var dsBase=(BOOK_CFG.dsBase||'https://api.deepseek.com').replace(/\/+$/,'');
+    var resp=await fetch(dsBase+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(BOOK_CFG.dsKey||'')},body:JSON.stringify({model:BOOK_CFG.dsModel||'deepseek-chat',max_tokens:4096,messages:[{role:'user',content:prompt}]})});
+    if(!resp.ok)throw new Error('故事生成失败 '+resp.status);
+    var data=await resp.json();if(data.error)throw new Error(data.error.message||data.error);
+    var raw=((data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'').replace(/```json|```/g,'').trim();
+    var match=raw.match(/\[[\s\S]*\]/);if(!match)throw new Error('返回格式不正确');
+    var pages=JSON.parse(match[0]);if(!Array.isArray(pages)||!pages.length)throw new Error('故事内容为空');
+    var bookTitle=_useCustomTheme&&customContent?(isEn?hero+"'s Story":hero+'的故事'):(isEn?hero+"'s "+themeName+' Adventure':hero+'的'+themeName);
+    var newBook={id:Date.now(),title:bookTitle,theme:themeName,lang:_genLang,badge:'new',pages:pages};
+    setStep(2);BOOKS.unshift(newBook);bSaveBooks();ldEl.style.display='none';$('bBtnGen').disabled=false;bOpenBook(newBook);
+  }catch(e){ldEl.style.display='none';$('bBtnGen').disabled=false;toast('生成失败: '+e.message);}
+}
+function bDeleteBook(id){BOOKS=BOOKS.filter(function(b){return b.id!==id});bSaveBooks();pgBook();}
+
+// ── 绘本馆视图 ──
+var bLibFilter='all';
+function bSetFilter(f){bLibFilter=f;document.querySelectorAll('#bLibFilter button').forEach(function(b,i){var vals=['all','zh','en'];b.className=(vals[i]===f?'on '+vals[i]:'');});pgBook();}
+
+// ── 主入口 ──
+function pgBook(){
+  if(!BOOKS.length)bInitData();
+  // 根据子视图渲染
+  if(bView==='reader'&&curBook){bRenderReader();return;}
+  if(bView==='generator'){bRenderGen();return;}
+  bView='library';bRenderLib();
+}
+function bRenderLib(){
+  var books=BOOKS.filter(function(b){return bLibFilter==='all'||b.lang===bLibFilter;}),page=$('page');
+  var html='<div class="b-lib-header"><h2>📚 我的绘本馆</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="b-filter-row" id="bLibFilter"><button class="on all" onclick="bSetFilter(\'all\')">全部</button><button onclick="bSetFilter(\'zh\')">中文</button><button onclick="bSetFilter(\'en\')">English</button></div><button class="b-btn-gen zh" onclick="bView=\'generator\';pgBook()">✨ 创作新故事</button></div></div>';
+  if(!books.length){html+='<p style="text-align:center;color:var(--ink-soft);padding:40px">还没有绘本，快去创作吧！</p>';page.innerHTML=html;return;}
+  html+='<div class="b-lib-grid">'+books.map(function(b){var emoji=bThemeEmoji(b.theme),firstImg=IMG_CACHE[b.id+'_0'],imgHTML=firstImg?'<img src="'+firstImg+'" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><span style="position:relative;font-size:28px;text-shadow:0 2px 8px rgba(0,0,0,.3)">'+emoji+'</span>':'<span style="font-size:48px">'+emoji+'</span>',badge=b.badge==='new'?'<span class="b-badge b-badge-new">NEW</span>':(b.lang==='zh'?'<span class="b-badge b-badge-zh">中</span>':'<span class="b-badge b-badge-en">EN</span>');
+    return'<div class="b-lib-card" onclick="bOpenById('+b.id+')"><div class="b-lib-card-img" style="position:relative">'+imgHTML+'</div><div class="b-lib-card-info"><div class="b-lib-card-title '+b.lang+'">'+b.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+badge+'</div><div class="b-lib-card-meta">'+b.pages.length+(b.lang==='zh'?'页':'p')+' · '+b.theme+' <span style="cursor:pointer;float:right;color:var(--red);font-size:11px" onclick="event.stopPropagation();bDeleteBook('+b.id+')">🗑</span></div></div></div>';
+  }).join('')+'</div>';
+  page.innerHTML=html;
+}
+function bRenderGen(){
+  var page=$('page'),isEn=_genLang==='en';
+  var heroVal=isEn?'Lily':'小桃桃';
+  var html='<div class="b-gen-section"><h3>✨ 创作新绘本故事</h3><div class="b-lang-tabs"><button class="b-ltab zh'+(isEn?'':' on')+'" id="bGltZh" onclick="bSetGenLang(\'zh\')">🇨🇳 中文绘本</button><button class="b-ltab en'+(isEn?' on':'')+'" id="bGltEn" onclick="bSetGenLang(\'en\')">🇺🇸 English Story</button></div>';
+  html+='<div class="b-gen-row" style="align-items:flex-start"><label style="padding-top:6px">主题</label><div><div id="bThemeGroups" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span class="b-custom-toggle" onclick="bToggleCustom()">✏️ 自定义主题/内容</span></div><div class="b-custom-box" id="bCustomBox"><textarea id="bCustomText" placeholder="输入你想要的故事主题或内容..." style="margin-top:6px;width:100%"></textarea></div></div></div>';
+  html+='<div class="b-gen-row"><label id="bLblHero">主角</label><input type="text" id="bGenHero" value="'+heroVal+'" placeholder="'+heroVal+'"></div>';
+  html+='<div class="b-gen-row"><label>页数</label><select id="bGenPages"><option value="4">4页（短）</option><option value="6" selected>6页（中）</option><option value="8">8页（长）</option><option value="12">12页（很长）</option></select></div>';
+  html+='<div class="b-gen-row"><label>要求</label><input type="text" id="bGenExtra" placeholder="例如：要有科普知识；主角要很勇敢..."></div>';
+  html+='<div style="display:flex;gap:8px"><button class="b-btn-gen zh" id="bBtnGen" style="flex:1;padding:12px;font-size:16px;margin-top:4px" onclick="bGenStory()">🎨 生成故事</button><button class="b-btn-nav" style="padding:8px 16px;margin-top:4px;font-family:var(--fzh);font-size:15px" onclick="bView=\'library\';pgBook()">← 返回</button></div></div>';
+  html+='<div class="b-ld-panel" id="bLdWrap"><div class="b-ld-spinner"></div><div class="b-ld-steps" id="bLdSteps"></div><div class="b-ld-bar-wrap"><div class="b-ld-bar-fill" id="bLdFill"></div></div><div class="b-ld-txt" id="bLdTxt"></div></div>';
+  page.innerHTML=html;bRenderThemes();
+}
+function bRenderReader(){
+  if(!curBook)return;var isEn=curBook.lang==='en',page=$('page');
+  var html='<div class="b-rdr-wrap"><div class="b-rdr-bar"><span class="b-rdr-title'+(isEn?' en':'')+'" id="bRdrTitle">'+curBook.title.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span><span class="b-pg-ind" id="bPgInd">1/'+curBook.pages.length+'</span><button class="b-btn-nav" style="font-family:var(--fzh);padding:5px 10px;font-size:12px" onclick="bView=\'library\';curBook=null;pgBook()">✕ 返回</button></div><div class="b-rdr-body"><div class="b-page-frame"><div class="b-page-illus" id="bPageIllus"></div><div class="b-page-right" id="bPageRight"></div></div></div><div class="b-rdr-ctrl"><button class="b-btn-nav" id="bPrev" onclick="bChangePg(-1)">◀ 上页</button><button class="b-btn-read zh" id="bBtnRead" onclick="bReadAll()">🔊 <span id="bReadLabel">朗读</span></button><button class="b-btn-nav" id="bNext" onclick="bChangePg(1)">下页 ▶</button></div></div>';
+  page.innerHTML=html;bRenderPg();
+}
+
+// ── 初始化书籍数据 ──
+bInitData();
+/* ══════════ 绘本板块结束 ══════════ */
+
 </script>
 </body>
 </html>
