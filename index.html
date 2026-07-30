@@ -1617,7 +1617,7 @@ var TTS = {
   doubaoKey       : 'b90b39d5-e7f0-49fa-9627-34e3ab47866c',
   doubaoVoice     : 'zh_female_xiaoxue_uranus_bigtts',  // 儿童绘本
   doubaoResourceId: 'seed-tts-2.0',
-  doubaoProxy     : 'http://localhost:8765/tts',  // 部署网站时换成 Worker 地址
+  doubaoProxy     : 'https://openspeech.bytedance.com/api/v3/tts/unidirectional',
 
   rateZh : 1.0,
   rateEn : 1.0,
@@ -1707,7 +1707,11 @@ function ttsDoubao(text, key, next, onEnd){
   try{
     fetch(TTS.doubaoProxy, {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'X-Api-Key': TTS.doubaoKey,
+        'X-Api-Resource-Id': TTS.doubaoResourceId
+      },
       body: JSON.stringify({
         user: {uid: 'study-island'},
         req_params: {
@@ -1799,8 +1803,8 @@ function speak(text, lang){
   const toBrowser = () => ttsBrowser(text, isEn);
   const toNeural = () => {
     if(isEn){ ttsEleven(text, key, toBrowser); return; }
-    // 非本地环境直接走浏览器语音，避免请求不存在的 localhost 代理
-    if(!_isLocal || TTS._dbFail >= 5){ toBrowser(); return; }
+    // 豆包连续失败5次就跳过，避免无效等待
+    if(TTS._dbFail >= 5){ toBrowser(); return; }
     ttsDoubao(text, key, toBrowser);
   };
   ttsDict(text, isEn, key, toNeural);
