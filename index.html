@@ -2305,8 +2305,6 @@ function rabbitAutoCheck(key){
 function rabbitAllTasks(){ return [...RABBIT_CFG.tasks.learn, ...RABBIT_CFG.tasks.habit]; }
 
 function rabbitToggleTask(t){
-  // 学习任务：自动完成不可手动切换，点错了需要去家长模式清空
-  if(t.link) return;
   const i = S.rabbit.done.indexOf(t.id);
   if(i>=0){
     S.rabbit.done.splice(i,1);
@@ -2366,15 +2364,12 @@ function rabbitRender(){
   const earned = rabbitAllTasks().filter(t=>R.done.includes(t.id)).reduce((s,t)=>s+t.coin,0);
   const lv = li+1;
 
-  const tasksHtml = [["学习任务", RABBIT_CFG.tasks.learn, true], ["习惯任务", RABBIT_CFG.tasks.habit, false]].map(([title,arr,isLearn])=>
+  const tasksHtml = [["学习任务", RABBIT_CFG.tasks.learn], ["习惯任务", RABBIT_CFG.tasks.habit]].map(([title,arr])=>
     `<div class="rtgroup"><p>${title}</p>`+
     arr.map(t=>{
       const done = R.done.includes(t.id);
-      const onclick = isLearn
-        ? `go('${t.link}')`
-        : `rabbitToggleTask(RABBIT_CFG.tasks.habit.find(x=>x.id==='${t.id}'))`;
-      const hint = isLearn ? (done ? '已完成 ✓' : '去学习 →') : (done ? '已完成 ✓' : '点我打卡');
-      return `<button class="rtask" data-done="${done?1:0}" onclick="${onclick}" title="${hint}">
+      const srcArr = arr===RABBIT_CFG.tasks.learn ? 'learn' : 'habit';
+      return `<button class="rtask" data-done="${done?1:0}" onclick="rabbitToggleTask(RABBIT_CFG.tasks.${srcArr}.find(x=>x.id==='${t.id}'))">
         <span class="rbox">✓</span><span class="rname">${t.name}</span><span class="rval">+${t.coin}</span></button>`;
     }).join("")+`</div>`
   ).join("");
