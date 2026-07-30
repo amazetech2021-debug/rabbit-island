@@ -1603,7 +1603,7 @@ const STAGES = [
    ══════════════════════════════════════════════════════════════ */
 var TTS = {
   /* 词典发音开关（有道免费接口），分语言 */
-  dictAudio : {zh:false, en:false},
+  dictAudio : {zh:true, en:true},
 
   /* 英文引擎：'eleven' ElevenLabs / 'dict' 有道词典 */
   enEngine   : 'eleven',
@@ -1628,6 +1628,14 @@ var TTS = {
   cur   : null,
   busy  : false
 };
+
+/* 部署检测 & 预加载浏览器语音 */
+const _isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+let _voicesCache = [];
+if('speechSynthesis' in window){
+  _voicesCache = speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => { _voicesCache = speechSynthesis.getVoices(); };
+}
 
 
 /* 词典真人发音（有道公开接口，免费，无需 Key） */
@@ -1750,7 +1758,7 @@ function ttsBrowser(text, isEn){
     u.lang  = isEn ? 'en-US' : 'zh-CN';
     u.rate  = isEn ? 0.82 : 0.75;
     u.pitch = 1.05;
-    const voices = speechSynthesis.getVoices();
+    const voices = _voicesCache.length ? _voicesCache : speechSynthesis.getVoices();
     const prefs = isEn
       ? ['Samantha','Microsoft Jenny','Google US English','Karen','en-US','en']
       : ['Microsoft Xiaoxiao','Ting-Ting','Mei-Jia','Google 普通话','zh-CN','zh'];
@@ -1791,8 +1799,8 @@ function speak(text, lang){
   const toBrowser = () => ttsBrowser(text, isEn);
   const toNeural = () => {
     if(isEn){ ttsEleven(text, key, toBrowser); return; }
-    // 豆包连续失败5次就跳过，避免无效等待
-    if(TTS._dbFail >= 5){ toBrowser(); return; }
+    // 非本地环境直接走浏览器语音，避免请求不存在的 localhost 代理
+    if(!_isLocal || TTS._dbFail >= 5){ toBrowser(); return; }
     ttsDoubao(text, key, toBrowser);
   };
   ttsDict(text, isEn, key, toNeural);
