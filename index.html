@@ -9998,6 +9998,74 @@ function _tbVideoView(){
   return h;
 }
 
+var BILI_SX_BV='BV1LxMg6yE3n';
+var BILI_SX_VIDEOS={
+  'sx-l01':[{p:1,t:'在校园里找一找',d:'11:18'},{p:2,t:'在操场上玩一玩',d:'14:58'},{p:3,t:'在教室里认一认',d:'12:32'},{p:4,t:'在教室里玩一玩',d:'12:44'}],
+  'sx-l02':[{p:6,t:'比大小',d:'14:03'}],
+  'sx-l21':[{p:5,t:'1~5的认识',d:'13:13'},{p:7,t:'第几',d:'12:00'},{p:8,t:'分与合',d:'10:21'}],
+  'sx-l22':[{p:9,t:'加法',d:'13:36'}],
+  'sx-l23':[{p:10,t:'减法',d:'14:10'},{p:11,t:'0的认识和加减法',d:'13:59'}],
+  'sx-l31':[{p:22,t:'认识立体图形',d:'10:37'}],
+  'sx-l32':[{p:23,t:'搭一搭、拼一拼',d:'15:14'}],
+  'sx-l41':[{p:12,t:'6~9的认识',d:'18:35'},{p:13,t:'6和7的分与合',d:'11:29'},{p:14,t:'8和9的分与合',d:'11:37'},{p:19,t:'10的认识',d:'11:24'},{p:24,t:'10的再认识',d:'12:18'}],
+  'sx-l42':[{p:15,t:'6和7的加减法',d:'16:59'},{p:16,t:'用6和7的加法解决问题',d:'9:34'},{p:17,t:'用6和7的减法解决问题',d:'9:30'},{p:18,t:'8和9的加减法',d:'15:10'},{p:20,t:'10的加减法',d:'10:55'},{p:21,t:'连加、连减',d:'12:04'}],
+  'sx-l51':[{p:25,t:'11~20的认识（第1课时）',d:'7:13'},{p:26,t:'11~20的认识（第2课时）',d:'7:19'},{p:27,t:'数的排列和比较大小',d:'9:35'}],
+  'sx-l52':[{p:20,t:'10的加减法',d:'10:55'}],
+  'sx-l61':[],
+  'sx-l62':[],
+  'sx-l71':[{p:28,t:'9加几',d:'12:01'}],
+  'sx-l72':[{p:29,t:'8、7、6加几（第1课时）',d:'11:32'},{p:30,t:'8、7、6加几（第2课时）',d:'12:37'},{p:31,t:'5、4、3、2加几',d:'11:27'}]
+};
+var BILI_SX_ALL=[
+  {p:1,t:'在校园里找一找',d:'11:18'},
+  {p:2,t:'在操场上玩一玩',d:'14:58'},
+  {p:3,t:'在教室里认一认',d:'12:32'},
+  {p:4,t:'在教室里玩一玩',d:'12:44'},
+  {p:5,t:'1~5的认识',d:'13:13'},
+  {p:6,t:'比大小',d:'14:03'},
+  {p:7,t:'第几',d:'12:00'},
+  {p:8,t:'分与合',d:'10:21'},
+  {p:9,t:'加法',d:'13:36'},
+  {p:10,t:'减法',d:'14:10'},
+  {p:11,t:'0的认识和加减法',d:'13:59'},
+  {p:12,t:'6~9的认识',d:'18:35'},
+  {p:13,t:'6和7的分与合',d:'11:29'},
+  {p:14,t:'8和9的分与合',d:'11:37'},
+  {p:15,t:'6和7的加减法',d:'16:59'},
+  {p:16,t:'用6和7的加法解决问题',d:'9:34'},
+  {p:17,t:'用6和7的减法解决问题',d:'9:30'},
+  {p:18,t:'8和9的加减法',d:'15:10'},
+  {p:19,t:'10的认识',d:'11:24'},
+  {p:20,t:'10的加减法',d:'10:55'},
+  {p:21,t:'连加、连减',d:'12:04'},
+  {p:22,t:'认识立体图形',d:'10:37'},
+  {p:23,t:'搭一搭、拼一拼',d:'15:14'},
+  {p:24,t:'10的再认识',d:'12:18'},
+  {p:25,t:'11~20的认识（第1课时）',d:'7:13'},
+  {p:26,t:'11~20的认识（第2课时）',d:'7:19'},
+  {p:27,t:'数的排列和比较大小',d:'9:35'},
+  {p:28,t:'9加几',d:'12:01'},
+  {p:29,t:'8、7、6加几（第1课时）',d:'11:32'},
+  {p:30,t:'8、7、6加几（第2课时）',d:'12:37'},
+  {p:31,t:'5、4、3、2加几',d:'11:27'},
+  {p:32,t:'数量关系',d:'11:05'},
+  {p:33,t:'数与运算',d:'15:46'},
+  {p:34,t:'图形的认识',d:'4:02'}
+];
+function _sxVideoView(){
+  var h='<div style="margin:8px 0 6px;font-weight:700;font-size:15px">📺 数学视频课 · 一年级上册</div>';
+  h+='<div style="font-size:12px;color:#888;margin-bottom:12px">B站同步视频讲解，共34集 · 点击在B站观看</div>';
+  BILI_SX_ALL.forEach(function(v){
+    var url='https://www.bilibili.com/video/'+BILI_SX_BV+'?p='+v.p;
+    h+='<a href="'+url+'" target="_blank" style="display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px;text-decoration:none;color:var(--tx)">';
+    h+='<div style="background:#4caf50;color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-weight:700;min-width:28px;text-align:center">'+v.p+'</div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.t+'</div>';
+    h+='<div style="font-size:12px;color:#999;margin-top:2px">&#9201; '+v.d+'</div></div>';
+    h+='<span style="color:#4caf50;font-size:18px">&#9654;</span>';
+    h+='</a>';
+  });
+  return h;
+}
 /* ===== 拼音映射 + 教材TTS ===== */
 var _PYMAP={
   'g':'哥','k':'科','h':'喝','j':'鸡','q':'起','x':'西',
@@ -10037,6 +10105,8 @@ function pgTextbook(){
     html+='<button class="tab on" onclick="_tbSwitch(\'video\')">&#128250; 视频</button>';
     html+='</div>';
     html+=_tbVideoView();
+    html+='<div style="height:16px"></div>';
+    html+=_sxVideoView();
     html+='</div>';
     $('page').innerHTML=html;
     return;
@@ -10190,6 +10260,21 @@ function _tbLessonView(){
       html+='<span style="background:#fb7299;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">&#9654; '+v.d+'</span>';
       html+='<span style="font-size:13px;flex:1">'+v.t+'</span>';
       html+='<span style="color:#fb7299;font-size:12px">B站 &#8594;</span>';
+      html+='</a>';
+    });
+    html+='</div>';
+  }
+  // Math videos for this lesson
+  var sxVids=BILI_SX_VIDEOS[lesson.id];
+  if(sxVids && sxVids.length){
+    html+='<div style="margin-bottom:12px">';
+    html+='<div style="font-weight:600;font-size:13px;margin-bottom:6px;color:#4caf50">&#128250; B站视频讲解</div>';
+    sxVids.forEach(function(v){
+      var vurl='https://www.bilibili.com/video/'+BILI_SX_BV+'?p='+v.p;
+      html+='<a href="'+vurl+'" target="_blank" style="display:flex;align-items:center;gap:8px;background:#f1f8e9;border-radius:10px;padding:8px 12px;margin-bottom:6px;text-decoration:none;color:#333">';
+      html+='<span style="background:#4caf50;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">&#9654; '+v.d+'</span>';
+      html+='<span style="font-size:13px;flex:1">'+v.t+'</span>';
+      html+='<span style="color:#4caf50;font-size:12px">B站 &#8594;</span>';
       html+='</a>';
     });
     html+='</div>';
@@ -10378,7 +10463,7 @@ function _tbSpeakPinyin(py){
     'un':'云','ang':'昂','eng':'嗯','ing':'英','ong':'翁'
   };
   var word = map[py] || py;
-  speak(word, 'zh-CN');
+  ttsBrowser(word, false);
 }
 
 
