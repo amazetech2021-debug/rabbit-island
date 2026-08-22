@@ -9998,6 +9998,30 @@ function _tbVideoView(){
   return h;
 }
 
+/* ===== 拼音映射 + 教材TTS ===== */
+var _PYMAP={
+  'g':'哥','k':'科','h':'喝','j':'鸡','q':'起','x':'西',
+  'b':'波','p':'坡','m':'摸','f':'佛',
+  'd':'得','t':'特','n':'讷','l':'勒',
+  'z':'资','c':'次','s':'思',
+  'zh':'知','ch':'吃','sh':'师','r':'日',
+  'y':'衣','w':'乌',
+  'a':'啊','o':'哦','e':'鹅',
+  'i':'衣','u':'乌','ü':'鱼',
+  'ai':'爱','ei':'诶','ui':'位',
+  'ao':'熬','ou':'欧','iu':'由',
+  'ie':'爷','üe':'月','er':'耳',
+  'an':'安','en':'恩','in':'因','un':'温','ün':'云',
+  'ang':'昂','eng':'灯','ing':'英','ong':'翁'
+};
+function speakTb(text){
+  if(!text||!String(text).trim())return;
+  var t=String(text).trim();
+  var low=t.toLowerCase();
+  if(_PYMAP[low]){ttsBrowser(_PYMAP[low],false);return;}
+  ttsBrowser(t,false);
+}
+
 /* ===== 教材页面渲染 ===== */
 var _tbCurUnit = null;
 var _tbCurLesson = null;
@@ -10233,12 +10257,12 @@ function _tbRenderExercise(ex, idx, lessonId){
   var key = lessonId+'_'+idx;
   var result = _tbExAnswers[key];
   var html = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:2px solid '+(result===true?'#4caf50':result===false?'#f44336':'var(--border)')+'">';
-  html += '<div onclick="speak(this.dataset.t,\'zh-CN\')" data-t="'+ex.q+'" style="font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx);cursor:pointer;line-height:1.6">'+(idx+1)+'、'+ex.q+'</div>';
+  html += '<div onclick="speakTb(this.dataset.t)" data-t="'+ex.q+'" style="font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx);cursor:pointer;line-height:1.6">'+(idx+1)+'、'+ex.q+'</div>';
   
   if(ex.type==='mc'){
     ex.opts.forEach(function(opt, oi){
       var sel = _tbExAnswers[key+'_sel']===oi;
-      html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbSelectMC(\''+lessonId+'\','+idx+','+oi+')" data-t="'+opt.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:left;background:'+(sel?'#e8f0ff':'var(--bg)')+';border:'+(sel?'1.5px solid var(--brand)':'1.5px solid var(--border)')+';border-radius:10px;padding:12px 14px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx)">'+String.fromCharCode(65+oi)+'. '+opt+'</button>';
+      html += '<button onclick="speakTb(this.dataset.t);_tbSelectMC(\''+lessonId+'\','+idx+','+oi+')" data-t="'+opt.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:left;background:'+(sel?'#e8f0ff':'var(--bg)')+';border:'+(sel?'1.5px solid var(--brand)':'1.5px solid var(--border)')+';border-radius:10px;padding:12px 14px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx)">'+String.fromCharCode(65+oi)+'. '+opt+'</button>';
     });
   } else if(ex.type==='fill'){
     var cur = _tbExAnswers[key+'_fill']||'';
@@ -10264,14 +10288,14 @@ function _tbRenderMatch(ex, key){
   html += '<div>';
   pairs.forEach(function(p,i){
     var isMatch = Object.keys(matched).indexOf(String(i))>=0;
-    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchLeft(\''+key+'\','+i+')" data-t="'+p[0].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[0]+'</button>';
+    html += '<button onclick="speakTb(this.dataset.t);_tbMatchLeft(\''+key+'\','+i+')" data-t="'+p[0].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[0]+'</button>';
   });
   html += '</div>';
   // Right column
   html += '<div>';
   pairs.forEach(function(p,i){
     var isMatched = Object.values(matched).indexOf(i)>=0;
-    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchRight(\''+key+'\','+i+')" data-t="'+p[1].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[1]+'</button>';
+    html += '<button onclick="speakTb(this.dataset.t);_tbMatchRight(\''+key+'\','+i+')" data-t="'+p[1].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[1]+'</button>';
   });
   html += '</div>';
   html += '</div>';
