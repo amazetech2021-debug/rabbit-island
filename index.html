@@ -4712,6 +4712,7 @@ const PAGES = [
   {k:"cartoon", n:"YouTube", e:"<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAcCAYAAAAN3M1lAAACeElEQVR42s2YMUscQRTHfzO7MRqCAXNILISkkASSSkgwksJGIan8CHb6WewOG/0sYiEEg5aXE8UmcBaHRYSEcJi72/2nmB1vXGJw91YuA4+7nZ198+PNvDfzngEQWAOp4BHwAXgDvACeAU+BJ8Bj3PuHwBjwAIgBGwhAGkgf6AFd4DfQAX4BP4HvQBv4BjSBzwY6ngVlCgWrghOBRiSnglVvKLI/H4MBqaAfSJJJmpO7Tpj/zusL5wj1ffJQE4KzrLM3Qov5uc8EExZYBOYcIzGja3HGMAcsWuBd1pEy+pZmLG8t8BIwpdQYA1FUNZwBXllgNugoBiVBkjg4Y6qCApi1wHQpFdbCzg6srDg4CeLKtug0gvPAre/mQca432ZTkqTtbWlmZvDO2rKe6RlaCC5Lgx0cSGnq4NptaX19MCaKBuOKg10idwwUU+AnPDx0UFdXum77+9LCwk3A4pbrUCqo5sH6fWe5ft89J4lUr0tTUzfHFwi2FDxebgfzzUNK0sWFtLHhrFZs36X2XsKkDx3dLvR65XTcy1J2u9LmpjQ5OdRSVrv5d3el+flKNv9w4cK383NpbW0wJo6HDhet0mDHxw6qXpdqNddnbWUB9mv2kBRSEkXS1pa0tDTssoXiGRoI9kqBhctULsr/C2wvBloDBy3iznIHuTHuEK+meYZWDJwWhrq+1t3L3VLAqQWOsnuQ/Q9usDZjOUIwHqRt3REmI37uE7ncFQTLOZdN/pK+lUnhbkvd8vpDXcuEyWWWWzZGaLGGzymzbPxGiWAMeA+8Bp4DM0AtVyIYz5UIomBvEGRcSa5EcBWUCH7kSgTHwBfjltMaSP8A2C6XfF2BfJkAAAAASUVORK5CYII=\" style=\"width:36px;height:26px;object-fit:contain\">", bg:"#D8C8F0"},
   {k:"gift", n:"奖励中心", e:"🎁", bg:"#DCD4FF"},
   {k:"memo", n:"备忘录", e:"📋", bg:"#D2CAFF"},
+  {k:"textbook", n:"教材", e:"📚", bg:"#E8F5E9"},
 ];
 let cur = "home";
 function paintSide(){
@@ -4743,7 +4744,7 @@ function render(){
   const p = PAGES.find(x=>x.k===cur);
   $("ptitle").textContent = cur==="home" ? "🐰 开心兔兔养成岛" : (p.e&&p.e[0]==="<"?p.n:p.e+" "+p.n);
   ({home:pgHome, hz:pgHanzi, py:pgPinyin, math:pgMath, en:pgEnglish, poem:pgPoem,
-    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo})[cur]();
+    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook})[cur]();
   scrollTabsIntoView();
 }
 
@@ -9277,6 +9278,851 @@ function closeYtModal(){
   var m=$('mbox');if(m){m.style.cssText='';m.innerHTML='';}
   closeModal();
 }
+
+
+
+
+
+
+/* ===== 教材模块 ===== */
+var _tbSubject = 'yuwen'; // 'yuwen' or 'shuxue'
+var _tbUnit = null;
+var _tbLesson = null;
+var _tbExState = {};  // exercise state
+
+var TEXTBOOK_DATA = {
+  yuwen: {
+    name:'语文', emoji:'📖', color:'#FFF3E0', pub:'统编版2024',
+    units:[
+      {id:'yw-u0', name:'入学教育', sub:'我上学了', emoji:'🏫', color:'#FFF9C4',
+       lessons:[
+         {id:'yw-l01', name:'我是中国人', content:'认识祖国的名字"中国"，了解中国是我们的家。学习说：我是中国人，我爱中国！',
+          words:['中国','我们','爱'],
+          exercises:[
+            {type:'mc', q:'我们的国家叫什么名字？', opts:['中国','日本','美国','英国'], ans:0},
+            {type:'mc', q:'"我是中国人"中的"中"字，共有多少笔画？', opts:['3画','4画','5画','6画'], ans:1},
+            {type:'fill', q:'我是___国人。', ans:'中'},
+            {type:'match', q:'连一连', pairs:[['中','guó'],['国','zhōng'],['人','rén']]},
+          ]
+         },
+         {id:'yw-l02', name:'我爱我们的祖国', content:'认识五星红旗是中国国旗，北京是首都，天安门广场升旗非常壮观。',
+          words:['国旗','首都','北京'],
+          exercises:[
+            {type:'mc', q:'中国的国旗是什么颜色？', opts:['红色为主，有黄色五星','蓝色为主','绿色为主','白色为主'], ans:0},
+            {type:'mc', q:'中国的首都是哪里？', opts:['上海','北京','广州','成都'], ans:1},
+            {type:'fill', q:'五星___旗是中国的国旗。', ans:'红'},
+          ]
+         },
+         {id:'yw-l03', name:'我是小学生', content:'进入小学，要遵守学校规则：认真听讲、按时到校、团结同学、爱护公物。',
+          words:['学校','同学','规则'],
+          exercises:[
+            {type:'mc', q:'下列哪个是好的学习习惯？', opts:['认真听讲','上课说话','乱扔垃圾','不做作业'], ans:0},
+            {type:'mc', q:'我们要怎样对待同学？', opts:['团结友爱','吵架打架','不理不睬','欺负同学'], ans:0},
+            {type:'fill', q:'我们要___时到校。', ans:'按'},
+          ]
+         },
+         {id:'yw-l04', name:'我爱学语文', content:'语文帮助我们读书识字、说话写作，让我们认识丰富多彩的世界。',
+          words:['语文','读书','识字'],
+          exercises:[
+            {type:'mc', q:'学习语文可以帮助我们做什么？', opts:['读书识字写作','踢足球','画画','唱歌'], ans:0},
+            {type:'fill', q:'我爱学___文。', ans:'语'},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u1', name:'第一单元', sub:'识字（一）', emoji:'🔡', color:'#E8F5E9',
+       lessons:[
+         {id:'yw-l11', name:'天地人', content:'学习6个基础汉字：天、地、人、你、我、他。这些字描述了世界（天地）和人（人你我他）。',
+          chars:['天','地','人','你','我','他'],
+          pinyin:['tiān','dì','rén','nǐ','wǒ','tā'],
+          strokes:[4,6,2,7,7,5],
+          exercises:[
+            {type:'mc', q:'"天"字有多少笔画？', opts:['3画','4画','5画','6画'], ans:1},
+            {type:'mc', q:'下面哪个字的拼音是"rén"？', opts:['天','地','人','你'], ans:2},
+            {type:'fill', q:'天___人，你我他。（填"地"）', ans:'地'},
+            {type:'match', q:'连一连（字和拼音）', pairs:[['天','tiān'],['地','dì'],['人','rén'],['你','nǐ']]},
+            {type:'mc', q:'"你""我""他"这三个字都是___字。', opts:['人称代词','天气','数字','颜色'], ans:0},
+            {type:'fill', q:'"我"的拼音是___。', ans:'wǒ'},
+          ]
+         },
+         {id:'yw-l12', name:'金木水火土', content:'学习6个汉字：金、木、水、火、土、山。这是中国传统的五行（金木水火土）和山。',
+          chars:['金','木','水','火','土','山'],
+          pinyin:['jīn','mù','shuǐ','huǒ','tǔ','shān'],
+          strokes:[8,4,4,4,3,3],
+          exercises:[
+            {type:'mc', q:'"山"字有几笔？', opts:['2笔','3笔','4笔','5笔'], ans:1},
+            {type:'mc', q:'五行是金、木、水、火、___。', opts:['天','土','山','石'], ans:1},
+            {type:'match', q:'连一连', pairs:[['金','jīn'],['木','mù'],['水','shuǐ'],['火','huǒ']]},
+            {type:'fill', q:'"木"字的拼音是___。', ans:'mù'},
+            {type:'mc', q:'下列哪个字笔画最少？', opts:['金','木','山','水'], ans:2},
+            {type:'fill', q:'金___水火土，山川日月明。（填"木"）', ans:'木'},
+          ]
+         },
+         {id:'yw-l13', name:'口耳目手足', content:'学习6个汉字：口、耳、目、手、足、立。这些字描述了人体的器官和动作。',
+          chars:['口','耳','目','手','足','立'],
+          pinyin:['kǒu','ěr','mù','shǒu','zú','lì'],
+          strokes:[3,6,5,4,7,5],
+          exercises:[
+            {type:'mc', q:'"耳朵"的"耳"字有几画？', opts:['4画','5画','6画','7画'], ans:2},
+            {type:'mc', q:'"目"在古代表示什么？', opts:['耳朵','眼睛','嘴巴','鼻子'], ans:1},
+            {type:'fill', q:'口___目手足，身体很重要。（填"耳"）', ans:'耳'},
+            {type:'match', q:'连一连', pairs:[['口','kǒu'],['耳','ěr'],['目','mù'],['手','shǒu']]},
+            {type:'mc', q:'走路用到的身体部位是？', opts:['手','耳','足','目'], ans:2},
+          ]
+         },
+         {id:'yw-l14', name:'日月山川', content:'学习6个汉字：日、月、山、川、田、禾。这些象形字像它们所代表的事物的样子。',
+          chars:['日','月','山','川','田','禾'],
+          pinyin:['rì','yuè','shān','chuān','tián','hé'],
+          strokes:[4,4,3,3,5,5],
+          exercises:[
+            {type:'mc', q:'"日"字表示什么？', opts:['月亮','太阳','星星','云朵'], ans:1},
+            {type:'mc', q:'"川"是指什么？', opts:['山','河流','田地','树木'], ans:1},
+            {type:'fill', q:'日___山川田禾，这些是象形字。（填"月"）', ans:'月'},
+            {type:'match', q:'连一连', pairs:[['日','rì'],['月','yuè'],['田','tián'],['禾','hé']]},
+            {type:'mc', q:'田里种的粮食叫___。', opts:['禾苗','月亮','山川','河流'], ans:0},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u2', name:'第二单元', sub:'汉语拼音（一）', emoji:'🔊', color:'#E3F2FD', type:'pinyin',
+       lessons:[
+         {id:'yw-p21', name:'a o e', sub:'单韵母', content:'学习三个单韵母：a、o、e。\na：嘴巴张大，发"啊"的音\no：嘴巴圆圆，发"哦"的音\ne：嘴角拉开，发"鹅"的音',
+          pinyin_chars:['a','o','e'],
+          tone_examples:[['ā','á','ǎ','à'],['ō','ó','ǒ','ò'],['ē','é','ě','è']],
+          exercises:[
+            {type:'mc', q:'单韵母一共有几个？', opts:['4个','5个','6个','7个'], ans:2},
+            {type:'mc', q:'"啊"的韵母是？', opts:['o','e','a','i'], ans:2},
+            {type:'mc', q:'声调中"ˊ"是第几声？', opts:['一声','二声','三声','四声'], ans:1},
+            {type:'fill', q:'a o e是___韵母。', ans:'单'},
+            {type:'mc', q:'"鹅"对应的单韵母是？', opts:['a','o','e','i'], ans:2},
+          ]
+         },
+         {id:'yw-p22', name:'i u ü', sub:'单韵母', content:'学习三个单韵母：i、u、ü。\ni：嘴巴微笑，发"衣"的音\nu：嘴巴圆小，发"乌"的音\nü：嘴圆发i，发"鱼"的音\n注意：ü遇到j、q、x时，两点省略。',
+          pinyin_chars:['i','u','ü'],
+          exercises:[
+            {type:'mc', q:'"衣服"的"衣"对应的韵母是？', opts:['u','i','ü','e'], ans:1},
+            {type:'mc', q:'"ü"与j、q、x相拼时，两点如何处理？', opts:['保留','省略','变成u','变成i'], ans:1},
+            {type:'fill', q:'i u ü是___韵母。', ans:'单'},
+            {type:'mc', q:'"鱼"的韵母是？', opts:['u','i','ü','o'], ans:2},
+            {type:'mc', q:'"ju"中的u其实是哪个字母？', opts:['u','i','ü','e'], ans:2},
+          ]
+         },
+         {id:'yw-p23', name:'b p m f', sub:'声母', content:'学习4个声母：b、p、m、f。\nb：双唇轻闭，不送气，如"玻"\np：双唇轻闭，送气，如"坡"\nm：双唇闭合，鼻音，如"摸"\nf：上齿轻触下唇，如"佛"',
+          pinyin_chars:['b','p','m','f'],
+          exercises:[
+            {type:'mc', q:'声母"b"发音时，是否送气？', opts:['送气','不送气','鼻音','唇齿音'], ans:1},
+            {type:'mc', q:'声母"m"属于什么音？', opts:['送气音','不送气音','鼻音','边音'], ans:2},
+            {type:'match', q:'连一连（声母和例字）', pairs:[['b','玻'],['p','坡'],['m','摸'],['f','佛']]},
+            {type:'fill', q:'b p m f是___母。（声）', ans:'声'},
+            {type:'mc', q:'下列哪个字的声母是"f"？', opts:['爸','泼','猫','飞'], ans:3},
+          ]
+         },
+         {id:'yw-p24', name:'d t n l', sub:'声母', content:'学习4个声母：d、t、n、l。\nd：舌尖抵上牙龈，不送气，如"得"\nt：舌尖抵上牙龈，送气，如"特"\nn：舌尖抵上牙龈，鼻音，如"讷"\nl：舌尖抵上牙龈，边音，如"勒"',
+          pinyin_chars:['d','t','n','l'],
+          exercises:[
+            {type:'mc', q:'"大"的声母是？', opts:['t','d','n','l'], ans:1},
+            {type:'mc', q:'"牛"的声母是？', opts:['d','t','n','l'], ans:2},
+            {type:'match', q:'连一连', pairs:[['d','得'],['t','特'],['n','讷'],['l','勒']]},
+            {type:'fill', q:'d t n l是___母。', ans:'声'},
+            {type:'mc', q:'"n"和"l"的区别是：n是___，l是___。', opts:['鼻音/边音','边音/鼻音','送气/不送气','不送气/送气'], ans:0},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u3', name:'第三单元', sub:'汉语拼音（二）', emoji:'🔊', color:'#F3E5F5', type:'pinyin',
+       lessons:[
+         {id:'yw-p31', name:'g k h', sub:'声母', content:'学习3个声母：g、k、h。\ng：舌根抵软腭，不送气，如"哥"\nk：舌根抵软腭，送气，如"科"\nh：声门摩擦，如"喝"',
+          pinyin_chars:['g','k','h'],
+          exercises:[
+            {type:'mc', q:'"哥哥"的声母是？', opts:['k','h','g','j'], ans:2},
+            {type:'match', q:'连一连', pairs:[['g','哥'],['k','科'],['h','喝']]},
+            {type:'fill', q:'g k h是___声母。', ans:'舌根'},
+            {type:'mc', q:'下列哪个字的声母是"k"？', opts:['古','科','喝','家'], ans:1},
+          ]
+         },
+         {id:'yw-p32', name:'j q x', sub:'声母', content:'学习3个声母：j、q、x。\nj：舌面音，不送气，如"鸡"\nq：舌面音，送气，如"期"\nx：舌面摩擦音，如"西"\n注意：j、q、x和ü相拼时，ü上两点省略。',
+          pinyin_chars:['j','q','x'],
+          exercises:[
+            {type:'mc', q:'"鸡"的声母是？', opts:['q','j','x','zh'], ans:1},
+            {type:'mc', q:'j q x与___相拼时，两点省略。', opts:['u','i','ü','e'], ans:2},
+            {type:'match', q:'连一连', pairs:[['j','鸡'],['q','期'],['x','西']]},
+            {type:'fill', q:'j q x是___面声母。', ans:'舌'},
+          ]
+         },
+         {id:'yw-p33', name:'z c s / zh ch sh r', sub:'声母', content:'z c s是平舌音（舌尖抵上齿背）：\nz如"资"，c如"次"，s如"思"\nzh ch sh r是翘舌音（舌尖翘起）：\nzh如"知"，ch如"吃"，sh如"师"，r如"日"',
+          pinyin_chars:['z','c','s','zh','ch','sh','r'],
+          exercises:[
+            {type:'mc', q:'平舌音包括哪些声母？', opts:['z c s','zh ch sh','g k h','j q x'], ans:0},
+            {type:'mc', q:'"吃"的声母是？', opts:['z','c','ch','zh'], ans:2},
+            {type:'match', q:'连一连', pairs:[['z','资'],['zh','知'],['c','次'],['ch','吃']]},
+            {type:'fill', q:'翘舌音有zh ch sh ___。', ans:'r'},
+            {type:'mc', q:'"思"的声母是？', opts:['sh','s','z','zh'], ans:1},
+          ]
+         },
+         {id:'yw-p34', name:'y w', sub:'整体认读音节', content:'y和w是两个特殊的声母，通常用来引导以i或u开头的音节。\ny：后接i为主的音节，如yi、ya、ye\nw：后接u为主的音节，如wu、wa、wo',
+          pinyin_chars:['y','w'],
+          exercises:[
+            {type:'mc', q:'"一"的拼音是？', opts:['yi','wi','yī','yee'], ans:2},
+            {type:'mc', q:'以"w"开头的音节，主要元音是？', opts:['i','ü','u','e'], ans:2},
+            {type:'fill', q:'y和w是___读音节。（整体）', ans:'整体'},
+            {type:'mc', q:'"五"的拼音是？', opts:['yu','wu','wü','yi'], ans:1},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u4', name:'第四单元', sub:'汉语拼音（三）', emoji:'🔊', color:'#FCE4EC', type:'pinyin',
+       lessons:[
+         {id:'yw-p41', name:'ai ei ui / ao ou iu', sub:'复韵母', content:'复韵母是由两个元音组成的韵母：\nai（爱）、ei（诶）、ui（位）\nao（熬）、ou（欧）、iu（由）\n注意声调标在主要元音上。',
+          pinyin_chars:['ai','ei','ui','ao','ou','iu'],
+          exercises:[
+            {type:'mc', q:'"爱"的韵母是？', opts:['ei','ui','ai','ao'], ans:2},
+            {type:'mc', q:'"牛"的韵母是？', opts:['ou','iu','au','ui'], ans:1},
+            {type:'fill', q:'ai ei ui ao ou iu都是___韵母。', ans:'复'},
+            {type:'mc', q:'"楼"的韵母是？', opts:['ao','ou','iu','ui'], ans:1},
+            {type:'match', q:'连一连', pairs:[['ai','爱'],['ei','诶'],['ao','熬'],['ou','欧']]},
+          ]
+         },
+         {id:'yw-p42', name:'ie üe er', sub:'特殊韵母', content:'特殊韵母：\nie（爷）、üe（月）、er（耳）\ner是特殊韵母，单独成音节时写作er。\nüe与j、q、x相拼时，ü上两点省略，写成jue、que、xue。',
+          pinyin_chars:['ie','üe','er'],
+          exercises:[
+            {type:'mc', q:'"月"的韵母是？', opts:['ie','üe','er','ue'], ans:1},
+            {type:'mc', q:'"耳"的韵母是？', opts:['er','ei','ie','ai'], ans:0},
+            {type:'fill', q:'üe和j相拼写成j___e。（u）', ans:'u'},
+            {type:'mc', q:'"爷爷"的韵母是？', opts:['ie','er','üe','ai'], ans:0},
+          ]
+         },
+         {id:'yw-p43', name:'an en in / ang eng ing ong', sub:'鼻韵母', content:'前鼻韵母（-n结尾）：an、en、in、un、ün\n后鼻韵母（-ng结尾）：ang、eng、ing、ong\n区分前后鼻韵母是难点：前鼻音舌尖抵上牙龈，后鼻音舌根抵软腭。',
+          pinyin_chars:['an','en','in','un','ün','ang','eng','ing','ong'],
+          exercises:[
+            {type:'mc', q:'前鼻韵母以哪个字母结尾？', opts:['m','n','ng','g'], ans:1},
+            {type:'mc', q:'"星"的韵母是？', opts:['in','ing','en','eng'], ans:1},
+            {type:'mc', q:'"山"的韵母是？', opts:['ang','an','eng','en'], ans:1},
+            {type:'fill', q:'ang eng ing ong是___鼻韵母。', ans:'后'},
+            {type:'mc', q:'"春"的韵母是？', opts:['un','ün','on','in'], ans:0},
+            {type:'match', q:'连一连', pairs:[['an','前鼻'],['ang','后鼻'],['en','前鼻'],['eng','后鼻']]},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u5', name:'第五单元', sub:'阅读（一）', emoji:'📝', color:'#E8F5E9',
+       lessons:[
+         {id:'yw-l51', name:'秋天', content:'课文：\n天气凉了。树叶黄了，一片片叶子从树上落下来。\n天空那么蓝，那么高。一群大雁往南飞，一会儿排成个"人"字，一会儿排成个"一"字。\n啊！秋天来了！\n\n生字：了、子、人、大、从、天',
+          words:['秋天','天气','树叶','大雁'],
+          exercises:[
+            {type:'mc', q:'秋天树叶变成什么颜色？', opts:['绿色','红色','黄色','蓝色'], ans:2},
+            {type:'mc', q:'大雁往哪个方向飞？', opts:['北方','南方','东方','西方'], ans:1},
+            {type:'fill', q:'大雁飞时排成"___"字或"一"字。', ans:'人'},
+            {type:'mc', q:'秋天天空的特点是？', opts:['灰蒙蒙','那么蓝那么高','乌云密布','下大雨'], ans:1},
+            {type:'mc', q:'"一片片叶子"说明叶子？', opts:['只有一片','很多片','只有两片','没有了'], ans:1},
+          ]
+         },
+         {id:'yw-l52', name:'江南', content:'课文（汉乐府）：\n江南可采莲，莲叶何田田。\n鱼戏莲叶间，鱼戏莲叶东，\n鱼戏莲叶西，鱼戏莲叶南，鱼戏莲叶北。\n\n这是一首描写江南采莲风光的古诗。',
+          words:['江南','莲叶','采莲','田田'],
+          exercises:[
+            {type:'mc', q:'"江南"指中国哪个地区？', opts:['长江以北','长江以南','黄河以北','珠江以南'], ans:1},
+            {type:'mc', q:'诗中的小鱼在哪里玩耍？', opts:['河里','莲叶间','大海里','小溪里'], ans:1},
+            {type:'fill', q:'江南可采___，莲叶何田田。', ans:'莲'},
+            {type:'mc', q:'"莲叶何田田"中"田田"形容莲叶？', opts:['枯黄','茂盛美丽','稀少','掉落'], ans:1},
+          ]
+         },
+         {id:'yw-l53', name:'雪地里的小画家', content:'课文：\n下雪了！下雪了！雪地里来了一群小画家。\n小鸡画竹叶，小狗画梅花，小鸭画枫叶，小马画月牙。\n不用颜料不用笔，几步就成一幅画。\n青蛙为什么没参加？它在洞里睡着啦。',
+          words:['雪地','画家','颜料','青蛙'],
+          exercises:[
+            {type:'mc', q:'小鸡用什么画竹叶？', opts:['画笔','爪子','嘴巴','翅膀'], ans:1},
+            {type:'mc', q:'小狗画的是什么？', opts:['竹叶','梅花','枫叶','月牙'], ans:1},
+            {type:'mc', q:'青蛙为什么没有参加？', opts:['不会画画','生病了','在睡觉','去旅行了'], ans:2},
+            {type:'fill', q:'小马画___牙。', ans:'月'},
+            {type:'match', q:'连一连', pairs:[['小鸡','竹叶'],['小狗','梅花'],['小鸭','枫叶'],['小马','月牙']]},
+          ]
+         },
+         {id:'yw-l54', name:'四季', content:'课文：\n草芽尖尖，它对小鸟说："我是春天。"\n荷叶圆圆，它对青蛙说："我是夏天。"\n谷穗弯弯，它对斗蟋蟀说："我是秋天。"\n雪人大肚子一挺，他顽皮地说："我就是冬天。"',
+          words:['春天','夏天','秋天','冬天'],
+          exercises:[
+            {type:'mc', q:'草芽代表哪个季节？', opts:['夏天','秋天','冬天','春天'], ans:3},
+            {type:'mc', q:'荷叶代表哪个季节？', opts:['春天','夏天','秋天','冬天'], ans:1},
+            {type:'match', q:'连一连', pairs:[['草芽','春天'],['荷叶','夏天'],['谷穗','秋天'],['雪人','冬天']]},
+            {type:'fill', q:'雪人代表___天。', ans:'冬'},
+            {type:'mc', q:'四季是指？', opts:['一年四个季节','四个月','四年','四个地方'], ans:0},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u6', name:'第六单元', sub:'识字（二）', emoji:'🔡', color:'#FFF3E0',
+       lessons:[
+         {id:'yw-l61', name:'对韵歌', content:'课文：\n云对雨，雪对风，晚霞对朝霞。\n花对树，鸟对虫，山清对水秀。\n\n对韵歌是一种传统的语言游戏，通过对对子学习汉字，认识事物的对应关系。',
+          words:['云','雨','雪','风','花','树'],
+          exercises:[
+            {type:'mc', q:'"云"对应的是？', opts:['风','雨','雪','霞'], ans:1},
+            {type:'mc', q:'"花"对应的是？', opts:['鸟','虫','树','草'], ans:2},
+            {type:'match', q:'对对子', pairs:[['云','雨'],['雪','风'],['花','树'],['鸟','虫']]},
+            {type:'fill', q:'山清对水___。', ans:'秀'},
+          ]
+         },
+         {id:'yw-l62', name:'日月明', content:'课文（字谜）：\n日月明，鱼羊鲜，小土尘，小大尖。\n一火灰，田力男，人木休，森木林。\n\n这首儿歌介绍了汉字的会意字构造规律：两个或多个字组合成一个新字。',
+          words:['明','鲜','尖','灰','男','休','林'],
+          exercises:[
+            {type:'mc', q:'"明"是由哪两个字组成的？', opts:['日+月','日+火','月+火','木+日'], ans:0},
+            {type:'mc', q:'"男"是由___+___组成的。', opts:['女+力','田+力','山+力','土+力'], ans:1},
+            {type:'fill', q:'人+木=___。', ans:'休'},
+            {type:'mc', q:'"林"是由什么组成的？', opts:['木+木','木+森','二+木','田+木'], ans:0},
+            {type:'match', q:'连一连', pairs:[['日+月','明'],['田+力','男'],['人+木','休'],['木+木','林']]},
+          ]
+         },
+         {id:'yw-l63', name:'小书包', content:'课文：\n书包，书包，背在肩上。\n课本，课本，书包里放着语文、数学、音乐书。\n铅笔，铅笔，书包里有铅笔。\n橡皮，橡皮，书包里有橡皮。\n\n认识常用文具的名称。',
+          words:['书包','课本','铅笔','橡皮','尺子','文具'],
+          exercises:[
+            {type:'mc', q:'书包里装的主要是什么？', opts:['零食','玩具','文具和课本','衣服'], ans:2},
+            {type:'match', q:'连一连', pairs:[['铅笔','写字用','橡皮','擦字用','尺子','画线用','书包','背在肩上']]},
+            {type:'fill', q:'书包里有___笔和橡皮。', ans:'铅'},
+            {type:'mc', q:'铅笔的作用是？', opts:['擦字','写字','画线量长度','装东西'], ans:1},
+          ]
+         },
+         {id:'yw-l64', name:'升国旗', content:'课文：\n五星红旗，我们的国旗。\n国旗，国旗，我爱你，你在我心里。\n升国旗了，起立，敬礼！\n\n学习升旗礼仪，表达对祖国的热爱。',
+          words:['国旗','升旗','敬礼','祖国'],
+          exercises:[
+            {type:'mc', q:'升国旗时我们应该做什么？', opts:['坐着','起立敬礼','跑步','唱歌'], ans:1},
+            {type:'mc', q:'五星红旗是什么？', opts:['一种玩具','中国国旗','一种花','一幅画'], ans:1},
+            {type:'fill', q:'升国旗了，起立，___礼！', ans:'敬'},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u7', name:'第七单元', sub:'阅读（二）', emoji:'📝', color:'#E8EAF6',
+       lessons:[
+         {id:'yw-l71', name:'小小的船', content:'课文（叶圣陶）：\n弯弯的月儿小小的船，小小的船儿两头尖。\n我在小小的船里坐，只看见闪闪的星星蓝蓝的天。\n\n生字：见、里、月、两、个、这、儿',
+          words:['月儿','星星','蓝天','两头尖'],
+          exercises:[
+            {type:'mc', q:'弯弯的月儿像什么？', opts:['太阳','小船','大海','星星'], ans:1},
+            {type:'mc', q:'坐在月儿里能看到什么？', opts:['白云和太阳','星星和蓝天','彩虹','大海'], ans:1},
+            {type:'fill', q:'弯弯的月儿小小的船，小小的船儿两头___。', ans:'尖'},
+            {type:'mc', q:'"闪闪的星星"说明星星？', opts:['不亮','很亮在发光','很小','很远'], ans:1},
+          ]
+         },
+         {id:'yw-l72', name:'影子', content:'课文：\n影子在前，影子在后。\n影子常常跟着我，就像一条小黑狗。\n影子在左，影子在右。\n影子常常陪着我，它是我的好朋友。\n\n生字：前、后、左、右、跟',
+          words:['影子','前后','左右','朋友'],
+          exercises:[
+            {type:'mc', q:'影子像什么？', opts:['小猫','小鸟','小黑狗','小白兔'], ans:2},
+            {type:'mc', q:'"前后左右"都是描述什么的词？', opts:['颜色','方向位置','大小','形状'], ans:1},
+            {type:'fill', q:'影子常常跟着我，就像一条小___狗。', ans:'黑'},
+            {type:'mc', q:'影子是我的？', opts:['敌人','好朋友','同学','老师'], ans:1},
+          ]
+         },
+         {id:'yw-l73', name:'两件宝', content:'课文：\n人有两件宝，双手和大脑。\n双手会做工，大脑会思考。\n用手不用脑，事情做不好。\n用脑不用手，啥也做不了。\n动手又动脑，才能有创造。\n\n生字：两、件、宝、手、脑',
+          words:['双手','大脑','创造','思考'],
+          exercises:[
+            {type:'mc', q:'人有哪两件宝？', opts:['眼睛和耳朵','双手和大脑','嘴和鼻子','腿和脚'], ans:1},
+            {type:'mc', q:'要有创造，需要怎么做？', opts:['只用手','只用脑','动手又动脑','什么都不做'], ans:2},
+            {type:'fill', q:'动手又动脑，才能有___造。', ans:'创'},
+            {type:'mc', q:'光用手不用脑，结果是？', opts:['事情做得好','事情做不好','有创造','很聪明'], ans:1},
+          ]
+         },
+       ]
+      },
+      {id:'yw-u8', name:'第八单元', sub:'阅读（三）', emoji:'📝', color:'#F9FBE7',
+       lessons:[
+         {id:'yw-l81', name:'比尾巴', content:'课文（问答形式）：\n谁的尾巴长？猴子的尾巴长。\n谁的尾巴短？兔子的尾巴短。\n谁的尾巴好像一把伞？松鼠的尾巴好像一把伞。\n谁的尾巴弯？公鸡的尾巴弯。\n谁的尾巴扁？鸭子的尾巴扁。\n谁的尾巴最好看？孔雀的尾巴最好看。',
+          words:['尾巴','松鼠','孔雀','公鸡'],
+          exercises:[
+            {type:'mc', q:'谁的尾巴最长？', opts:['兔子','猴子','鸭子','公鸡'], ans:1},
+            {type:'mc', q:'谁的尾巴像一把伞？', opts:['猴子','兔子','松鼠','孔雀'], ans:2},
+            {type:'match', q:'连一连', pairs:[['猴子','长'],['兔子','短'],['松鼠','像伞'],['孔雀','最好看']]},
+            {type:'fill', q:'孔雀的尾巴最好___。', ans:'看'},
+            {type:'mc', q:'谁的尾巴是扁的？', opts:['公鸡','鸭子','松鼠','猴子'], ans:1},
+          ]
+         },
+         {id:'yw-l82', name:'乌鸦喝水', content:'课文：\n一只乌鸦口渴了，到处找水喝。乌鸦看见一个瓶子，瓶子里有水，可是瓶子里水不多，瓶口又小，乌鸦喝不到水。\n怎么办呢？乌鸦看见旁边有许多小石子，想出办法了：把小石子一颗一颗地放进瓶子里，瓶子里的水渐渐升高，乌鸦就喝到水了。',
+          words:['乌鸦','口渴','石子','办法'],
+          exercises:[
+            {type:'mc', q:'乌鸦用什么方法喝到水？', opts:['打破瓶子','放入石子让水升高','用吸管','等别人帮忙'], ans:1},
+            {type:'mc', q:'乌鸦为什么喝不到水？', opts:['水太少瓶口太小','水太多','没有瓶子','水不干净'], ans:0},
+            {type:'fill', q:'乌鸦把小___子放进瓶子里。', ans:'石'},
+            {type:'mc', q:'这个故事告诉我们什么道理？', opts:['要喝水','遇到困难要动脑筋想办法','不喜欢喝水','喝水很重要'], ans:1},
+          ]
+         },
+         {id:'yw-l83', name:'雨点儿', content:'课文：\n数不清的雨点儿，从云彩里飘落下来。\n半空中，大雨点儿问小雨点儿："你要到哪里去？"\n小雨点儿回答："我要去有花有草的地方。"\n大雨点儿说："我要去没有花没有草的地方。"\n不久，有花有草的地方，花更红了，草更绿了；没有花没有草的地方，开出了红色的花，长出了绿色的草。',
+          words:['雨点','云彩','花草','绿色'],
+          exercises:[
+            {type:'mc', q:'大雨点儿要去哪里？', opts:['有花有草的地方','没有花没有草的地方','海里','山里'], ans:1},
+            {type:'mc', q:'雨水浇过后，没有草的地方发生了什么？', opts:['什么都没有','长出了花草','变成了沙漠','被淹了'], ans:1},
+            {type:'fill', q:'雨点儿从___彩里飘落下来。', ans:'云'},
+            {type:'mc', q:'雨点儿有什么作用？', opts:['让植物生长更好','让植物死亡','没有作用','让天气变冷'], ans:0},
+          ]
+         },
+       ]
+      },
+    ]
+  },
+  shuxue: {
+    name:'数学', emoji:'🔢', color:'#E3F2FD', pub:'人教版2024',
+    units:[
+      {id:'sx-u0', name:'准备课', sub:'数一数/比多少', emoji:'🔢', color:'#E8F5E9',
+       lessons:[
+         {id:'sx-l01', name:'数一数', content:'观察图片，数一数各种物体的数量。数数是数学最基础的技能。\n数数时要：一个一个地数，不重复，不遗漏。\n1-10的数字：1、2、3、4、5、6、7、8、9、10',
+          exercises:[
+            {type:'mc', q:'1到10一共有多少个数？', opts:['8个','9个','10个','11个'], ans:2},
+            {type:'mc', q:'比10少1的数是？', opts:['8','9','11','7'], ans:1},
+            {type:'fill', q:'1、2、3、4、5、6、7、8、9、___。', ans:'10'},
+            {type:'mc', q:'数苹果：🍎🍎🍎🍎🍎，一共几个？', opts:['4个','5个','6个','3个'], ans:1},
+            {type:'mc', q:'数小鸡：🐤🐤🐤，一共几只？', opts:['2只','3只','4只','1只'], ans:1},
+          ]
+         },
+         {id:'sx-l02', name:'比多少', content:'比较两组物体的多少：\n• 一一对应法：将两组物体配对，多出来的就是更多的\n• 同样多：两组数量相等\n• 多：数量大的\n• 少：数量小的',
+          exercises:[
+            {type:'mc', q:'4和3比，哪个多？', opts:['3多','4多','同样多','不知道'], ans:1},
+            {type:'mc', q:'5和5比，结果是？', opts:['5多','5少','同样多','不能比'], ans:2},
+            {type:'fill', q:'6比5___（填"多"或"少"）。', ans:'多'},
+            {type:'mc', q:'3个苹果和5个苹果比，谁少？', opts:['5个苹果','3个苹果','一样多','不知道'], ans:1},
+            {type:'mc', q:'用一一对应法比较时，剩下来的就是？', opts:['少的','多的','相等的','不确定'], ans:1},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u1', name:'第一单元', sub:'比一比', emoji:'📏', color:'#FFF9C4',
+       lessons:[
+         {id:'sx-l11', name:'比长短', content:'比较物体的长短：\n• 长：比另一个物体更长\n• 短：比另一个物体更短\n• 比较时要从同一端开始\n\n常见比较方法：直接比较、间接比较',
+          exercises:[
+            {type:'mc', q:'比较铅笔长短，要从哪里开始对齐？', opts:['任意位置','从同一端','从中间','从末端'], ans:1},
+            {type:'mc', q:'30cm和20cm比，哪个更长？', opts:['20cm','30cm','一样长','不能比'], ans:1},
+            {type:'fill', q:'铅笔比橡皮___。（长/短）', ans:'长'},
+            {type:'mc', q:'蚯蚓和蛇比，通常哪个更长？', opts:['蚯蚓','蛇','一样长','不一定'], ans:1},
+          ]
+         },
+         {id:'sx-l12', name:'比高矮/比轻重', content:'比高矮：\n• 高：比另一个物体更高（通常需要在同一平面比较）\n\n比轻重：\n• 轻：比另一个物体更轻\n• 重：比另一个物体更重\n• 可以用天平或掂一掂的方法比较',
+          exercises:[
+            {type:'mc', q:'大象和小狗比，谁更重？', opts:['小狗','大象','一样重','不确定'], ans:1},
+            {type:'mc', q:'1kg的铁和1kg的棉花，哪个重？', opts:['铁重','棉花重','一样重','不能比'], ans:2},
+            {type:'fill', q:'长颈鹿比小兔子___。（高/矮）', ans:'高'},
+            {type:'mc', q:'用天平比较两个物体，天平哪边低就说明那边？', opts:['更轻','更重','一样重','不确定'], ans:1},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u2', name:'第二单元', sub:'1-5的认识和加减法', emoji:'➕', color:'#E8F5E9',
+       lessons:[
+         {id:'sx-l21', name:'1-5的认识', content:'认识1到5：\n1、2、3、4、5\n\n基数：表示数量，如3个苹果\n序数：表示顺序，如第3个\n\n数的顺序：1<2<3<4<5\n相邻数：比某个数大1或小1的数',
+          exercises:[
+            {type:'mc', q:'2的相邻数（前一个）是？', opts:['3','1','4','0'], ans:1},
+            {type:'mc', q:'4的相邻数（后一个）是？', opts:['3','4','5','6'], ans:2},
+            {type:'fill', q:'1、2、3、___、5（填数字）', ans:'4'},
+            {type:'mc', q:'比3大，比5小的数是？', opts:['2','4','6','1'], ans:1},
+            {type:'mc', q:'3个苹果，第二个是指？', opts:['最后一个','第2位置的苹果','所有苹果','第1个'], ans:1},
+          ]
+         },
+         {id:'sx-l22', name:'加法（1-5）', content:'加法：把两组数合并在一起\n符号：+（加号）、=（等号）\n\n例题：\n1+1=2\n2+3=5\n3+2=5\n\n加法的含义：有…，又来了…，一共有多少？',
+          exercises:[
+            {type:'mc', q:'1+2=？', opts:['1','2','3','4'], ans:2},
+            {type:'mc', q:'2+3=？', opts:['4','5','6','3'], ans:1},
+            {type:'fill', q:'3+___=5', ans:'2'},
+            {type:'mc', q:'小明有2个苹果，妈妈又给了2个，共有几个？', opts:['2个','3个','4个','5个'], ans:2},
+            {type:'mc', q:'4+1=？', opts:['4','5','6','3'], ans:1},
+          ]
+         },
+         {id:'sx-l23', name:'减法（1-5）', content:'减法：从一组数中拿走一部分\n符号：-（减号）、=（等号）\n\n例题：\n5-1=4\n5-2=3\n3-1=2\n\n减法的含义：有…，用了…，还剩多少？',
+          exercises:[
+            {type:'mc', q:'5-2=？', opts:['2','3','4','5'], ans:1},
+            {type:'mc', q:'4-1=？', opts:['2','3','4','5'], ans:1},
+            {type:'fill', q:'5-___=3', ans:'2'},
+            {type:'mc', q:'有5个气球，飞走了3个，还剩几个？', opts:['1个','2个','3个','4个'], ans:1},
+            {type:'mc', q:'3-2=？', opts:['0','1','2','3'], ans:1},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u3', name:'第三单元', sub:'认识图形（一）', emoji:'🔶', color:'#FFF3E0',
+       lessons:[
+         {id:'sx-l31', name:'认识立体图形', content:'认识四种基本立体图形：\n• 长方体（正方体）：像砖块、盒子\n• 球：像皮球、地球仪\n• 圆柱：像罐头、水桶\n• 正方体：像骰子、积木方块\n\n特征：长方体有6个面；球是圆的；圆柱有两个圆形底面。',
+          exercises:[
+            {type:'mc', q:'球形的特点是？', opts:['有棱有角','任何方向都是圆的','有平面','像盒子'], ans:1},
+            {type:'mc', q:'积木方块属于什么形状？', opts:['球','圆柱','正方体','三角形'], ans:2},
+            {type:'mc', q:'罐头属于什么形状？', opts:['球','圆柱','长方体','正方体'], ans:1},
+            {type:'fill', q:'我们喝水的杯子（圆形底）属于___柱。', ans:'圆'},
+            {type:'match', q:'连一连', pairs:[['砖块','长方体'],['皮球','球'],['罐头','圆柱'],['骰子','正方体']]},
+          ]
+         },
+         {id:'sx-l32', name:'认识平面图形', content:'从立体图形的面得到平面图形：\n• 长方形（从长方体面得到）\n• 正方形（从正方体面得到）\n• 圆形（从球或圆柱底面得到）\n• 三角形\n\n特征：\n正方形四条边相等；长方形对边相等；圆形无角无边。',
+          exercises:[
+            {type:'mc', q:'正方形有几条边？', opts:['3条','4条','5条','6条'], ans:1},
+            {type:'mc', q:'圆形有几个角？', opts:['0个','1个','2个','3个'], ans:0},
+            {type:'mc', q:'正方形和长方形的区别是？', opts:['正方形四边相等，长方形对边相等','形状相同','大小相同','没有区别'], ans:0},
+            {type:'fill', q:'三角形有___条边。', ans:'3'},
+            {type:'match', q:'连一连', pairs:[['正方体的面','正方形'],['圆柱底面','圆形'],['长方体的面','长方形']]},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u4', name:'第四单元', sub:'6-10的认识和加减法', emoji:'➕', color:'#E8EAF6',
+       lessons:[
+         {id:'sx-l41', name:'6-10的认识', content:'认识6到10：\n6、7、8、9、10\n\n数的顺序：5<6<7<8<9<10\n10的组成：\n10=1+9=2+8=3+7=4+6=5+5\n\n10是两位数的开始，个位是0，十位是1。',
+          exercises:[
+            {type:'mc', q:'8的相邻数（后一个）是？', opts:['7','8','9','10'], ans:2},
+            {type:'mc', q:'10=7+？', opts:['2','3','4','5'], ans:1},
+            {type:'fill', q:'6、7、8、9、___（填下一个数）', ans:'10'},
+            {type:'mc', q:'比8大，比10小的数是？', opts:['7','8','9','11'], ans:2},
+            {type:'mc', q:'10是几位数？', opts:['一位数','两位数','三位数','四位数'], ans:1},
+          ]
+         },
+         {id:'sx-l42', name:'加减法（6-10）', content:'6到10范围内的加减法：\n加法例题：6+3=9，7+2=9，5+5=10\n减法例题：10-3=7，9-4=5，8-2=6\n\n技巧：凑十法——7+3=10，8+2=10，9+1=10',
+          exercises:[
+            {type:'mc', q:'7+3=？', opts:['9','10','11','8'], ans:1},
+            {type:'mc', q:'10-4=？', opts:['5','6','7','8'], ans:1},
+            {type:'fill', q:'8+___=10', ans:'2'},
+            {type:'mc', q:'9-2=？', opts:['6','7','8','9'], ans:1},
+            {type:'mc', q:'6+4=？', opts:['9','10','11','8'], ans:1},
+            {type:'fill', q:'10-___=7', ans:'3'},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u5', name:'第五单元', sub:'11-20各数的认识', emoji:'🔢', color:'#FCE4EC',
+       lessons:[
+         {id:'sx-l51', name:'11-20的认识', content:'11到20的数由十位和个位组成：\n• 10+1=11（十一）\n• 10+5=15（十五）\n• 10+9=19（十九）\n• 10+10=20（二十）\n\n十位上的数表示有几个十，个位上的数表示有几个一。',
+          exercises:[
+            {type:'mc', q:'15是由（）个十和（）个一组成的？', opts:['1个十5个一','2个十5个一','15个一','1个十15个一'], ans:0},
+            {type:'mc', q:'10+8=？', opts:['17','18','19','20'], ans:1},
+            {type:'fill', q:'19比20少___。', ans:'1'},
+            {type:'mc', q:'20里面有几个十？', opts:['1个','2个','3个','20个'], ans:1},
+            {type:'mc', q:'个位是3，十位是1，这个数是？', opts:['13','31','3','1'], ans:0},
+          ]
+         },
+         {id:'sx-l52', name:'10加几和相应减法', content:'10加几（10+几）的计算：\n10+1=11，10+2=12，…10+9=19\n\n对应的减法：\n11-1=10，12-2=10，…19-9=10\n也可以：11-10=1，12-10=2',
+          exercises:[
+            {type:'mc', q:'10+6=？', opts:['15','16','17','18'], ans:1},
+            {type:'mc', q:'13-3=？', opts:['9','10','11','12'], ans:1},
+            {type:'fill', q:'10+___=17', ans:'7'},
+            {type:'mc', q:'18-10=？', opts:['7','8','9','10'], ans:1},
+            {type:'fill', q:'15-___=10', ans:'5'},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u6', name:'第六单元', sub:'认识钟表', emoji:'⏰', color:'#E8F5E9',
+       lessons:[
+         {id:'sx-l61', name:'认识钟面', content:'钟面的组成：\n• 时针（短针）：指示小时\n• 分针（长针）：指示分钟\n• 秒针（最细最长）：指示秒\n• 12个数字，12个大格，60个小格\n\n一圈 = 12小时（时针）= 60分钟（分针）',
+          exercises:[
+            {type:'mc', q:'时针是钟表上的哪根针？', opts:['最长的针','最短的针','最细的针','中等长的针'], ans:1},
+            {type:'mc', q:'钟面上有多少个数字？', opts:['10个','11个','12个','13个'], ans:2},
+            {type:'fill', q:'分针转一圈是___分钟。', ans:'60'},
+            {type:'mc', q:'当分针指向12，时针指向3，是几时？', opts:['12时','2时','3时','4时'], ans:2},
+            {type:'mc', q:'时针转一圈是多少小时？', opts:['6小时','12小时','24小时','60小时'], ans:1},
+          ]
+         },
+         {id:'sx-l62', name:'认识整时和半时', content:'整时：分针指向12\n半时：分针指向6\n\n读法：\n• 3:00 → 3时（或3点整）\n• 3:30 → 3时30分（或3点半）\n\n写法：数字写法如 7:00，7:30',
+          exercises:[
+            {type:'mc', q:'分针指向12，时针指向7，是几时？', opts:['6时','7时','8时','12时'], ans:1},
+            {type:'mc', q:'分针指向6，时针指向9，是几时几分？', opts:['9时','9时30分','6时','6时30分'], ans:1},
+            {type:'fill', q:'5:00读作5___。', ans:'时'},
+            {type:'mc', q:'"半时"是指分钟指向？', opts:['12','3','6','9'], ans:2},
+            {type:'fill', q:'8:30的分针指向数字___。', ans:'6'},
+          ]
+         },
+       ]
+      },
+      {id:'sx-u7', name:'第七单元', sub:'20以内的进位加法', emoji:'➕', color:'#F3E5F5',
+       lessons:[
+         {id:'sx-l71', name:'凑十法', content:'20以内进位加法的核心方法：凑十法\n\n步骤（以8+5为例）：\n1. 找较大数：8\n2. 8需要几个能凑成10？需要2个\n3. 把5分成2和3（5=2+3）\n4. 8+2=10，10+3=13\n所以8+5=13\n\n口诀：看大数，凑成十，再加剩。',
+          exercises:[
+            {type:'mc', q:'9+3=？（凑十法）', opts:['11','12','13','14'], ans:1},
+            {type:'mc', q:'8+6=？', opts:['13','14','15','16'], ans:1},
+            {type:'fill', q:'7+5=___', ans:'12'},
+            {type:'mc', q:'9+8=？', opts:['16','17','18','19'], ans:1},
+            {type:'fill', q:'8+___=14', ans:'6'},
+            {type:'mc', q:'6+7=？', opts:['12','13','14','15'], ans:1},
+          ]
+         },
+         {id:'sx-l72', name:'进位加法练习', content:'20以内进位加法汇总：\n9+2=11，9+3=12，9+4=13，9+5=14\n8+3=11，8+4=12，8+5=13，8+6=14\n7+4=11，7+5=12，7+6=13，7+7=14\n6+5=11，6+6=12，6+7=13，6+8=14\n5+6=11，5+7=12，5+8=13，5+9=14',
+          exercises:[
+            {type:'mc', q:'7+4=？', opts:['10','11','12','13'], ans:1},
+            {type:'mc', q:'6+8=？', opts:['13','14','15','16'], ans:1},
+            {type:'fill', q:'5+___=11', ans:'6'},
+            {type:'mc', q:'8+7=？', opts:['14','15','16','17'], ans:1},
+            {type:'fill', q:'9+___=16', ans:'7'},
+            {type:'mc', q:'最小的两位数是？', opts:['9','10','11','12'], ans:1},
+          ]
+         },
+       ]
+      },
+    ]
+  }
+};
+
+/* ===== 教材页面渲染 ===== */
+var _tbCurUnit = null;
+var _tbCurLesson = null;
+var _tbExAnswers = {};
+
+function pgTextbook(){
+  var data = TEXTBOOK_DATA[_tbSubject];
+  var html = '<div style="padding:12px">';
+  // Tab
+  html += '<div class="tabs">';
+  html += '<button class="tab '+(_tbSubject==='yuwen'?'on':'')+'" onclick="_tbSwitch(\'yuwen\')">📖 语文</button>';
+  html += '<button class="tab '+(_tbSubject==='shuxue'?'on':'')+'" onclick="_tbSwitch(\'shuxue\')">🔢 数学</button>';
+  html += '</div>';
+  
+  if(_tbCurLesson){
+    html += _tbLessonView();
+  } else if(_tbCurUnit){
+    html += _tbUnitView();
+  } else {
+    html += _tbSubjectView(data);
+  }
+  html += '</div>';
+  $('page').innerHTML = html;
+}
+
+function _tbSwitch(s){
+  _tbSubject=s; _tbCurUnit=null; _tbCurLesson=null; _tbExAnswers={};
+  pgTextbook();
+}
+
+function _tbSubjectView(data){
+  var html = '<div style="margin:12px 0 8px;font-weight:700;font-size:15px;color:var(--tx)">'+data.emoji+' '+data.name+'一年级上册 · '+data.pub+'</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">';
+  data.units.forEach(function(u, idx){
+    var lessons_count = u.lessons.length;
+    html += '<button onclick="_tbOpenUnit('+idx+')" style="background:'+u.color+';border:none;border-radius:14px;padding:14px 12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px">';
+    html += '<span style="font-size:28px">'+u.emoji+'</span>';
+    html += '<span style="font-weight:700;font-size:14px;color:var(--tx)">'+u.name+'</span>';
+    html += '<span style="font-size:12px;color:#666">'+u.sub+'</span>';
+    html += '<span style="font-size:11px;color:#888;margin-top:4px">'+lessons_count+'课 · 点击进入</span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _tbOpenUnit(idx){
+  _tbCurUnit = idx;
+  _tbCurLesson = null;
+  _tbExAnswers = {};
+  pgTextbook();
+}
+
+function _tbUnitView(){
+  var data = TEXTBOOK_DATA[_tbSubject];
+  var unit = data.units[_tbCurUnit];
+  var html = '<button onclick="_tbCurUnit=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;margin:8px 0">← 返回单元列表</button>';
+  html += '<div style="font-weight:700;font-size:16px;margin:4px 0 2px">'+unit.emoji+' '+unit.name+'</div>';
+  html += '<div style="font-size:13px;color:#666;margin-bottom:12px">'+unit.sub+'</div>';
+  unit.lessons.forEach(function(lesson, idx){
+    var ex_count = lesson.exercises ? lesson.exercises.length : 0;
+    html += '<button onclick="_tbOpenLesson('+idx+')" style="width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;text-align:left;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:22px;min-width:32px;text-align:center">'+(lesson.pinyin_chars?'🔊':'📄')+'</span>';
+    html += '<div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--tx)">'+lesson.name+'</div>';
+    if(lesson.sub) html += '<div style="font-size:12px;color:#888">'+lesson.sub+'</div>';
+    html += '<div style="font-size:11px;color:#aaa;margin-top:2px">'+ex_count+'道练习题</div></div>';
+    html += '<span style="color:#ccc;font-size:18px">›</span>';
+    html += '</button>';
+  });
+  return html;
+}
+
+function _tbOpenLesson(idx){
+  _tbCurLesson = idx;
+  _tbExAnswers = {};
+  pgTextbook();
+}
+
+function _tbLessonView(){
+  var data = TEXTBOOK_DATA[_tbSubject];
+  var unit = data.units[_tbCurUnit];
+  var lesson = unit.lessons[_tbCurLesson];
+  var html = '<button onclick="_tbCurLesson=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;margin:8px 0">← 返回课文列表</button>';
+  
+  // Title
+  html += '<div style="font-weight:700;font-size:16px;margin:4px 0">'+lesson.name+'</div>';
+  if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-bottom:8px">'+lesson.sub+'</div>';
+  
+  // Content box
+  html += '<div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;font-size:13px;color:var(--tx);line-height:1.8;white-space:pre-wrap">'+htmlEsc(lesson.content)+'</div>';
+  
+  // Characters (if any)
+  if(lesson.chars && lesson.chars.length){
+    html += '<div style="margin-bottom:12px"><div style="font-weight:600;font-size:13px;margin-bottom:6px">📝 本课生字</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    lesson.chars.forEach(function(c, i){
+      var py = lesson.pinyin ? lesson.pinyin[i] : '';
+      var st = lesson.strokes ? lesson.strokes[i]+'画' : '';
+      html += '<button onclick="speak(\''+c+'\',\'zh-CN\')" style="background:#f5f0ff;border:none;border-radius:10px;padding:8px 10px;text-align:center;min-width:52px;cursor:pointer">';
+      html += '<div style="font-size:24px">'+c+'</div>';
+      if(py) html += '<div style="font-size:11px;color:#888">'+py+'</div>';
+      if(st) html += '<div style="font-size:10px;color:#aaa">'+st+'</div>';
+      html += '</button>';
+    });
+    html += '</div></div>';
+  }
+  
+  // Pinyin chars (for pinyin lessons)
+  if(lesson.pinyin_chars && lesson.pinyin_chars.length){
+    html += '<div style="margin-bottom:12px"><div style="font-weight:600;font-size:13px;margin-bottom:6px">🔊 拼音（点击朗读）</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    lesson.pinyin_chars.forEach(function(p){
+      html += '<button onclick="_tbSpeakPinyin(\''+p+'\')" style="background:#e8f0ff;border:none;border-radius:10px;padding:10px 14px;font-size:18px;font-weight:700;cursor:pointer;color:#3a5fc8">'+p+'</button>';
+    });
+    html += '</div></div>';
+  }
+  
+  // Word pairs (if any)
+  if(lesson.words && lesson.words.length){
+    html += '<div style="margin-bottom:12px"><div style="font-weight:600;font-size:13px;margin-bottom:6px">📚 关键词</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    lesson.words.forEach(function(w){
+      html += '<button onclick="speak(\''+w+'\',\'zh-CN\')" style="background:#fff0f5;border:none;border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;color:#c02060">'+w+'</button>';
+    });
+    html += '</div></div>';
+  }
+  
+  // Exercises
+  if(lesson.exercises && lesson.exercises.length){
+    html += '<div style="font-weight:700;font-size:14px;margin:12px 0 8px">🧪 练习题</div>';
+    lesson.exercises.forEach(function(ex, exIdx){
+      html += _tbRenderExercise(ex, exIdx, lesson.id);
+    });
+    html += '<button onclick="_tbCheckAll(\''+lesson.id+'\')" style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px">✅ 检查全部答案</button>';
+  }
+  
+  // Navigation
+  var total = unit.lessons.length;
+  html += '<div style="display:flex;gap:8px;margin-top:12px">';
+  if(_tbCurLesson > 0){
+    html += '<button onclick="_tbOpenLesson('+(_tbCurLesson-1)+')" style="flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:10px;font-size:13px;cursor:pointer">← 上一课</button>';
+  }
+  if(_tbCurLesson < total-1){
+    html += '<button onclick="_tbOpenLesson('+(_tbCurLesson+1)+')" style="flex:1;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:10px;font-size:13px;cursor:pointer">下一课 →</button>';
+  }
+  html += '</div>';
+  
+  return html;
+}
+
+function _tbRenderExercise(ex, idx, lessonId){
+  var key = lessonId+'_'+idx;
+  var result = _tbExAnswers[key];
+  var html = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:8px;border:1.5px solid '+(result===true?'#4caf50':result===false?'#f44336':'var(--border)')+'">';
+  html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--tx)">'+(idx+1)+'、'+ex.q+'</div>';
+  
+  if(ex.type==='mc'){
+    ex.opts.forEach(function(opt, oi){
+      var sel = _tbExAnswers[key+'_sel']===oi;
+      html += '<button onclick="_tbSelectMC(\''+lessonId+'\','+idx+','+oi+')" style="display:block;width:100%;text-align:left;background:'+(sel?'#e8f0ff':'var(--bg)')+';border:'+(sel?'1.5px solid var(--brand)':'1.5px solid var(--border)')+';border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+String.fromCharCode(65+oi)+'. '+opt+'</button>';
+    });
+  } else if(ex.type==='fill'){
+    var cur = _tbExAnswers[key+'_fill']||'';
+    html += '<input id="tbfill_'+key+'" type="text" value="'+htmlEsc(cur)+'" placeholder="填写答案" style="width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--bg);color:var(--tx)" oninput="_tbExAnswers[\''+key+'_fill\']=this.value">';
+  } else if(ex.type==='match'){
+    html += _tbRenderMatch(ex, key);
+  }
+  
+  if(result===true) html += '<div style="color:#4caf50;font-size:12px;margin-top:6px">✅ 正确！</div>';
+  if(result===false) html += '<div style="color:#f44336;font-size:12px;margin-top:6px">❌ 再想想！正确答案：'+_tbGetCorrect(ex)+'</div>';
+  
+  html += '</div>';
+  return html;
+}
+
+function _tbRenderMatch(ex, key){
+  var pairs = ex.pairs;
+  if(!pairs || !pairs.length) return '';
+  var sel = _tbExAnswers[key+'_matchSel'] || null; // selected left item
+  var matched = _tbExAnswers[key+'_matched'] || {};
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  // Left column
+  html += '<div>';
+  pairs.forEach(function(p,i){
+    var isMatch = Object.keys(matched).indexOf(String(i))>=0;
+    html += '<button onclick="_tbMatchLeft(\''+key+'\','+i+')" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:8px;padding:7px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+p[0]+'</button>';
+  });
+  html += '</div>';
+  // Right column
+  html += '<div>';
+  pairs.forEach(function(p,i){
+    var isMatched = Object.values(matched).indexOf(i)>=0;
+    html += '<button onclick="_tbMatchRight(\''+key+'\','+i+')" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:8px;padding:7px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+p[1]+'</button>';
+  });
+  html += '</div>';
+  html += '</div>';
+  if(Object.keys(matched).length>0){
+    html += '<div style="font-size:11px;color:#888;margin-top:2px">已连'+Object.keys(matched).length+'/'+pairs.length+'对</div>';
+  }
+  return html;
+}
+
+function _tbMatchLeft(key, idx){
+  _tbExAnswers[key+'_matchSel'] = idx;
+  _tbCurLesson !== null && pgTextbook();
+}
+function _tbMatchRight(key, ridx){
+  var lidx = _tbExAnswers[key+'_matchSel'];
+  if(lidx===null||lidx===undefined) return;
+  var matched = _tbExAnswers[key+'_matched'] || {};
+  matched[lidx] = ridx;
+  _tbExAnswers[key+'_matched'] = matched;
+  _tbExAnswers[key+'_matchSel'] = null;
+  pgTextbook();
+}
+
+function _tbSelectMC(lessonId, exIdx, oi){
+  var key = lessonId+'_'+exIdx;
+  _tbExAnswers[key+'_sel'] = oi;
+  delete _tbExAnswers[key];
+  pgTextbook();
+}
+
+function _tbGetCorrect(ex){
+  if(ex.type==='mc') return ex.opts[ex.ans];
+  if(ex.type==='fill') return ex.ans;
+  if(ex.type==='match') return ex.pairs.map(function(p){return p[0]+'→'+p[1];}).join('，');
+  return '';
+}
+
+function _tbCheckAll(lessonId){
+  var data = TEXTBOOK_DATA[_tbSubject];
+  var unit = data.units[_tbCurUnit];
+  var lesson = unit.lessons[_tbCurLesson];
+  var correct = 0, total = 0;
+  lesson.exercises.forEach(function(ex, idx){
+    var key = lessonId+'_'+idx;
+    total++;
+    if(ex.type==='mc'){
+      var sel = _tbExAnswers[key+'_sel'];
+      _tbExAnswers[key] = (sel===ex.ans);
+      if(sel===ex.ans) correct++;
+    } else if(ex.type==='fill'){
+      var inp = document.getElementById('tbfill_'+key);
+      var val = inp ? inp.value.trim() : (_tbExAnswers[key+'_fill']||'').trim();
+      _tbExAnswers[key+'_fill'] = val;
+      var ok = val === ex.ans || val.toLowerCase() === ex.ans.toLowerCase();
+      _tbExAnswers[key] = ok;
+      if(ok) correct++;
+    } else if(ex.type==='match'){
+      var matched = _tbExAnswers[key+'_matched'] || {};
+      var allRight = ex.pairs.every(function(p,i){ return matched[i]===i; });
+      _tbExAnswers[key] = allRight;
+      if(allRight) correct++;
+    }
+  });
+  pgTextbook();
+  var pct = Math.round(correct/total*100);
+  var emoji = pct>=80?'🎉':pct>=60?'👍':'💪';
+  _syncToast(emoji+' 得分：'+correct+'/'+total+'题正确（'+pct+'%）', 4000);
+}
+
+function _tbSpeakPinyin(py){
+  // Map pinyin to example Chinese words for TTS
+  var map = {
+    'a':'啊','o':'哦','e':'鹅','i':'衣','u':'乌','ü':'鱼',
+    'b':'玻','p':'坡','m':'摸','f':'佛','d':'得','t':'特',
+    'n':'讷','l':'勒','g':'哥','k':'科','h':'喝','j':'鸡',
+    'q':'期','x':'西','z':'资','c':'次','s':'思',
+    'zh':'知','ch':'吃','sh':'师','r':'日','y':'衣','w':'乌',
+    'ai':'爱','ei':'诶','ui':'位','ao':'熬','ou':'欧','iu':'由',
+    'ie':'爷','er':'耳','an':'安','en':'恩','in':'音',
+    'un':'云','ang':'昂','eng':'嗯','ing':'英','ong':'翁'
+  };
+  var word = map[py] || py;
+  speak(word, 'zh-CN');
+}
+
 
 
 </script>
