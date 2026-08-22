@@ -10136,18 +10136,8 @@ function pgTextbook(){
     html += '<button onclick="_tbShowPdf=false;pgTextbook()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer">← 返回</button>';
     html += '<span style="font-weight:700;font-size:15px">'+data.name+'一年级上册原版教材</span>';
     html += '</div>';
-    if(_tbSubject==='shuxue'){
-      html += '<div style="text-align:center;padding:40px 20px;background:var(--card);border-radius:16px">';
-      html += '<div style="font-size:48px;margin-bottom:16px">📚</div>';
-      html += '<p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:8px">数学教材需要在浏览器中打开</p>';
-      html += '<p style="font-size:13px;color:#999;margin-bottom:20px">由于版权保护，数学教材需要跳转到官方网站查看</p>';
-      html += '<div style="margin-bottom:8px;font-size:13px;color:#888">📄 教材第 '+lessonPdfPage+' 页</div>';
-      html += '<a href="'+pdfUrl+'" target="_blank" style="display:inline-block;background:var(--brand);color:#fff;text-decoration:none;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:700">📖 在新窗口打开（第'+lessonPdfPage+'页）</a>';
-      html += '</div>';
-    } else {
-      html += '<iframe src="'+pdfUrl+'" style="width:100%;height:75vh;border:none;border-radius:12px" allowfullscreen></iframe>';
-      html += '<p style="font-size:12px;color:#999;margin-top:8px;text-align:center">如无法加载，请<a href="'+pdfUrl+'" target="_blank" style="color:var(--brand)">点击在新窗口打开</a></p>';
-    }
+    html += '<iframe src="'+pdfUrl+'" style="width:100%;height:75vh;border:none;border-radius:12px" allowfullscreen></iframe>';
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;text-align:center">如无法加载，请<a href="'+pdfUrl+'" target="_blank" style="color:var(--brand)">在新窗口打开（第'+lessonPdfPage+'页）</a></p>';
     html += '</div>';
     $('page').innerHTML = html;
     return;
