@@ -4702,6 +4702,7 @@ function revive(){
 /* ══════════ 侧边栏 ══════════ */
 const PAGES = [
   {k:"home", n:"首页", e:"🏠", bg:"#D8D0F5"},
+  {k:"textbook", n:"教材", e:"📚", bg:"#E8F5E9"},
   {k:"hz",   n:"识字", e:"📖", bg:"#CEC6F0"},
   {k:"py",   n:"拼音", e:"🔤", bg:"#D6CEFF"},
   {k:"math", n:"数学", e:"🔢", bg:"#C8C0EE"},
@@ -4712,7 +4713,6 @@ const PAGES = [
   {k:"cartoon", n:"YouTube", e:"<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAcCAYAAAAN3M1lAAACeElEQVR42s2YMUscQRTHfzO7MRqCAXNILISkkASSSkgwksJGIan8CHb6WewOG/0sYiEEg5aXE8UmcBaHRYSEcJi72/2nmB1vXGJw91YuA4+7nZ198+PNvDfzngEQWAOp4BHwAXgDvACeAU+BJ8Bj3PuHwBjwAIgBGwhAGkgf6AFd4DfQAX4BP4HvQBv4BjSBzwY6ngVlCgWrghOBRiSnglVvKLI/H4MBqaAfSJJJmpO7Tpj/zusL5wj1ffJQE4KzrLM3Qov5uc8EExZYBOYcIzGja3HGMAcsWuBd1pEy+pZmLG8t8BIwpdQYA1FUNZwBXllgNugoBiVBkjg4Y6qCApi1wHQpFdbCzg6srDg4CeLKtug0gvPAre/mQca432ZTkqTtbWlmZvDO2rKe6RlaCC5Lgx0cSGnq4NptaX19MCaKBuOKg10idwwUU+AnPDx0UFdXum77+9LCwk3A4pbrUCqo5sH6fWe5ft89J4lUr0tTUzfHFwi2FDxebgfzzUNK0sWFtLHhrFZs36X2XsKkDx3dLvR65XTcy1J2u9LmpjQ5OdRSVrv5d3el+flKNv9w4cK383NpbW0wJo6HDhet0mDHxw6qXpdqNddnbWUB9mv2kBRSEkXS1pa0tDTssoXiGRoI9kqBhctULsr/C2wvBloDBy3iznIHuTHuEK+meYZWDJwWhrq+1t3L3VLAqQWOsnuQ/Q9usDZjOUIwHqRt3REmI37uE7ncFQTLOZdN/pK+lUnhbkvd8vpDXcuEyWWWWzZGaLGGzymzbPxGiWAMeA+8Bp4DM0AtVyIYz5UIomBvEGRcSa5EcBWUCH7kSgTHwBfjltMaSP8A2C6XfF2BfJkAAAAASUVORK5CYII=\" style=\"width:36px;height:26px;object-fit:contain\">", bg:"#D8C8F0"},
   {k:"gift", n:"奖励中心", e:"🎁", bg:"#DCD4FF"},
   {k:"memo", n:"备忘录", e:"📋", bg:"#D2CAFF"},
-  {k:"textbook", n:"教材", e:"📚", bg:"#E8F5E9"},
 ];
 let cur = "home";
 function paintSide(){
@@ -9899,7 +9899,7 @@ function _tbSubjectView(data){
     var lessons_count = u.lessons.length;
     html += '<button onclick="_tbOpenUnit('+idx+')" style="background:'+u.color+';border:none;border-radius:14px;padding:14px 12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px">';
     html += '<span style="font-size:28px">'+u.emoji+'</span>';
-    html += '<span style="font-weight:700;font-size:14px;color:var(--tx)">'+u.name+'</span>';
+    html += '<span style="font-weight:700;font-size:15px;color:var(--tx)">'+u.name+'</span>';
     html += '<span style="font-size:12px;color:#666">'+u.sub+'</span>';
     html += '<span style="font-size:11px;color:#888;margin-top:4px">'+lessons_count+'课 · 点击进入</span>';
     html += '</button>';
@@ -9943,7 +9943,7 @@ function _tbUnitView(){
     html += '</div>';
     // Content
     html += '<div style="flex:1;padding:12px 14px">';
-    html += '<div style="font-weight:700;font-size:15px;color:var(--tx)">'+lesson.name+'</div>';
+    html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:16px;color:var(--tx);cursor:pointer">'+lesson.name+' <span style="font-size:12px;color:#bbb">🔊</span></div>';
     if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-top:2px">'+lesson.sub+'</div>';
     html += '<div style="margin-top:6px;display:flex;align-items:center;gap:6px">';
     html += '<span style="background:#f0ebff;color:#7c5cbf;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+ex_count+'道练习</span>';
@@ -9972,11 +9972,16 @@ function _tbLessonView(){
   html += '</div>';
   
   // Title
-  html += '<div style="font-weight:700;font-size:16px;margin:4px 0">'+lesson.name+'</div>';
+  html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:18px;margin:4px 0;cursor:pointer">'+lesson.name+' <span style="font-size:13px;color:#bbb">🔊</span></div>';
   if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-bottom:8px">'+lesson.sub+'</div>';
   
   // Content box
-  html += '<div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;font-size:13px;color:var(--tx);line-height:1.8;white-space:pre-wrap">'+htmlEsc(lesson.content)+'</div>';
+  // Content box – tap anywhere to hear it read aloud
+  var contentText = lesson.content || '';
+  html += '<div onclick="speak(this.dataset.t,'zh-CN')" data-t="'+contentText.replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/
+/g,' ')+'" style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;font-size:15px;color:var(--tx);line-height:2;white-space:pre-wrap;cursor:pointer;position:relative">';
+  html += '<span style="position:absolute;top:8px;right:10px;font-size:11px;color:#bbb">🔊 点击朗读</span>';
+  html += htmlEsc(lesson.content)+'</div>';
   
   // Characters (if any)
   if(lesson.chars && lesson.chars.length){
@@ -10040,17 +10045,17 @@ function _tbLessonView(){
 function _tbRenderExercise(ex, idx, lessonId){
   var key = lessonId+'_'+idx;
   var result = _tbExAnswers[key];
-  var html = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:8px;border:1.5px solid '+(result===true?'#4caf50':result===false?'#f44336':'var(--border)')+'">';
-  html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--tx)">'+(idx+1)+'、'+ex.q+'</div>';
+  var html = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:2px solid '+(result===true?'#4caf50':result===false?'#f44336':'var(--border)')+'">';
+  html += '<div onclick="speak(ex.q,\'zh-CN\')" style="font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx);cursor:pointer;line-height:1.6">'+(idx+1)+'、'+ex.q+' <span style="font-size:12px;color:#bbb">🔊</span></div>';
   
   if(ex.type==='mc'){
     ex.opts.forEach(function(opt, oi){
       var sel = _tbExAnswers[key+'_sel']===oi;
-      html += '<button onclick="_tbSelectMC(\''+lessonId+'\','+idx+','+oi+')" style="display:block;width:100%;text-align:left;background:'+(sel?'#e8f0ff':'var(--bg)')+';border:'+(sel?'1.5px solid var(--brand)':'1.5px solid var(--border)')+';border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+String.fromCharCode(65+oi)+'. '+opt+'</button>';
+      html += '<button onclick="_tbSelectMC(\''+lessonId+'\','+idx+','+oi+');speak(this.dataset.t,\'zh-CN\')" data-t="'+opt+'" style="display:block;width:100%;text-align:left;background:'+(sel?'#e8f0ff':'var(--bg)')+';border:'+(sel?'1.5px solid var(--brand)':'1.5px solid var(--border)')+';border-radius:10px;padding:12px 14px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx)">'+String.fromCharCode(65+oi)+'. '+opt+'</button>';
     });
   } else if(ex.type==='fill'){
     var cur = _tbExAnswers[key+'_fill']||'';
-    html += '<input id="tbfill_'+key+'" type="text" value="'+htmlEsc(cur)+'" placeholder="填写答案" style="width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--bg);color:var(--tx)" oninput="_tbExAnswers[\''+key+'_fill\']=this.value">';
+    html += '<input id="tbfill_'+key+'" type="text" value="'+htmlEsc(cur)+'" placeholder="填写答案" style="width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:18px;background:var(--bg);color:var(--tx)" oninput="_tbExAnswers[\''+key+'_fill\']=this.value">';
   } else if(ex.type==='match'){
     html += _tbRenderMatch(ex, key);
   }
@@ -10072,14 +10077,14 @@ function _tbRenderMatch(ex, key){
   html += '<div>';
   pairs.forEach(function(p,i){
     var isMatch = Object.keys(matched).indexOf(String(i))>=0;
-    html += '<button onclick="_tbMatchLeft(\''+key+'\','+i+')" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:8px;padding:7px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+p[0]+'</button>';
+    html += '<button onclick="_tbMatchLeft(\''+key+'\','+i+');speak(this.dataset.t,\'zh-CN\')" data-t="'+p[0]+'" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[0]+'</button>';
   });
   html += '</div>';
   // Right column
   html += '<div>';
   pairs.forEach(function(p,i){
     var isMatched = Object.values(matched).indexOf(i)>=0;
-    html += '<button onclick="_tbMatchRight(\''+key+'\','+i+')" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:8px;padding:7px;margin-bottom:4px;cursor:pointer;font-size:13px;color:var(--tx)">'+p[1]+'</button>';
+    html += '<button onclick="_tbMatchRight(\''+key+'\','+i+');speak(this.dataset.t,\'zh-CN\')" data-t="'+p[1]+'" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[1]+'</button>';
   });
   html += '</div>';
   html += '</div>';
