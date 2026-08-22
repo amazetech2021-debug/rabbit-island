@@ -9859,9 +9859,9 @@ function pgTextbook(){
   html += '<button class="tab '+(_tbSubject==='shuxue'?'on':'')+'" onclick="_tbSwitch(\'shuxue\')">🔢 数学</button>';
   html += '</div>';
   
-  if(_tbCurLesson){
+  if(_tbCurLesson !== null){
     html += _tbLessonView();
-  } else if(_tbCurUnit){
+  } else if(_tbCurUnit !== null){
     html += _tbUnitView();
   } else {
     html += _tbSubjectView(data);
@@ -9901,18 +9901,38 @@ function _tbOpenUnit(idx){
 function _tbUnitView(){
   var data = TEXTBOOK_DATA[_tbSubject];
   var unit = data.units[_tbCurUnit];
-  var html = '<button onclick="_tbCurUnit=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;margin:8px 0">← 返回单元列表</button>';
-  html += '<div style="font-weight:700;font-size:16px;margin:4px 0 2px">'+unit.emoji+' '+unit.name+'</div>';
-  html += '<div style="font-size:13px;color:#666;margin-bottom:12px">'+unit.sub+'</div>';
+  // Header banner
+  var html = '<button onclick="_tbCurUnit=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:4px 0 8px;display:flex;align-items:center;gap:4px">← 返回单元列表</button>';
+  html += '<div style="background:'+unit.color+';border-radius:16px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">';
+  html += '<span style="font-size:40px">'+unit.emoji+'</span>';
+  html += '<div><div style="font-weight:800;font-size:17px;color:#333">'+unit.name+'</div>';
+  html += '<div style="font-size:13px;color:#666;margin-top:2px">'+unit.sub+'</div>';
+  html += '<div style="font-size:11px;color:#999;margin-top:4px">共 '+unit.lessons.length+' 课</div></div>';
+  html += '</div>';
+  // Lesson cards
   unit.lessons.forEach(function(lesson, idx){
     var ex_count = lesson.exercises ? lesson.exercises.length : 0;
-    html += '<button onclick="_tbOpenLesson('+idx+')" style="width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;text-align:left;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">';
-    html += '<span style="font-size:22px;min-width:32px;text-align:center">'+(lesson.pinyin_chars?'🔊':'📄')+'</span>';
-    html += '<div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--tx)">'+lesson.name+'</div>';
-    if(lesson.sub) html += '<div style="font-size:12px;color:#888">'+lesson.sub+'</div>';
-    html += '<div style="font-size:11px;color:#aaa;margin-top:2px">'+ex_count+'道练习题</div></div>';
-    html += '<span style="color:#ccc;font-size:18px">›</span>';
-    html += '</button>';
+    var isPinyin = !!lesson.pinyin_chars;
+    var emo = isPinyin ? '🔊' : (lesson.chars && lesson.chars.length ? '✍️' : '📖');
+    var accent = unit.color;
+    html += '<button onclick="_tbOpenLesson('+idx+')" style="width:100%;background:var(--card);border:none;border-radius:16px;padding:0;text-align:left;margin-bottom:10px;cursor:pointer;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:block">';
+    html += '<div style="display:flex;align-items:stretch">';
+    // Colored left stripe + number
+    html += '<div style="background:'+accent+';min-width:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px;gap:4px">';
+    html += '<span style="font-size:22px">'+emo+'</span>';
+    html += '<span style="font-size:11px;font-weight:700;color:#555">'+String(idx+1).padStart(2,'0')+'</span>';
+    html += '</div>';
+    // Content
+    html += '<div style="flex:1;padding:12px 14px">';
+    html += '<div style="font-weight:700;font-size:15px;color:var(--tx)">'+lesson.name+'</div>';
+    if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-top:2px">'+lesson.sub+'</div>';
+    html += '<div style="margin-top:6px;display:flex;align-items:center;gap:6px">';
+    html += '<span style="background:#f0ebff;color:#7c5cbf;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+ex_count+'道练习</span>';
+    if(lesson.chars && lesson.chars.length) html += '<span style="background:#e8f5e9;color:#388e3c;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+lesson.chars.length+'个生字</span>';
+    html += '</div></div>';
+    // Arrow
+    html += '<div style="display:flex;align-items:center;padding-right:14px"><span style="color:#bbb;font-size:22px;font-weight:300">›</span></div>';
+    html += '</div></button>';
   });
   return html;
 }
