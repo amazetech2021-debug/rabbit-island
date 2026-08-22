@@ -9863,8 +9863,17 @@ function pgTextbook(){
     html += '<button onclick="_tbShowPdf=false;pgTextbook()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer">← 返回</button>';
     html += '<span style="font-weight:700;font-size:15px">'+data.name+'一年级上册原版教材</span>';
     html += '</div>';
-    html += '<iframe src="'+pdfUrl+'" style="width:100%;height:75vh;border:none;border-radius:12px" allowfullscreen></iframe>';
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;text-align:center">如无法加载，请<a href="'+pdfUrl+'" target="_blank" style="color:var(--brand)">点击在新窗口打开</a></p>';
+    if(_tbSubject==='shuxue'){
+      html += '<div style="text-align:center;padding:40px 20px;background:var(--card);border-radius:16px">';
+      html += '<div style="font-size:48px;margin-bottom:16px">📚</div>';
+      html += '<p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:8px">数学教材需要在浏览器中打开</p>';
+      html += '<p style="font-size:13px;color:#999;margin-bottom:20px">由于版权保护，数学教材需要跳转到官方网站查看</p>';
+      html += '<a href="'+pdfUrl+'" target="_blank" style="display:inline-block;background:var(--brand);color:#fff;text-decoration:none;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:700">📖 在新窗口打开教材</a>';
+      html += '</div>';
+    } else {
+      html += '<iframe src="'+pdfUrl+'" style="width:100%;height:75vh;border:none;border-radius:12px" allowfullscreen></iframe>';
+      html += '<p style="font-size:12px;color:#999;margin-top:8px;text-align:center">如无法加载，请<a href="'+pdfUrl+'" target="_blank" style="color:var(--brand)">点击在新窗口打开</a></p>';
+    }
     html += '</div>';
     $('page').innerHTML = html;
     return;
@@ -9943,7 +9952,7 @@ function _tbUnitView(){
     html += '</div>';
     // Content
     html += '<div style="flex:1;padding:12px 14px">';
-    html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:16px;color:var(--tx);cursor:pointer">'+lesson.name+' <span style="font-size:12px;color:#bbb">🔊</span></div>';
+    html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:16px;color:var(--tx);cursor:pointer">'+lesson.name+'</div>';
     if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-top:2px">'+lesson.sub+'</div>';
     html += '<div style="margin-top:6px;display:flex;align-items:center;gap:6px">';
     html += '<span style="background:#f0ebff;color:#7c5cbf;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+ex_count+'道练习</span>';
@@ -9972,14 +9981,14 @@ function _tbLessonView(){
   html += '</div>';
   
   // Title
-  html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:18px;margin:4px 0;cursor:pointer">'+lesson.name+' <span style="font-size:13px;color:#bbb">🔊</span></div>';
+  html += '<div onclick="speak(lesson.name,\'zh-CN\')" style="font-weight:700;font-size:18px;margin:4px 0;cursor:pointer">'+lesson.name+'</div>';
   if(lesson.sub) html += '<div style="font-size:12px;color:#888;margin-bottom:8px">'+lesson.sub+'</div>';
   
   // Content box
   // Content box – tap anywhere to hear it read aloud
   var contentText = lesson.content || '';
   html += '<div onclick="speak(this.dataset.t,\'zh-CN\')" data-t="'+contentText.replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,' ')+'" style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;font-size:15px;color:var(--tx);line-height:2;white-space:pre-wrap;cursor:pointer;position:relative">';
-  html += '<span style="position:absolute;top:8px;right:10px;font-size:11px;color:#bbb">🔊 点击朗读</span>';
+  // TTS: tap text to hear it read aloud
   html += htmlEsc(lesson.content)+'</div>';
   
   // Characters (if any)
@@ -10045,7 +10054,7 @@ function _tbRenderExercise(ex, idx, lessonId){
   var key = lessonId+'_'+idx;
   var result = _tbExAnswers[key];
   var html = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:2px solid '+(result===true?'#4caf50':result===false?'#f44336':'var(--border)')+'">';
-  html += '<div onclick="speak(this.dataset.t,\'zh-CN\')" data-t="'+ex.q+'" style="font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx);cursor:pointer;line-height:1.6">'+(idx+1)+'、'+ex.q+' <span style="font-size:12px;color:#bbb">🔊</span></div>';
+  html += '<div onclick="speak(this.dataset.t,\'zh-CN\')" data-t="'+ex.q+'" style="font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx);cursor:pointer;line-height:1.6">'+(idx+1)+'、'+ex.q+'</div>';
   
   if(ex.type==='mc'){
     ex.opts.forEach(function(opt, oi){
