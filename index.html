@@ -3855,6 +3855,7 @@ function dictAudioUrl(text, isEn, force){
 }
 
 function stopSpeak(){
+  if(TTS._ctrl){ try{ TTS._ctrl.abort(); }catch(e){} TTS._ctrl = null; }
   if(TTS.cur){ try{ TTS.cur.pause(); TTS.cur.currentTime = 0; }catch(e){} TTS.cur = null; }
   try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
   TTS.busy = false;
@@ -3910,7 +3911,10 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
   if(!TTS.doubaoKey || typeof fetch === 'undefined'){ next(); return; }
   const apiUrl = 'https://openspeech.bytedance.com/api/v3/tts/unidirectional?api_key=' + encodeURIComponent(TTS.doubaoKey);
   try{
+    const ctrl = new AbortController();
+    TTS._ctrl = ctrl;
     fetch(apiUrl, {
+      signal: ctrl.signal,
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -3929,6 +3933,7 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
       })
     })
     .then(r => {
+      TTS._ctrl = null;
       if(!r.ok){
         return r.json().then(j => { throw new Error('豆包 '+r.status+': '+(j.message||j.error||JSON.stringify(j))); })
                .catch(e => { if(e.message.startsWith('豆包')) throw e; throw new Error('豆包 '+r.status); });
@@ -3954,7 +3959,7 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
       TTS._dbFail = 0;
       playUrl(URL.createObjectURL(new Blob([bytes], {type:'audio/mpeg'})), key, onEnd);
     })
-    .catch(e => { TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS:', e.message); next(); });
+    .catch(e => { TTS._ctrl = null; if(e.name==='AbortError') return; TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS:', e.message); next(); });
   }catch(e){ TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS 异常:', e.message); next(); }
 }
 
