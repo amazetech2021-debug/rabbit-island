@@ -9293,6 +9293,7 @@ var _tbExState = {};  // exercise state
 var TEXTBOOK_DATA = {
   yuwen: {
     name:'语文', emoji:'📖', color:'#FFF3E0', pub:'统编版2024',
+    pdfUrl:'https://r2-ndr.ykt.cbern.com.cn/edu_product/esp/assets/1c73b348-e8b6-47d6-84b0-6dbacbe28268.pkg/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%20%E8%AF%AD%E6%96%87%20%E4%B8%80%E5%B9%B4%E7%BA%A7%20%E4%B8%8A%E5%86%8C_1725097498841.pdf',
     units:[
       {id:'yw-u0', name:'入学教育', sub:'我上学了', emoji:'🏫', color:'#FFF9C4',
        lessons:[
@@ -9654,6 +9655,7 @@ var TEXTBOOK_DATA = {
   },
   shuxue: {
     name:'数学', emoji:'🔢', color:'#E3F2FD', pub:'人教版2024',
+    pdfUrl:'https://c1.ykt.cbern.com.cn/%E5%90%88%E5%B9%B6%E7%94%B5%E5%AD%90%E6%95%99%E6%9D%90/0321/%E4%BA%BA%E6%95%99%E7%89%88/%E5%B0%8F%E5%AD%A6/%E6%95%B0%E5%AD%A6/%E4%B8%80%E5%B9%B4%E7%BA%A7/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%C2%B7%E6%95%B0%E5%AD%A6%E4%B8%80%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C.pdf',
     units:[
       {id:'sx-u0', name:'准备课', sub:'数一数/比多少', emoji:'🔢', color:'#E8F5E9',
        lessons:[
@@ -9849,9 +9851,24 @@ var TEXTBOOK_DATA = {
 var _tbCurUnit = null;
 var _tbCurLesson = null;
 var _tbExAnswers = {};
+var _tbShowPdf = false;
 
 function pgTextbook(){
   var data = TEXTBOOK_DATA[_tbSubject];
+  // If showing PDF viewer inline
+  if(_tbShowPdf){
+    var pdfUrl = data.pdfUrl;
+    var html = '<div style="padding:12px">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+    html += '<button onclick="_tbShowPdf=false;pgTextbook()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer">← 返回</button>';
+    html += '<span style="font-weight:700;font-size:15px">'+data.name+'一年级上册原版教材</span>';
+    html += '</div>';
+    html += '<iframe src="'+pdfUrl+'" style="width:100%;height:75vh;border:none;border-radius:12px" allowfullscreen></iframe>';
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;text-align:center">如无法加载，请<a href="'+pdfUrl+'" target="_blank" style="color:var(--brand)">点击在新窗口打开</a></p>';
+    html += '</div>';
+    $('page').innerHTML = html;
+    return;
+  }
   var html = '<div style="padding:12px">';
   // Tab
   html += '<div class="tabs">';
@@ -9903,6 +9920,8 @@ function _tbUnitView(){
   var unit = data.units[_tbCurUnit];
   // Header banner
   var html = '<button onclick="_tbCurUnit=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:4px 0 8px;display:flex;align-items:center;gap:4px">← 返回单元列表</button>';
+  // PDF button
+  html += '<button onclick="_tbShowPdf=true;pgTextbook()" style="width:100%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:14px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">📖 查看原版教材（国家电子课本）</button>';
   html += '<div style="background:'+unit.color+';border-radius:16px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">';
   html += '<span style="font-size:40px">'+unit.emoji+'</span>';
   html += '<div><div style="font-weight:800;font-size:17px;color:#333">'+unit.name+'</div>';
@@ -9947,7 +9966,10 @@ function _tbLessonView(){
   var data = TEXTBOOK_DATA[_tbSubject];
   var unit = data.units[_tbCurUnit];
   var lesson = unit.lessons[_tbCurLesson];
-  var html = '<button onclick="_tbCurLesson=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;margin:8px 0">← 返回课文列表</button>';
+  var html = '<div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px">';
+  html += '<button onclick="_tbCurLesson=null;pgTextbook()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:0">← 返回课文列表</button>';
+  html += '<button onclick="_tbShowPdf=true;pgTextbook()" style="margin-left:auto;background:#6c5ce7;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer">📖 看教材</button>';
+  html += '</div>';
   
   // Title
   html += '<div style="font-weight:700;font-size:16px;margin:4px 0">'+lesson.name+'</div>';
