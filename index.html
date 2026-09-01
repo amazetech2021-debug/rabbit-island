@@ -7970,8 +7970,8 @@ function playBookVideo(chId,plIdx,epIdx){
   m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var isBili=!!ep.bili;
   var openUrl=isBili?ep.bili:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
-  // Mobile/tablet: skip modal, jump directly
-  location.href=openUrl;return;
+  // Skip modal: mobile=same tab (back works), desktop=new tab
+  if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
   var thumbHtml=isBili
     ?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:'+ch.color+'"><span style="font-size:64px">'+ch.emoji+'</span></div>'
     :'<img src="https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg" style="width:100%;display:block;opacity:0.85" onerror="this.style.display=\'none\'">';
@@ -9255,8 +9255,8 @@ function playYtVideo(chId,plIdx,epIdx){
   var m=$('mbox');
   m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var ytUrl=ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v;
-  // Mobile/tablet: skip modal, jump directly
-  location.href=ytUrl;return;
+  // Skip modal: mobile=same tab (back works), desktop=new tab
+  if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=ytUrl;}else{window.open(ytUrl,'_blank');}return;
   var thumbUrl='https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg';
   var titleShort=ep.t.length>70?ep.t.substring(0,70)+'…':ep.t;
   var plShort=pl.name.length>40?pl.name.substring(0,40)+'…':pl.name;
