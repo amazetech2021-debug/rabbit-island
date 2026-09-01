@@ -3826,52 +3826,72 @@ var TTS = {
   useSSML : true,
 
   /* 拼音本地录音覆盖表：填了就优先用录音，最准也最快，还能离线 */
-  // 363 davinfifield + 14 hugolpz natural pinyin recordings
   pyAudio : (function(){
+    /* 拼音录音：托管在 GitHub Pages 避免 Safari content-disposition 问题
+       主要覆盖声母/韵母/整体认读的基准音节（45个×4调=180个）
+       以及常用完整音节（via davinfifield raw URLs） */
+    var G="https://amazetech2021-debug.github.io/rabbit-island/pinyin-audio/";
     var D="https://raw.githubusercontent.com/davinfifield/mp3-chinese-pinyin-sound/master/mp3/";
     var H="https://raw.githubusercontent.com/hugolpz/audio-cmn/master/64k/syllabs/cmn-";
-    var sd=[
-      "a","ai","an","ang","ao","ba","bai","ban","bang","bao","bei","ben",
-      "beng","bi","bie","bin","bing","bo","bu","ca","cai","can","cang","cao",
-      "ce","cen","ceng","cha","chai","chan","chang","chao","che","chen","cheng","chi",
-      "chou","chu","chua","chuai","chuan","chuang","chui","chun","chuo","ci","cou","cu",
-      "cuan","cui","cun","cuo","da","dai","dan","dang","dao","de","dei","den",
-      "deng","di","die","ding","diu","dou","du","duan","dui","dun","duo","e",
-      "ei","en","er","fa","fan","fang","fei","fen","feng","fo","fou","fu",
-      "ga","gai","gan","gang","gao","ge","gen","geng","gou","gu","gua","guai",
-      "guan","guang","gui","gun","guo","ha","hai","han","hang","hao","he","hei",
-      "hen","heng","hou","hu","hua","huai","huan","huang","hui","hun","huo","ji",
-      "jia","jian","jiao","jie","jin","jing","jiong","jiu","ju","juan","jue","jun",
-      "ka","kai","kan","kang","kao","ke","ken","keng","kou","ku","kua","kuai",
-      "kuan","kuang","kui","kun","kuo","la","lai","lan","lang","lao","le","lei",
-      "leng","li","lia","liao","lie","ling","liu","lo","lou","lu","luan","luo",
-      "ma","mai","man","mang","mao","mei","men","meng","mi","miao","mie","min",
-      "ming","mo","mou","mu","na","nai","nan","nang","nao","ne","nei","nen",
-      "neng","ni","niao","nie","nin","ning","niu","nou","nu","nuan","ou","pa",
-      "pai","pan","pang","pao","pei","pen","peng","pi","piao","pie","pin","ping",
-      "po","pu","qi","qia","qian","qiao","qie","qin","qing","qiong","qiu","qu",
-      "quan","que","qun","ran","rang","rao","re","ren","reng","ri","rou","ru",
-      "ruan","run","ruo","sa","sai","san","sang","sao","se","sen","seng","sha",
-      "shai","shan","shang","shao","she","shei","shen","sheng","shi","shou","shu","shua",
-      "shuai","shuan","shuang","shui","shun","shuo","si","sou","su","suan","sui","sun",
-      "suo","ta","tai","tan","tang","tao","te","teng","ti","tiao","tie","ting",
-      "tou","tu","tuan","tui","tun","tuo","wa","wai","wan","wang","wei","wen",
-      "weng","wo","wu","xi","xia","xian","xiao","xie","xin","xing","xiong","xu",
-      "xuan","xue","xun","ya","yan","yang","yao","ye","yi","yin","ying","yong",
-      "you","yu","yuan","yue","yun","za","zai","zan","zang","zao","ze","zei",
-      "zen","zeng","zha","zhai","zhang","zhao","zhe","zhei","zhen","zheng","zhi","zhou",
-      "zhu","zhua","zhuai","zhuan","zhuang","zhui","zhun","zhuo","zi","zou","zu","zuan",
-      "zui","zun","zuo"
-    ];
-    var sh=[
-      "biao","diao","eng","lin","lun","lv","lve","nuo","nv","nve","o","rui",
-      "xiu","zhan"
-    ];
     var m={};
-    sd.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=D+s+t+'.mp3';});});
-    sh.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=H+s+t+'.mp3';});});
-    /* standalone ü → yu files; v is what pyToNum() emits for ü */
-    [1,2,3,4].forEach(function(t){m['v'+t]=D+'yu'+t+'.mp3';});
+    /* ── GitHub Pages 自托管：声母/韵母/整体认读（更可靠） ── */
+    var sg=["a","ai","an","ang","ao","bo","chi","ci","de","e","ei","en","eng","er",
+            "fo","ge","he","ji","ke","le","mo","ne","o","ou","po","qi","ri","shi","si",
+            "te","wei","wen","wu","xi","ye","yi","yin","ying","you","yu","yuan","yue","yun",
+            "zhi","zi","bo","po","mo","fo","de","te","ne","le","ge","ke","he","ji","qi","xi"];
+    /* 去重 */
+    sg=[...new Set(sg)];
+    sg.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=G+s+t+'.mp3';});});
+    /* 韵母 it[1] 别名 → 对应自托管文件 */
+    [1,2,3,4].forEach(function(t){
+      m['i'+t]=G+'yi'+t+'.mp3';   /* 韵母 i → yi */
+      m['u'+t]=G+'wu'+t+'.mp3';   /* 韵母 u → wu */
+      m['v'+t]=G+'yu'+t+'.mp3';   /* 韵母 ü → yu (pyToNum emits v) */
+      m['ui'+t]=G+'wei'+t+'.mp3'; /* 韵母 ui → wei */
+      m['iu'+t]=G+'you'+t+'.mp3'; /* 韵母 iu → you */
+      m['ie'+t]=G+'ye'+t+'.mp3';  /* 韵母 ie → ye */
+      m['in'+t]=G+'yin'+t+'.mp3'; /* 韵母 in → yin */
+      m['un'+t]=G+'wen'+t+'.mp3'; /* 韵母 un → wen */
+      m['ing'+t]=G+'ying'+t+'.mp3'; /* 韵母 ing → ying */
+    });
+    /* 韵母 üe/ün 别名 */
+    [1,2,3,4].forEach(function(t){
+      m['üe'+t]=G+'yue'+t+'.mp3'; /* üe → yue */
+      m['ün'+t]=G+'yun'+t+'.mp3'; /* ün → yun */
+      m['ü'+t]=G+'yu'+t+'.mp3';   /* ü → yu */
+    });
+    /* ── 完整音节库（davinfifield/hugolpz，用于四声条等） ── */
+    var sd=[
+      "ba","bai","ban","bang","bao","bei","ben","beng","bi","biao","bie","bin","bing","bu",
+      "ca","cai","can","cang","cao","ce","cen","ceng","cha","chai","chan","chang","chao",
+      "che","chen","cheng","chou","chu","chua","chuai","chuan","chuang","chui","chun","chuo",
+      "ci","cou","cu","cuan","cui","cun","cuo",
+      "da","dai","dan","dang","dao","dei","den","deng","di","die","ding","diu","dou",
+      "du","duan","dui","dun","duo",
+      "fa","fan","fang","fei","fen","feng","fo","fou","fu",
+      "ga","gai","gan","gang","gao","gen","geng","gou","gu","gua","guai","guan","guang","gui","gun","guo",
+      "ha","hai","han","hang","hao","hei","hen","heng","hou","hu","hua","huai","huan","huang","hui","hun","huo",
+      "jia","jian","jiao","jie","jin","jing","jiong","jiu","ju","juan","jue","jun",
+      "ka","kai","kan","kang","kao","ken","keng","kou","ku","kua","kuai","kuan","kuang","kui","kun","kuo",
+      "la","lai","lan","lang","lao","le","lei","leng","li","lia","liao","lie","ling","liu","lo","lou",
+      "lu","luan","luo","ma","mai","man","mang","mao","mei","men","meng","mi","miao","mie","min",
+      "ming","mou","mu","na","nai","nan","nang","nao","ne","nei","nen","neng","ni","niao","nie",
+      "nin","ning","niu","nou","nu","nuan","pa","pai","pan","pang","pao","pei","pen","peng",
+      "pi","piao","pie","pin","ping","pu",
+      "qia","qian","qiao","qie","qin","qing","qiong","qiu","qu","quan","que","qun",
+      "ran","rang","rao","re","ren","reng","rou","ru","ruan","run","ruo",
+      "sa","sai","san","sang","sao","se","sen","seng","sha","shai","shan","shang","shao","she","shei",
+      "shen","sheng","shou","shu","shua","shuai","shuan","shuang","shui","shun","shuo",
+      "si","sou","su","suan","sui","sun","suo",
+      "ta","tai","tan","tang","tao","teng","ti","tiao","tie","ting","tou","tu","tuan","tui","tun","tuo",
+      "wa","wai","wan","wang","weng","wo","xia","xian","xiao","xie","xin","xing","xiong",
+      "xu","xuan","xue","xun","ya","yan","yang","yao","yong","za","zai","zan","zang","zao","ze","zei",
+      "zen","zeng","zha","zhai","zhang","zhao","zhe","zhei","zhen","zheng","zhou",
+      "zhu","zhua","zhuai","zhuan","zhuang","zhui","zhun","zhuo","zi","zou","zu","zuan","zui","zun","zuo"
+    ];
+    var sh=["biao","diao","eng","lin","lun","lv","lve","nuo","nv","nve","o","rui","xiu","zhan"];
+    sd.forEach(function(s){[1,2,3,4].forEach(function(t){if(!m[s+t])m[s+t]=D+s+t+'.mp3';});});
+    sh.forEach(function(s){[1,2,3,4].forEach(function(t){if(!m[s+t])m[s+t]=H+s+t+'.mp3';});});
     return m;
   })(),
 
