@@ -1302,10 +1302,19 @@ function pyToNum(s){
 function speakSyllable(py, tone, fallbackChar){
   const t = tone || 1;
 
-  /* 1) 真人录音优先：按"音节+声调"查找，如 bo1/bo2/bo3/bo4 */
+  /* 1) 真人录音优先：按"音节+声调"查找，如 bo1/bo2/bo3/bo4；失败自动退回 TTS */
   const clipKey = py + t;
   const clip = TTS.pyAudio && TTS.pyAudio[clipKey];
-  if(clip){ stopSpeak(); playUrl(clip, null); return; }
+  if(clip){
+    stopSpeak();
+    playUrl(clip, null, null, function(){
+      /* 录音加载失败（404 / 网络）→ 退回豆包 TTS */
+      const mm = PINYIN_TTS[py];
+      if(mm && mm.c){ speakForced(mm.c, mm.p || (py+t)); return; }
+      if(fallbackChar && /[一-龥]/.test(fallbackChar)){ speak(fallbackChar,'zh-CN'); }
+    });
+    return;
+  }
 
   /* 2) 无录音则退回 TTS — 有映射就用 SSML 锁死读音 */
   const m = PINYIN_TTS[py];
@@ -3817,14 +3826,52 @@ var TTS = {
   useSSML : true,
 
   /* 拼音本地录音覆盖表：填了就优先用录音，最准也最快，还能离线 */
+  // 363 davinfifield + 14 hugolpz natural pinyin recordings
   pyAudio : (function(){
-    var B="https://raw.githubusercontent.com/davinfifield/mp3-chinese-pinyin-sound/master/mp3/";
-    var syls=["bo","po","mo","fo","de","te","ne","le","ge","ke","he","ji","qi","xi",
-              "zhi","chi","shi","ri","zi","ci","si",
-              "a","e","yi","wu","yu","ai","ei","wei","ao","ou","you","ye","yue","er",
-              "an","en","yin","wen","yun","ang","ying","yuan"];
+    var D="https://raw.githubusercontent.com/davinfifield/mp3-chinese-pinyin-sound/master/mp3/";
+    var H="https://raw.githubusercontent.com/hugolpz/audio-cmn/master/64k/syllabs/cmn-";
+    var sd=[
+      "a","ai","an","ang","ao","ba","bai","ban","bang","bao","bei","ben",
+      "beng","bi","bie","bin","bing","bo","bu","ca","cai","can","cang","cao",
+      "ce","cen","ceng","cha","chai","chan","chang","chao","che","chen","cheng","chi",
+      "chou","chu","chua","chuai","chuan","chuang","chui","chun","chuo","ci","cou","cu",
+      "cuan","cui","cun","cuo","da","dai","dan","dang","dao","de","dei","den",
+      "deng","di","die","ding","diu","dou","du","duan","dui","dun","duo","e",
+      "ei","en","er","fa","fan","fang","fei","fen","feng","fo","fou","fu",
+      "ga","gai","gan","gang","gao","ge","gen","geng","gou","gu","gua","guai",
+      "guan","guang","gui","gun","guo","ha","hai","han","hang","hao","he","hei",
+      "hen","heng","hou","hu","hua","huai","huan","huang","hui","hun","huo","ji",
+      "jia","jian","jiao","jie","jin","jing","jiong","jiu","ju","juan","jue","jun",
+      "ka","kai","kan","kang","kao","ke","ken","keng","kou","ku","kua","kuai",
+      "kuan","kuang","kui","kun","kuo","la","lai","lan","lang","lao","le","lei",
+      "leng","li","lia","liao","lie","ling","liu","lo","lou","lu","luan","luo",
+      "ma","mai","man","mang","mao","mei","men","meng","mi","miao","mie","min",
+      "ming","mo","mou","mu","na","nai","nan","nang","nao","ne","nei","nen",
+      "neng","ni","niao","nie","nin","ning","niu","nou","nu","nuan","ou","pa",
+      "pai","pan","pang","pao","pei","pen","peng","pi","piao","pie","pin","ping",
+      "po","pu","qi","qia","qian","qiao","qie","qin","qing","qiong","qiu","qu",
+      "quan","que","qun","ran","rang","rao","re","ren","reng","ri","rou","ru",
+      "ruan","run","ruo","sa","sai","san","sang","sao","se","sen","seng","sha",
+      "shai","shan","shang","shao","she","shei","shen","sheng","shi","shou","shu","shua",
+      "shuai","shuan","shuang","shui","shun","shuo","si","sou","su","suan","sui","sun",
+      "suo","ta","tai","tan","tang","tao","te","teng","ti","tiao","tie","ting",
+      "tou","tu","tuan","tui","tun","tuo","wa","wai","wan","wang","wei","wen",
+      "weng","wo","wu","xi","xia","xian","xiao","xie","xin","xing","xiong","xu",
+      "xuan","xue","xun","ya","yan","yang","yao","ye","yi","yin","ying","yong",
+      "you","yu","yuan","yue","yun","za","zai","zan","zang","zao","ze","zei",
+      "zen","zeng","zha","zhai","zhang","zhao","zhe","zhei","zhen","zheng","zhi","zhou",
+      "zhu","zhua","zhuai","zhuan","zhuang","zhui","zhun","zhuo","zi","zou","zu","zuan",
+      "zui","zun","zuo"
+    ];
+    var sh=[
+      "biao","diao","eng","lin","lun","lv","lve","nuo","nv","nve","o","rui",
+      "xiu","zhan"
+    ];
     var m={};
-    syls.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=B+s+t+".mp3";});});
+    sd.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=D+s+t+'.mp3';});});
+    sh.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=H+s+t+'.mp3';});});
+    /* standalone ü → yu files; v is what pyToNum() emits for ü */
+    [1,2,3,4].forEach(function(t){m['v'+t]=D+'yu'+t+'.mp3';});
     return m;
   })(),
 
@@ -3861,12 +3908,13 @@ function stopSpeak(){
   TTS.busy = false;
 }
 
-function playUrl(url, cacheKey, onEnd){
+function playUrl(url, cacheKey, onEnd, onError){
   const a = new Audio(url);
   TTS.cur = a;
-  a.onended = a.onerror = () => { TTS.cur = null; TTS.busy = false; if(onEnd) onEnd(); };
+  a.onended = () => { TTS.cur = null; TTS.busy = false; if(onEnd) onEnd(); };
+  a.onerror = () => { TTS.cur = null; TTS.busy = false; if(onError) onError(); else if(onEnd) onEnd(); };
   a.volume = 1.0;
-  a.play().catch(()=>{ TTS.busy = false; });
+  a.play().catch(()=>{ TTS.busy = false; if(onError) onError(); });
   if(cacheKey) TTS.cache.set(cacheKey, url);
 }
 
