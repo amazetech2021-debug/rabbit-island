@@ -8049,7 +8049,7 @@ function pgBook(){
     var firstVid=firstEp&&firstEp.v&&!firstEp.bili?firstEp.v:null;
     var coverUrl=(_COVERS&&_COVERS[ch.id])||ch.cover||(firstEp&&firstEp.cover)||null;
     var thumbHtml=coverUrl
-      ?'<img src="'+coverUrl+'" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display=\'none\'">'
+      ?'<img src="'+coverUrl+'" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display=\'none\'">'
       :firstVid
         ?'<img src="https://img.youtube.com/vi/'+firstVid+'/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display=\'none\'"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;opacity:0">'+ ch.emoji+'</span>'
         :'<span style="font-size:52px">'+ch.emoji+'</span>';
@@ -8160,7 +8160,7 @@ function _mkPager(total,cur,gofn){
 function _bkThumbDiv(ch,ep){
   var inner;
   if(ep&&ep.cover){
-    inner='<img src="'+ep.cover+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'">'
+    inner='<img src="'+ep.cover+'" referrerpolicy="no-referrer" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'">'
          +'<span style="position:relative;font-size:26px;z-index:1">'+ch.emoji+'</span>';
   } else if(ep&&ep.v){
     inner='<img src="https://img.youtube.com/vi/'+ep.v+'/mqdefault.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'">'
@@ -8172,6 +8172,17 @@ function _bkThumbDiv(ch,ep){
 }
 function _bkFiltered(ch,q){
   var lq=(q||'').trim().toLowerCase();
+  if(ch.flat){
+    var results=[];
+    ch.playlists.forEach(function(pl,plIdx){
+      pl.episodes.forEach(function(ep,epIdx){
+        if(!lq||ep.t.toLowerCase().indexOf(lq)>=0||(ch.nameZh||ch.name).toLowerCase().indexOf(lq)>=0){
+          results.push({pl:pl,idx:plIdx,ep:ep,epIdx:epIdx});
+        }
+      });
+    });
+    return results;
+  }
   return ch.playlists.map(function(pl,idx){return{pl:pl,idx:idx};})
     .filter(function(x){return!lq||x.pl.name.toLowerCase().indexOf(lq)>=0;});
 }
@@ -8183,10 +8194,10 @@ function _renderBkPage(pg){
   var html=slice.map(function(x){
     var pl=x.pl;
     if(isFlat){
-      var ep=pl.episodes[0];if(!ep)return '';
-      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+x.idx+',0)">'+
+      var ep=x.ep;if(!ep)return '';
+      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'','+x.idx+','+x.epIdx+')">'+
         _bkThumbDiv(ch,ep)+
-        '<div class="ep-titles"><b>'+htmlEsc(pl.name)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
+        '<div class="ep-titles"><b>'+htmlEsc(ep.t)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
         '<div class="ep-play-btn">▶</div></button>';
     } else {
       return '<button class="ep-item" onclick="openBookPlaylist(\''+ch.id+'\','+x.idx+')">'+
