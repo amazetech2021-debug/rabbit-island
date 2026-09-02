@@ -4510,6 +4510,7 @@ function _sbHeaders(){
 }
 
 /* 把单个档案推送到云端，显示错误 */
+var _cloudErrTs = 0;
 function cloudPush(profileName, profileData){
   var base=_sbUrl(); if(!base||!_sbKey()) return;
   var url = base+'/rest/v1/profiles';
@@ -4518,8 +4519,14 @@ function cloudPush(profileName, profileData){
     headers: Object.assign({},_sbHeaders(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
     body: JSON.stringify({username: profileName, data: profileData})
   }).then(function(r){
-    if(!r.ok) r.text().then(function(t){ _syncToast('⚠ 上传失败 '+r.status+': '+t.substring(0,80), 8000); });
-  }).catch(function(e){ _syncToast('⚠ 上传出错: '+e.message, 8000); });
+    if(!r.ok) r.text().then(function(t){
+      var now=Date.now();
+      if(now-_cloudErrTs>300000){_cloudErrTs=now;_syncToast('⚠ 上传失败 '+r.status+': '+t.substring(0,80), 8000);}
+    });
+  }).catch(function(e){
+    var now=Date.now();
+    if(now-_cloudErrTs>300000){_cloudErrTs=now;_syncToast('⚠ 上传出错: '+e.message, 8000);}
+  });
 }
 
 /* 从云端拉取单个档案，返回 Promise<data|null> */
