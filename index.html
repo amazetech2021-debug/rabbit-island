@@ -229,7 +229,7 @@ body{
 .key{border:1px solid rgba(150,130,200,.18);background:var(--paper);border-radius:14px;height:52px;font-size:19px;font-weight:700;
   color:var(--ink);cursor:pointer;font-family:inherit;box-shadow:0 2px 0 rgba(100,80,160,.14)}
 .key:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(100,80,160,.14)}
-.key.del{background:#FDECEB;color:var(--red)} .key.go{background:#EAF7EB;color:var(--green-d)}
+.key.del{background:#e05c4a;color:#fff} .key.go{background:#3aab5c;color:#fff}
 .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .choice{border:1px solid rgba(150,130,200,.18);background:var(--paper);border-radius:18px;padding:20px 8px;font-size:28px;font-weight:900;
   color:var(--ink);cursor:pointer;font-family:inherit;box-shadow:0 3px 0 rgba(100,80,160,.14)}
@@ -6579,10 +6579,10 @@ function tfBodyHTML(){
       ${trayDots || `<span class="ph">${TF.plus?'（空了）':'（把要拿走的拖到这里）'}</span>`}
     </div>`;
 
-  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="ans ${judged}" style="flex:1">${typed===""?"?":typed}</div>
-      <button class="key del" style="width:72px;height:52px;flex-shrink:0" onclick="tap('del')">✕</button>
-      <button class="key go" style="width:72px;height:52px;flex-shrink:0" onclick="checkPad()">✓</button></div>
+  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;justify-content:center">
+      <div class="ans ${judged}" style="min-width:90px;max-width:140px">${typed===""?"?":typed}</div>
+      <button class="key del" style="width:64px;height:52px;flex-shrink:0;background:#e05c4a;color:#fff;font-size:22px" onclick="tap('del')">✕</button>
+      <button class="key go" style="width:64px;height:52px;flex-shrink:0;background:#3aab5c;color:#fff;font-size:22px" onclick="checkPad()">✓</button></div>
     <div class="pad" style="grid-template-columns:repeat(3,1fr)">
       ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="key" onclick="tap('${d}')">${d}</button>`).join("")}
       <button class="key" style="grid-column:2" onclick="tap('0')">0</button></div>`;
@@ -7005,10 +7005,10 @@ function pgMathChartCF(){
 
 function pgMathQ(){
   if(!Q) newQ();
-  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="ans ${judged}" style="flex:1">${typed===""?"?":typed}</div>
-      <button class="key del" style="width:72px;height:52px;flex-shrink:0" onclick="tap('del')">✕</button>
-      <button class="key go" style="width:72px;height:52px;flex-shrink:0" onclick="checkPad()">✓</button></div>
+  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;justify-content:center">
+      <div class="ans ${judged}" style="min-width:90px;max-width:140px">${typed===""?"?":typed}</div>
+      <button class="key del" style="width:64px;height:52px;flex-shrink:0;background:#e05c4a;color:#fff;font-size:22px" onclick="tap('del')">✕</button>
+      <button class="key go" style="width:64px;height:52px;flex-shrink:0;background:#3aab5c;color:#fff;font-size:22px" onclick="checkPad()">✓</button></div>
     <div class="pad" style="grid-template-columns:repeat(3,1fr)">
       ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="key" onclick="tap('${d}')">${d}</button>`).join("")}
       <button class="key" style="grid-column:2" onclick="tap('0')">0</button></div>`;
