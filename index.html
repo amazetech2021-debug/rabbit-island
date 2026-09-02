@@ -3834,14 +3834,38 @@ var TTS = {
     var D="https://raw.githubusercontent.com/davinfifield/mp3-chinese-pinyin-sound/master/mp3/";
     var H="https://raw.githubusercontent.com/hugolpz/audio-cmn/master/64k/syllabs/cmn-";
     var m={};
-    /* ── GitHub Pages 自托管：声母/韵母/整体认读（更可靠） ── */
-    var sg=["a","ai","an","ang","ao","bo","chi","ci","de","e","ei","en","eng","er",
-            "fo","ge","he","ji","ke","le","mo","ne","o","ou","po","qi","ri","shi","si",
-            "te","wei","wen","wu","xi","ye","yi","yin","ying","you","yu","yuan","yue","yun",
-            "zhi","zi","bo","po","mo","fo","de","te","ne","le","ge","ke","he","ji","qi","xi",
-            "ba","ma","fa","da","ta","na","la"];
-    /* 去重 */
-    sg=[...new Set(sg)];
+    /* ── GitHub Pages 自托管：全部 407 个音节（来自 gitcode 真人录音） ── */
+    var sg=["a","ai","an","ang","ao","ba","bai","ban","bang","bao","bei","ben","beng",
+      "bi","bian","biao","bie","bin","bing","bo","bu","ca","cai","can","cang","cao","ce",
+      "cen","ceng","cha","chai","chan","chang","chao","che","chen","cheng","chi","chong",
+      "chou","chu","chua","chuai","chuan","chuang","chui","chun","chuo","ci","cong","cou",
+      "cu","cuan","cui","cun","cuo","da","dai","dan","dang","dao","de","dei","den","deng",
+      "di","dia","dian","diao","die","ding","diu","dong","dou","du","duan","dui","dun","duo",
+      "e","ei","en","eng","er","fa","fan","fang","fei","fen","feng","fo","fou","fu","ga",
+      "gai","gan","gang","gao","ge","gei","gen","geng","gong","gou","gu","gua","guai","guan",
+      "guang","gui","gun","guo","ha","hai","han","hang","hao","he","hei","hen","heng","hong",
+      "hou","hu","hua","huai","huan","huang","hui","hun","huo","ji","jia","jian","jiang",
+      "jiao","jie","jin","jing","jiong","jiu","ju","juan","jue","jun","ka","kai","kan","kang",
+      "kao","ke","kei","ken","keng","kong","kou","ku","kua","kuai","kuan","kuang","kui","kun",
+      "kuo","la","lai","lan","lang","lao","le","lei","leng","li","lia","lian","liang","liao",
+      "lie","lin","ling","liu","long","lou","lu","luan","lun","luo","lv","ma","mai","man",
+      "mang","mao","mei","men","meng","mi","mian","miao","mie","min","ming","miu","mo","mou",
+      "mu","na","nai","nan","nang","nao","ne","nei","nen","neng","ni","nian","niang","niao",
+      "nie","nin","ning","niu","nong","nou","nu","nuan","nuo","nv","o","ou","pa","pai","pan",
+      "pang","pao","pei","pen","peng","pi","pian","piao","pie","pin","ping","po","pou","pu",
+      "qi","qia","qian","qiang","qiao","qie","qin","qing","qiong","qiu","qu","quan","que",
+      "qun","ran","rang","rao","re","ren","reng","ri","rong","rou","ru","ruan","rui","run",
+      "ruo","sa","sai","san","sang","sao","se","sen","seng","sha","shai","shan","shang","shao",
+      "she","shei","shen","sheng","shi","shou","shu","shua","shuai","shuan","shuang","shui",
+      "shun","shuo","si","song","sou","su","suan","sui","sun","suo","ta","tai","tan","tang",
+      "tao","te","teng","ti","tian","tiao","tie","ting","tong","tou","tu","tuan","tui","tun",
+      "tuo","wa","wai","wan","wang","wei","wen","weng","wo","wu","xi","xia","xian","xiang",
+      "xiao","xie","xin","xing","xiong","xiu","xu","xuan","xue","xun","ya","yan","yang","yao",
+      "ye","yi","yin","ying","yo","yong","you","yu","yuan","yue","yun","za","zai","zan","zang",
+      "zao","ze","zei","zen","zeng","zha","zhai","zhan","zhang","zhao","zhe","zhei","zhen",
+      "zheng","zhi","zhong","zhou","zhu","zhua","zhuai","zhuan","zhuang","zhui","zhun","zhuo",
+      "zi","zong","zou","zu","zuan","zui","zun","zuo"];
+    /* 已去重 */
     sg.forEach(function(s){[1,2,3,4].forEach(function(t){m[s+t]=G+s+t+'.mp3';});});
     /* 韵母 it[1] 别名 → 对应自托管文件 */
     [1,2,3,4].forEach(function(t){
@@ -6072,8 +6096,10 @@ function pyListHTML(){
 function pyPaint(){ const el = $("pyList"); if(el) el.innerHTML = pyListHTML(); }
 function pgPinyin(){
   if(pyMode === "review"){ pgPinyinReview(); return; }
+  if(pyMode === "table"){ pgPinyinTable(); return; }
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==="learn"?"on":""}" onclick="pyMode='learn';render()">📖 学习</button>
+     <button class="tab ${pyMode==="table"?"on":""}" onclick="pyMode='table';render()">🔊 拼音表</button>
      <button class="tab ${pyMode==="review"?"on":""}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?" ("+Object.keys(S.learnedPy).length+")":""}</button></div>
    <div class="tiptext">👆 点一下听发音（自动记为学会 +⚡1）　·　👉 长按看口诀、例字和四声</div>
    <div id="pyList">${pyListHTML()}</div>
@@ -6133,11 +6159,108 @@ function learnPy(key){
   S.cnt.py++; earn(1,"py"); save(); render();
 }
 
+/* ══════════ 拼音总表子页面 ══════════ */
+var _PY_TABLE_GROUPS = [
+  {label:"b p m f", initials:["b","p","m","f"]},
+  {label:"d t n l", initials:["d","t","n","l"]},
+  {label:"g k h",   initials:["g","k","h"]},
+  {label:"j q x",   initials:["j","q","x"]},
+  {label:"zh ch sh r", initials:["zh","ch","sh","r"]},
+  {label:"z c s",   initials:["z","c","s"]},
+  {label:"y w",     initials:["y","w"]},
+  {label:"零声母",  initials:[""]}
+];
+/* 所有音节（来自 GitHub Pages 录音文件夹） */
+var _PY_ALL=["a","ai","an","ang","ao","ba","bai","ban","bang","bao","bei","ben","beng",
+  "bi","bian","biao","bie","bin","bing","bo","bu","ca","cai","can","cang","cao","ce",
+  "cen","ceng","cha","chai","chan","chang","chao","che","chen","cheng","chi","chong",
+  "chou","chu","chua","chuai","chuan","chuang","chui","chun","chuo","ci","cong","cou",
+  "cu","cuan","cui","cun","cuo","da","dai","dan","dang","dao","de","dei","den","deng",
+  "di","dia","dian","diao","die","ding","diu","dong","dou","du","duan","dui","dun","duo",
+  "e","ei","en","eng","er","fa","fan","fang","fei","fen","feng","fo","fou","fu","ga",
+  "gai","gan","gang","gao","ge","gei","gen","geng","gong","gou","gu","gua","guai","guan",
+  "guang","gui","gun","guo","ha","hai","han","hang","hao","he","hei","hen","heng","hong",
+  "hou","hu","hua","huai","huan","huang","hui","hun","huo","ji","jia","jian","jiang",
+  "jiao","jie","jin","jing","jiong","jiu","ju","juan","jue","jun","ka","kai","kan","kang",
+  "kao","ke","kei","ken","keng","kong","kou","ku","kua","kuai","kuan","kuang","kui","kun",
+  "kuo","la","lai","lan","lang","lao","le","lei","leng","li","lia","lian","liang","liao",
+  "lie","lin","ling","liu","long","lou","lu","luan","lun","luo","lv","ma","mai","man",
+  "mang","mao","mei","men","meng","mi","mian","miao","mie","min","ming","miu","mo","mou",
+  "mu","na","nai","nan","nang","nao","ne","nei","nen","neng","ni","nian","niang","niao",
+  "nie","nin","ning","niu","nong","nou","nu","nuan","nuo","nv","o","ou","pa","pai","pan",
+  "pang","pao","pei","pen","peng","pi","pian","piao","pie","pin","ping","po","pou","pu",
+  "qi","qia","qian","qiang","qiao","qie","qin","qing","qiong","qiu","qu","quan","que",
+  "qun","ran","rang","rao","re","ren","reng","ri","rong","rou","ru","ruan","rui","run",
+  "ruo","sa","sai","san","sang","sao","se","sen","seng","sha","shai","shan","shang","shao",
+  "she","shei","shen","sheng","shi","shou","shu","shua","shuai","shuan","shuang","shui",
+  "shun","shuo","si","song","sou","su","suan","sui","sun","suo","ta","tai","tan","tang",
+  "tao","te","teng","ti","tian","tiao","tie","ting","tong","tou","tu","tuan","tui","tun",
+  "tuo","wa","wai","wan","wang","wei","wen","weng","wo","wu","xi","xia","xian","xiang",
+  "xiao","xie","xin","xing","xiong","xiu","xu","xuan","xue","xun","ya","yan","yang","yao",
+  "ye","yi","yin","ying","yo","yong","you","yu","yuan","yue","yun","za","zai","zan","zang",
+  "zao","ze","zei","zen","zeng","zha","zhai","zhan","zhang","zhao","zhe","zhei","zhen",
+  "zheng","zhi","zhong","zhou","zhu","zhua","zhuai","zhuan","zhuang","zhui","zhun","zhuo",
+  "zi","zong","zou","zu","zuan","zui","zun","zuo"];
+
+function _pyInitialOf(syl){
+  /* 提取声母（多字母优先）*/
+  var prefixes=["zh","ch","sh","b","p","m","f","d","t","n","l","g","k","h","j","q","x","r","z","c","s","y","w"];
+  for(var i=0;i<prefixes.length;i++){
+    if(syl.startsWith(prefixes[i])) return prefixes[i];
+  }
+  return "";
+}
+
+function pgPinyinTable(){
+  var G="https://amazetech2021-debug.github.io/rabbit-island/pinyin-audio/";
+  /* 构建音节分组 */
+  var grouped={};
+  _PY_ALL.forEach(function(syl){
+    var ini=_pyInitialOf(syl);
+    if(!grouped[ini]) grouped[ini]=[];
+    grouped[ini].push(syl);
+  });
+
+  /* 渲染每个大类（声母组） */
+  var html='';
+  _PY_TABLE_GROUPS.forEach(function(grp){
+    var syls=[];
+    grp.initials.forEach(function(ini){ if(grouped[ini]) syls=syls.concat(grouped[ini]); });
+    if(!syls.length) return;
+
+    var rows=syls.map(function(syl){
+      var tones='';
+      [1,2,3,4].forEach(function(t){
+        var url=G+syl+t+'.mp3';
+        tones+='<button class="tonebtn" onclick="(function(){var a=new Audio(\''+url+'\');a.play();})()" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--green-d);background:var(--cream-2);color:var(--green-d);font-size:12px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">'+t+'</button>';
+      });
+      var display=syl==='lv'?'lü':syl==='nv'?'nü':syl;
+      return '<div class="py-row" style="display:flex;align-items:center;gap:6px;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,0.05)">'
+        +'<span style="min-width:48px;font-size:15px;font-weight:700;color:var(--ink)">'+(display||syl)+'</span>'
+        +'<div style="display:flex;gap:5px">'+tones+'</div>'
+        +'</div>';
+    }).join('');
+
+    html+='<div class="card sect" style="margin-bottom:10px">'
+      +'<div class="secthead"><h3>'+grp.label+'</h3><em>'+syls.length+'个音节</em></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0">'+rows+'</div>'
+      +'</div>';
+  });
+
+  $("page").innerHTML=`
+   <div class="tabs"><button class="tab" onclick="pyMode='learn';render()">📖 学习</button>
+     <button class="tab on">🔊 拼音表</button>
+     <button class="tab" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
+   <div class="tiptext">🎵 点数字按钮听对应声调的发音 · 共 ${_PY_ALL.length} 个音节（真人录音）</div>
+   <div>${html}</div>`;
+}
+
 /* 拼音复习子页面 */
 function pgPinyinReview(){
   const cats = Object.keys(PINYIN);
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==='learn'?'on':''}" onclick="pyMode='learn';render()">📖 学习</button>
+     <button class="tab ${pyMode==='table'?'on':''}" onclick="pyMode='table';render()">🔊 拼音表</button>
      <button class="tab ${pyMode==='review'?'on':''}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
    <div class="tabs">${cats.map(c=>`<button class="tab ${c===pyCat?"on":""}" onclick="pyCat='${c}';pyIdx=0;render()">${c}</button>`).join("")}</div>
    ${reviewListHTML("py", false)}`;
