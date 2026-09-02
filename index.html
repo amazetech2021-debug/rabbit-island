@@ -6212,7 +6212,6 @@ function _pyInitialOf(syl){
 }
 
 function pgPinyinTable(){
-  var G="https://amazetech2021-debug.github.io/rabbit-island/pinyin-audio/";
   /* 构建音节分组 */
   var grouped={};
   _PY_ALL.forEach(function(syl){
@@ -6231,8 +6230,7 @@ function pgPinyinTable(){
     var rows=syls.map(function(syl){
       var tones='';
       [1,2,3,4].forEach(function(t){
-        var url=G+syl+t+'.mp3';
-        tones+='<button class="tonebtn" onclick="(function(){var a=new Audio(\''+url+'\');a.play();})()" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--green-d);background:var(--cream-2);color:var(--green-d);font-size:12px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">'+t+'</button>';
+        tones+='<button class="tonebtn" onclick="speakSyllable(\''+syl+'\','+t+',\'\')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--green-d);background:var(--cream-2);color:var(--green-d);font-size:12px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0">'+t+'</button>';
       });
       var display=syl==='lv'?'lü':syl==='nv'?'nü':syl;
       return '<div class="py-row" style="display:flex;align-items:center;gap:6px;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,0.05)">'
