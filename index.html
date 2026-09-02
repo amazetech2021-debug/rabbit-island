@@ -8195,7 +8195,7 @@ function _renderBkPage(pg){
     var pl=x.pl;
     if(isFlat){
       var ep=x.ep;if(!ep)return '';
-      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'','+x.idx+','+x.epIdx+')">'+
+      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+x.idx+','+x.epIdx+')">'+
         _bkThumbDiv(ch,ep)+
         '<div class="ep-titles"><b>'+htmlEsc(ep.t)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
         '<div class="ep-play-btn">▶</div></button>';
