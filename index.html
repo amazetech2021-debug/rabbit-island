@@ -6599,7 +6599,7 @@ function tfBodyHTML(){
       ${tray}
     </div>
     <div class="hint">${TF.plus ? '把蓝珠子拖进格子里' : '把珠子从格子里拖出来'}　·　点一下也会自己飞过去</div>
-    ${tfDone() ? cnt + pad : ''}`;
+    ${tfDone() ? cnt : ''}${pad}`;
 }
 
 function ctsBodyHTML(){
