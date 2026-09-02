@@ -225,7 +225,7 @@ body{
 .confirm{border:none;border-radius:16px;background:var(--green);color:#fff;font-size:20px;font-weight:900;
   padding:0 26px;height:62px;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 var(--green-d)}
 .confirm:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-d)}
-.pad{display:grid;grid-template-columns:repeat(3,1fr) 1.15fr;grid-template-rows:repeat(4,1fr);gap:7px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .key{border:1px solid rgba(150,130,200,.18);background:var(--paper);border-radius:14px;height:52px;font-size:19px;font-weight:700;
   color:var(--ink);cursor:pointer;font-family:inherit;box-shadow:0 2px 0 rgba(100,80,160,.14)}
 .key:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(100,80,160,.14)}
@@ -6579,13 +6579,13 @@ function tfBodyHTML(){
       ${trayDots || `<span class="ph">${TF.plus?'（空了）':'（把要拿走的拖到这里）'}</span>`}
     </div>`;
 
-  const pad = `<div class="ansrow">
-      <div class="ans ${judged}">${typed===""?"?":typed}</div></div>
-    <div class="pad">
-      ${[1,2,3,4,5,6,7,8,9].map((d,i)=>`<button class="key" style="grid-row:${Math.floor(i/3)+1};grid-column:${(i%3)+1}" onclick="tap('${d}')">${d}</button>`).join("")}
-      <button class="key" style="grid-row:4;grid-column:2" onclick="tap('0')">0</button>
-      <button class="key del" style="grid-row:1/3;grid-column:4;height:auto;border-radius:14px 14px 6px 6px" onclick="tap('del')">✕</button>
-      <button class="key go" style="grid-row:3/5;grid-column:4;height:auto;border-radius:6px 6px 14px 14px" onclick="checkPad()">✓</button></div>`;
+  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="ans ${judged}" style="flex:1">${typed===""?"?":typed}</div>
+      <button class="key del" style="width:72px;height:52px;flex-shrink:0" onclick="tap('del')">✕</button>
+      <button class="key go" style="width:72px;height:52px;flex-shrink:0" onclick="checkPad()">✓</button></div>
+    <div class="pad" style="grid-template-columns:repeat(3,1fr)">
+      ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="key" onclick="tap('${d}')">${d}</button>`).join("")}
+      <button class="key" style="grid-column:2" onclick="tap('0')">0</button></div>`;
 
   const cnt = TF.revealed
     ? `<div class="hint">格子里一共 <b style="color:var(--green-d);font-size:20px">${tfIn()}</b> 颗</div>`
@@ -7005,13 +7005,13 @@ function pgMathChartCF(){
 
 function pgMathQ(){
   if(!Q) newQ();
-  const pad = `<div class="ansrow">
-      <div class="ans ${judged}">${typed===""?"?":typed}</div></div>
-    <div class="pad">
-      ${[1,2,3,4,5,6,7,8,9].map((d,i)=>`<button class="key" style="grid-row:${Math.floor(i/3)+1};grid-column:${(i%3)+1}" onclick="tap('${d}')">${d}</button>`).join("")}
-      <button class="key" style="grid-row:4;grid-column:2" onclick="tap('0')">0</button>
-      <button class="key del" style="grid-row:1/3;grid-column:4;height:auto;border-radius:14px 14px 6px 6px" onclick="tap('del')">✕</button>
-      <button class="key go" style="grid-row:3/5;grid-column:4;height:auto;border-radius:6px 6px 14px 14px" onclick="checkPad()">✓</button></div>`;
+  const pad = `<div class="ansrow" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="ans ${judged}" style="flex:1">${typed===""?"?":typed}</div>
+      <button class="key del" style="width:72px;height:52px;flex-shrink:0" onclick="tap('del')">✕</button>
+      <button class="key go" style="width:72px;height:52px;flex-shrink:0" onclick="checkPad()">✓</button></div>
+    <div class="pad" style="grid-template-columns:repeat(3,1fr)">
+      ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="key" onclick="tap('${d}')">${d}</button>`).join("")}
+      <button class="key" style="grid-column:2" onclick="tap('0')">0</button></div>`;
   const choice = `<div class="choices" ${Q.opts&&Q.opts.length===3?'style="grid-template-columns:repeat(3,1fr)"':""}>
       ${(Q.opts||[]).map(o=>`<button class="choice ${Q.sm?"sm":""} ${judged&&String(o)===String(Q.ans)?"right":""}"
         onclick="checkChoice(this,'${o}')">${o}</button>`).join("")}</div>`;
