@@ -4818,6 +4818,7 @@ const PAGES = [
   {k:"cartoon", n:"YouTube", e:"<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAcCAYAAAAN3M1lAAACeElEQVR42s2YMUscQRTHfzO7MRqCAXNILISkkASSSkgwksJGIan8CHb6WewOG/0sYiEEg5aXE8UmcBaHRYSEcJi72/2nmB1vXGJw91YuA4+7nZ198+PNvDfzngEQWAOp4BHwAXgDvACeAU+BJ8Bj3PuHwBjwAIgBGwhAGkgf6AFd4DfQAX4BP4HvQBv4BjSBzwY6ngVlCgWrghOBRiSnglVvKLI/H4MBqaAfSJJJmpO7Tpj/zusL5wj1ffJQE4KzrLM3Qov5uc8EExZYBOYcIzGja3HGMAcsWuBd1pEy+pZmLG8t8BIwpdQYA1FUNZwBXllgNugoBiVBkjg4Y6qCApi1wHQpFdbCzg6srDg4CeLKtug0gvPAre/mQca432ZTkqTtbWlmZvDO2rKe6RlaCC5Lgx0cSGnq4NptaX19MCaKBuOKg10idwwUU+AnPDx0UFdXum77+9LCwk3A4pbrUCqo5sH6fWe5ft89J4lUr0tTUzfHFwi2FDxebgfzzUNK0sWFtLHhrFZs36X2XsKkDx3dLvR65XTcy1J2u9LmpjQ5OdRSVrv5d3el+flKNv9w4cK383NpbW0wJo6HDhet0mDHxw6qXpdqNddnbWUB9mv2kBRSEkXS1pa0tDTssoXiGRoI9kqBhctULsr/C2wvBloDBy3iznIHuTHuEK+meYZWDJwWhrq+1t3L3VLAqQWOsnuQ/Q9usDZjOUIwHqRt3REmI37uE7ncFQTLOZdN/pK+lUnhbkvd8vpDXcuEyWWWWzZGaLGGzymzbPxGiWAMeA+8Bp4DM0AtVyIYz5UIomBvEGRcSa5EcBWUCH7kSgTHwBfjltMaSP8A2C6XfF2BfJkAAAAASUVORK5CYII=\" style=\"width:36px;height:26px;object-fit:contain\">", bg:"#D8C8F0"},
   {k:"gift", n:"奖励中心", e:"🎁", bg:"#DCD4FF"},
   {k:"memo", n:"备忘录", e:"📋", bg:"#D2CAFF"},
+  {k:"links", n:"书签", e:"🔖", bg:"#FFE0B2"},
 ];
 let cur = "home";
 function paintSide(){
@@ -4849,7 +4850,7 @@ function render(){
   const p = PAGES.find(x=>x.k===cur);
   $("ptitle").textContent = cur==="home" ? "🐰 开心兔兔养成岛" : (p.e&&p.e[0]==="<"?p.n:p.e+" "+p.n);
   ({home:pgHome, hz:pgHanzi, py:pgPinyin, math:pgMath, en:pgEnglish, poem:pgPoem,
-    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook})[cur]();
+    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook, links:pgLinks})[cur]();
   scrollTabsIntoView();
 }
 
@@ -7443,6 +7444,26 @@ function memoToggle(i){
 function memoDel(i){
   if(!S.memo[i]) return;
   S.memo.splice(i,1); save(); pgMemo();
+}
+
+
+/* ══════════ 书签 ══════════ */
+const BOOKMARKS = [
+  {e:"📚", n:"Epic · 儿童图书馆", d:"海量英文绘本，Educator免费", url:"https://www.getepic.com/app", color:"#FF6B35"},
+];
+function pgLinks(){
+  var cards = BOOKMARKS.map(function(b){
+    return '<div style="background:var(--paper);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .15s" onclick="window.open(\'' + b.url + '\',\'_blank\')" onmousedown="this.style.transform=\'scale(.97)\'" onmouseup="this.style.transform=\'\'">'+
+      '<div style="width:52px;height:52px;border-radius:14px;background:' + b.color + ';display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">' + b.e + '</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:17px;font-weight:800;color:var(--ink);margin-bottom:3px">' + b.n + '</div>'+
+        '<div style="font-size:13px;color:var(--ink-soft)">' + b.d + '</div>'+
+      '</div>'+
+      '<div style="color:var(--ink-soft);font-size:20px">›</div>'+
+    '</div>';
+  }).join('');
+  $("page").innerHTML = '<div class="card sect"><div class="secthead"><h3>🔖 书签收藏</h3><em>点击直接跳转</em></div>'+
+    '<div style="display:flex;flex-direction:column;gap:12px">' + cards + '</div></div>';
 }
 
 /* ══════════ 奖励中心 ══════════ */
