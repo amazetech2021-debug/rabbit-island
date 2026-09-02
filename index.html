@@ -6563,7 +6563,7 @@ function tfFrameHTML(f){
   const full = filled === 10;
   return `<div class="tfbox">
       <div class="tenframe ${full?'full':''}">${cells}</div>
-      <div class="tflabel ${full?'full':''}">${full ? '满十啦！ 10' : filled + ' 颗'}</div>
+  
     </div>`;
 }
 
@@ -6577,8 +6577,7 @@ function tfBodyHTML(){
     : (TF.tray.length < TF.b ? `还要拿走 <b>${TF.b - TF.tray.length}</b> 颗` : `已拿走 ${TF.b} 颗 ✓`);
   const tray = `<div class="tftray ${tfDone()?'done':''}">
       ${trayDots || `<span class="ph">${TF.plus?'（空了）':'（把要拿走的拖到这里）'}</span>`}
-    </div>
-    <div class="tflabel">${trayLabel}</div>`;
+    </div>`;
 
   const pad = `<div class="ansrow">
       <div class="ans ${judged}">${typed===""?"?":typed}</div>
@@ -6594,7 +6593,7 @@ function tfBodyHTML(){
 
   return `<div class="ctsrow1" style="font-size:44px;margin-bottom:10px">
       <span>${TF.a}</span><span class="op">${TF.plus?'+':'−'}</span><span>${TF.b}</span>
-      <span class="eq">=</span><div class="ans ${judged}">${typed===""?"?":typed}</div></div>
+      <span class="eq">=</span>${tfDone() ? `<div class="ans ${judged}">${typed===""?"?":typed}</div>` : '<div style="min-width:72px;height:58px;border:3px dashed #bbb;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;color:#ccc">?</div>'}</div>
     <div class="tfwrap">
       <div class="tfrow">${frames.join('')}</div>
       ${tray}
