@@ -8172,6 +8172,17 @@ function _bkThumbDiv(ch,ep){
 }
 function _bkFiltered(ch,q){
   var lq=(q||'').trim().toLowerCase();
+  if(ch.flat){
+    var results=[];
+    ch.playlists.forEach(function(pl,plIdx){
+      pl.episodes.forEach(function(ep,epIdx){
+        if(!lq||ep.t.toLowerCase().indexOf(lq)>=0||(ch.nameZh||ch.name).toLowerCase().indexOf(lq)>=0){
+          results.push({pl:pl,idx:plIdx,ep:ep,epIdx:epIdx});
+        }
+      });
+    });
+    return results;
+  }
   return ch.playlists.map(function(pl,idx){return{pl:pl,idx:idx};})
     .filter(function(x){return!lq||x.pl.name.toLowerCase().indexOf(lq)>=0;});
 }
@@ -8183,10 +8194,10 @@ function _renderBkPage(pg){
   var html=slice.map(function(x){
     var pl=x.pl;
     if(isFlat){
-      var ep=pl.episodes[0];if(!ep)return '';
-      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+x.idx+',0)">'+
+      var ep=x.ep;if(!ep)return '';
+      return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+x.idx+','+x.epIdx+')">'+
         _bkThumbDiv(ch,ep)+
-        '<div class="ep-titles"><b>'+htmlEsc(pl.name)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
+        '<div class="ep-titles"><b>'+htmlEsc(ep.t)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
         '<div class="ep-play-btn">▶</div></button>';
     } else {
       return '<button class="ep-item" onclick="openBookPlaylist(\''+ch.id+'\','+x.idx+')">'+
@@ -8249,7 +8260,8 @@ function playBookVideo(chId,plIdx,epIdx){
   var m=$('mbox');
   m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var isBili=!!ep.bili;
-  var openUrl=isBili?ep.bili:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
+  var _biliBase=ep.bili&&!ep.bili.startsWith('http')?'https://www.bilibili.com/video/'+ep.bili:ep.bili;
+  var openUrl=isBili?_biliBase:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
   var thumbHtml=isBili
