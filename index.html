@@ -7397,9 +7397,16 @@ const GEMINI_LESSONS = [
 ];
 
 var _gemPhase = 0, _gemLesson = null;
+var _GEMINI_SPEAK_CACHE = {};
+function spkG(num,type,idx){
+  var l = GEMINI_LESSONS.find(function(x){return x.num===num;});
+  if(!l) return;
+  var txt = type==='w' ? l.words[idx] : l.sents[idx];
+  if(txt) speak(txt,'en-US');
+}
 function pgGemini(){
   if(_gemLesson !== null){ pgGeminiLesson(_gemLesson); return; }
-  var GICON = '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4Ij4KICA8cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSIxMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNMjQsMjQgQzE4LDIwIDE4LDEwIDI0LDQgQzMwLDEwIDMwLDIwIDI0LDI0WiIgZmlsbD0iI0VBNDMzNSIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMjgsMTggMzgsMTggNDQsMjQgQzM4LDMwIDI4LDMwIDI0LDI0WiIgZmlsbD0iIzQyODVGNCIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMzAsMjggMzAsMzggMjQsNDQgQzE4LDM4IDE4LDI4IDI0LDI0WiIgZmlsbD0iIzM0QTg1MyIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMjAsMzAgMTAsMzAgNCwyNCBDMTAsMTggMjAsMTggMjQsMjRaIiBmaWxsPSIjRkJCQzA0Ii8+Cjwvc3ZnPg==" style="width:28px;height:28px;vertical-align:middle">';
+  var GICO = '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4Ij48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSIxMCIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjQsMjQgQzE4LDIwIDE4LDEwIDI0LDQgQzMwLDEwIDMwLDIwIDI0LDI0WiIgZmlsbD0iI0VBNDMzNSIvPjxwYXRoIGQ9Ik0yNCwyNCBDMjgsMTggMzgsMTggNDQsMjQgQzM4LDMwIDI4LDMwIDI0LDI0WiIgZmlsbD0iIzQyODVGNCIvPjxwYXRoIGQ9Ik0yNCwyNCBDMzAsMjggMzAsMzggMjQsNDQgQzE4LDM4IDE4LDI4IDI0LDI0WiIgZmlsbD0iIzM0QTg1MyIvPjxwYXRoIGQ9Ik0yNCwyNCBDMjAsMzAgMTAsMzAgNCwyNCBDMTAsMTggMjAsMTggMjQsMjRaIiBmaWxsPSIjRkJCQzA0Ii8+PC9zdmc+" style="width:28px;height:28px;vertical-align:middle">';
   var phases = [
     {n:1, label:'第一阶段：你好！', sub:'打招呼·数字·颜色·身体·字母ABC-F'},
     {n:2, label:'第二阶段：我的世界', sub:'家人·动物·食物·心情·字母G-L'},
@@ -7407,15 +7414,26 @@ function pgGemini(){
     {n:4, label:'第四阶段：探索世界', sub:'天气·季节·太空·玩具·字母S-X'},
     {n:5, label:'第五阶段：英语达人', sub:'字母YZ·反义词·疑问词·歌曲·毕业秀'},
   ];
-  var html = '<div style="padding:12px 10px 0"><h2 style="font-size:18px;font-weight:700;color:var(--brand);margin:0 0 4px;display:flex;align-items:center;gap:8px">'+GICON+' Gemini英语课</h2><p style="font-size:12px;color:#888;margin:0 0 14px">50节课 &middot; 5个阶段 &middot; 点击单词/句子可发音</p>';
+  var html = '<div style="padding:12px 10px 0"><h2 style="font-size:18px;font-weight:700;color:var(--brand);margin:0 0 4px;display:flex;align-items:center;gap:8px">'+GICO+' Gemini英语课</h2><p style="font-size:12px;color:#888;margin:0 0 14px">50节课 &middot; 5个阶段 &middot; 点击单词/句子可发音</p>';
   phases.forEach(function(ph){
     var phaseLessons = GEMINI_LESSONS.filter(function(l){return l.phase===ph.n;});
-    html += '<div style="margin-bottom:16px"><div onclick="var d=this.nextElementSibling;d.style.display=d.style.display===\'none\'?\'block\':\'none\';" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px">'+ph.label+'</div><div style="font-size:11px;opacity:0.85">'+ph.sub+'</div></div><div style="font-size:18px">▾</div></div><div style="display:none">';
+    html += '<div style="margin-bottom:16px">';
+    html += '<div onclick="var d=this.nextElementSibling;d.style.display=d.style.display===' + "'none'" + '?' + "'block'" + ':' + "'none'" + '" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px">'+ph.label+'</div><div style="font-size:11px;opacity:0.85">'+ph.sub+'</div></div><div style="font-size:18px">&#9660;</div></div>';
+    html += '<div style="display:none">';
     phaseLessons.forEach(function(l){
-      var ww = l.words.map(function(w){return '<button onclick="speak(\''+(w.replace(/\'/g,"\\\'"))+'\',\'en-US\')" style="background:#e8f4fd;border:1px solid #b3d9f7;border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer;margin:2px">'+w+'</button>';}).join('');
-      var ss = l.sents.map(function(s){return '<div style="background:#f0fdf4;border-left:3px solid #4caf50;padding:4px 8px;border-radius:4px;font-size:12px;margin:2px 0;cursor:pointer" onclick="speak(\''+(s.replace(/\'/g,"\\\'"))+'\',\'en-US\')'> '+s+'</div>';}).join('');
-      var hasPPT = l.ppt;
-      html += '<div style="background:#fff;border:1px solid #e8e0ff;border-radius:10px;padding:10px 12px;margin:6px 0"><div onclick="_gemLesson='+l.num+';render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px"><span style="font-size:22px">'+l.emoji+'</span><div><div style="font-weight:600;font-size:13px;color:#333">第'+l.num+'课 '+l.title_en+'</div><div style="font-size:11px;color:#666">'+l.title_zh+'</div></div></div>'+(l.goal?'<div style="font-size:11px;color:#888;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:6px">🎯 '+l.goal+'</div>':'')+'<div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px">'+(ww?'<div style="flex:1;min-width:120px"><div style="font-size:11px;font-weight:600;color:#4a90e2;margin-bottom:3px">📝 新单词</div>'+ww+'</div>':'')+''+''+''+''+''+''+'</div>'+(ss?'<div style="margin-top:6px"><div style="font-size:11px;font-weight:600;color:#4caf50;margin-bottom:2px">💬 关键句</div>'+ss+'</div>':'')+'</div>';
+      var ww = l.words.map(function(w,wi){
+        return '<button onclick="spkG('+l.num+',\'w\','+wi+')" style="background:#e8f4fd;border:1px solid #b3d9f7;border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer;margin:2px">'+w+'</button>';
+      }).join('');
+      var ss = l.sents.map(function(s,si){
+        return '<div onclick="spkG('+l.num+',\'s\','+si+')" style="background:#f0fdf4;border-left:3px solid #4caf50;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer;margin:2px 0">'+s+'</div>';
+      }).join('');
+      html += '<div style="background:#fff;border:1px solid #e8e0ff;border-radius:10px;padding:10px 12px;margin:6px 0">';
+      html += '<div onclick="_gemLesson='+l.num+';render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px"><span style="font-size:22px">'+l.emoji+'</span><div><div style="font-weight:600;font-size:13px;color:#333">第'+l.num+'课 '+l.title_en+'</div><div style="font-size:11px;color:#666">'+l.title_zh+'</div></div></div>';
+      if(l.goal) html += '<div style="font-size:11px;color:#888;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:6px">🎯 '+l.goal+'</div>';
+      if(ww) html += '<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:600;color:#4a90e2;margin-bottom:3px">📝 新单词</div>'+ww+'</div>';
+      if(ss) html += '<div><div style="font-size:11px;font-weight:600;color:#4caf50;margin-bottom:2px">💬 关键句</div>'+ss+'</div>';
+      if(l.ppt) html += '<div style="margin-top:6px"><span style="font-size:11px;background:#e8d5ff;color:#6c5ce7;padding:2px 8px;border-radius:6px;cursor:pointer" onclick="_gemLesson='+l.num+';render()">📊 点击查看PPT</span></div>';
+      html += '</div>';
     });
     html += '</div></div>';
   });
@@ -7425,19 +7443,34 @@ function pgGemini(){
 function pgGeminiLesson(num){
   var l = GEMINI_LESSONS.find(function(x){return x.num===num;});
   if(!l){ _gemLesson=null; pgGemini(); return; }
-  var GICON = '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4Ij4KICA8cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSIxMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNMjQsMjQgQzE4LDIwIDE4LDEwIDI0LDQgQzMwLDEwIDMwLDIwIDI0LDI0WiIgZmlsbD0iI0VBNDMzNSIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMjgsMTggMzgsMTggNDQsMjQgQzM4LDMwIDI4LDMwIDI0LDI0WiIgZmlsbD0iIzQyODVGNCIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMzAsMjggMzAsMzggMjQsNDQgQzE4LDM4IDE4LDI4IDI0LDI0WiIgZmlsbD0iIzM0QTg1MyIvPgogIDxwYXRoIGQ9Ik0yNCwyNCBDMjAsMzAgMTAsMzAgNCwyNCBDMTAsMTggMjAsMTggMjQsMjRaIiBmaWxsPSIjRkJCQzA0Ii8+Cjwvc3ZnPg==" style="width:28px;height:28px;vertical-align:middle">';
-  var ww = l.words.map(function(w){return '<button onclick="speak(\''+(w.replace(/\'/g,"\\\'"))+'\',\'en-US\')" style="background:#e8f4fd;border:1px solid #b3d9f7;border-radius:10px;padding:6px 14px;font-size:15px;cursor:pointer;margin:4px;font-weight:600">'+w+'</button>';}).join('');
-  var ss = l.sents.map(function(s){return '<div onclick="speak(\''+(s.replace(/\'/g,"\\\'"))+'\',\'en-US\')" style="background:#f0fdf4;border-left:4px solid #4caf50;padding:10px 12px;border-radius:6px;font-size:14px;cursor:pointer;margin:6px 0;display:flex;align-items:center;gap:8px"><span>🔊</span><span>'+s+'</span></div>';}).join('');
+  var ww = l.words.map(function(w,wi){
+    return '<button onclick="spkG('+num+',\'w\','+wi+')" style="background:#e8f4fd;border:1px solid #b3d9f7;border-radius:10px;padding:6px 14px;font-size:15px;cursor:pointer;margin:4px;font-weight:600">'+w+'</button>';
+  }).join('');
+  var ss = l.sents.map(function(s,si){
+    return '<div onclick="spkG('+num+',\'s\','+si+')" style="background:#f0fdf4;border-left:4px solid #4caf50;padding:10px 12px;border-radius:6px;font-size:14px;cursor:pointer;margin:6px 0;display:flex;align-items:center;gap:8px"><span>🔊</span><span>'+s+'</span></div>';
+  }).join('');
   var pp = '';
   if(l.ppt){
     var pptNum = String(l.num).padStart(2,'0');
     var pptUrl = 'https://raw.githubusercontent.com/amazetech2021-debug/rabbit-island/main/ppts/lesson'+pptNum+'.pptx';
     var viewUrl = 'https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(pptUrl);
-    pp = '<div style="margin-top:16px"><div style="font-weight:700;font-size:14px;color:#6c5ce7;margin-bottom:10px">📊 本课PPT演示</div><button onclick="var f=document.getElementById(\'pptf'+l.num+'\');f.style.display=f.style.display===\'none\'?\'block\':\'none\'" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:14px;cursor:pointer;width:100%;font-weight:600;margin-bottom:10px">📊 展开/收起PPT</button><iframe id="pptf'+l.num+'" src="'+viewUrl+'" style="display:none;width:100%;height:420px;border:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1)" allowfullscreen></iframe></div>';
+    pp = '<div style="margin-top:16px"><div style="font-weight:700;font-size:14px;color:#6c5ce7;margin-bottom:10px">📊 本课PPT演示</div>';
+    pp += '<button onclick="var f=document.getElementById(\'pptf'+l.num+'\');f.style.display=f.style.display===\'none\'?\'block\':\'none\'" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:14px;cursor:pointer;width:100%;font-weight:600;margin-bottom:10px">📊 展开/收起PPT</button>';
+    pp += '<iframe id="pptf'+l.num+'" src="'+viewUrl+'" style="display:none;width:100%;height:420px;border:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1)" allowfullscreen></iframe></div>';
   }
-  $("page").innerHTML = '<div style="padding:12px"><button onclick="_gemLesson=null;pgGemini()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:4px 0 12px">&larr; 返回课程列表</button><div style="text-align:center;margin-bottom:16px"><div style="font-size:52px">'+l.emoji+'</div><h2 style="font-size:20px;font-weight:700;color:#333;margin:8px 0 4px">Lesson '+l.num+': '+l.title_en+'</h2><div style="font-size:15px;color:#666;margin-bottom:4px">'+l.title_zh+'</div>'+(l.goal?'<div style="font-size:12px;color:#666;background:#f5f5f5;border-radius:10px;padding:10px 14px;margin-top:8px;text-align:left;line-height:1.5">🎯 <b>学习目标：</b>'+l.goal+'</div>':'')+'</div>'+(ww?'<div style="background:#f0f8ff;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:#4a90e2;margin-bottom:10px">📝 新单词（点击发音）</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+ww+'</div></div>':'')+''+(ss?'<div style="background:#f0fff4;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:#4caf50;margin-bottom:8px">💬 关键句（点击发音）</div>'+ss+'</div>':'')+ pp +'</div>';
+  $("page").innerHTML = '<div style="padding:12px">'
+    + '<button onclick="_gemLesson=null;pgGemini()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:4px 0 12px">&larr; 返回课程列表</button>'
+    + '<div style="text-align:center;margin-bottom:16px">'
+    + '<div style="font-size:52px">'+l.emoji+'</div>'
+    + '<h2 style="font-size:20px;font-weight:700;color:#333;margin:8px 0 4px">Lesson '+l.num+': '+l.title_en+'</h2>'
+    + '<div style="font-size:15px;color:#666;margin-bottom:4px">'+l.title_zh+'</div>'
+    + (l.goal?'<div style="font-size:12px;color:#666;background:#f5f5f5;border-radius:10px;padding:10px 14px;margin-top:8px;text-align:left;line-height:1.5">🎯 <b>学习目标：</b>'+l.goal+'</div>':'')
+    + '</div>'
+    + (ww?'<div style="background:#f0f8ff;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:#4a90e2;margin-bottom:10px">📝 新单词（点击发音）</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+ww+'</div></div>':'')
+    + (ss?'<div style="background:#f0fff4;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:#4caf50;margin-bottom:8px">💬 关键句（点击发音）</div>'+ss+'</div>':'')
+    + pp
+    + '</div>';
 }
-
 
 /* ══════════ 古诗 ══════════ */
 let poemGrade = 1, poemIdx = -1;
