@@ -4272,7 +4272,7 @@ function renderProfileGrid(){
   const profiles = getAllProfiles();
   const names = Object.keys(profiles);
   const cur = getCurrentProfileName();
-  const hasCloud = !!((_sbUrl())&&(_sbKey()));
+  const hasCloud = !!_tcbEnv();
   grid.innerHTML = names.map(name=>{
     const p = profiles[name];
     const coins = (p.rabbit && p.rabbit.coin) ? p.rabbit.coin : 0;
@@ -4295,30 +4295,27 @@ function renderProfileGrid(){
 }
 /* 从云端拉取所有档案名，展示给用户选择后导入 */
 function cloudImportProfile(){
-  var base=_sbUrl(); var key=_sbKey();
-  if(!base||!key){ alert('请先在家长模式里填好 Supabase URL 和 anon key，并点保存。'); return; }
+  if(!_tcbEnv()){ alert('请先在家长模式里填好腾讯云环境 ID 并点保存。'); return; }
   var panel = document.getElementById('cloudImportPanel');
   var list  = document.getElementById('cloudImportList');
   if(!panel||!list) return;
   list.innerHTML = '<p style="color:#999;font-size:13px">加载中…</p>';
   panel.style.display = 'flex';
-  fetch(base+'/rest/v1/profiles?select=username&order=username.asc',{
-    headers:{'apikey':key,'Authorization':'Bearer '+key}
-  }).then(function(r){
-    if(!r.ok){ r.text().then(function(t){ list.innerHTML='<p style="color:red">加载失败 '+r.status+': '+t.substring(0,60)+'</p>'; }); return; }
-    return r.json();
-  }).then(function(rows){
-    if(!rows){ return; }
+  _getTcbApp().then(function(app){
+    if(!app) throw new Error('初始化失败');
+    return app.database().collection('profiles').get();
+  }).then(function(res){
+    var rows=res&&res.data?res.data:[];
     if(!rows.length){ list.innerHTML='<p style="color:#999;font-size:13px">云端暂无档案数据</p>'; return; }
     var local = getAllProfiles();
     list.innerHTML = rows.map(function(row){
-      var n = row.username;
+      var n = row._id;
       var exists = local.hasOwnProperty(n) ? ' <span style="font-size:11px;color:#aaa">（本地已有）</span>' : '';
       return '<button style="display:block;width:100%;margin:4px 0;padding:10px 14px;border-radius:12px;border:1.5px solid #c9aff0;background:#f5f0ff;font-size:15px;font-family:inherit;cursor:pointer;text-align:left" onclick="doCloudImport(\''+n.replace(/'/g,"\\'")+'\')">'
         +'🐰 '+n+exists+'</button>';
     }).join('');
   }).catch(function(e){
-    list.innerHTML='<p style="color:red">网络错误: '+e.message+'</p>';
+    list.innerHTML='<p style="color:red">加载失败: '+(e.message||e)+'</p>';
   });
 }
 function doCloudImport(name){
@@ -4346,7 +4343,7 @@ function selectProfile(name){
   load();
   hideProfileOverlay();
   render();
-  if(_sbUrl()&&_sbKey()){
+  if(_tcbEnv()){
     _syncToast('⬇ 同步中…');
     cloudPull(name).then(function(remote){
       if(remote && typeof remote === 'object'){
@@ -4522,73 +4519,66 @@ function importSave(){
     } catch(e){ errTip.textContent = '解析失败：' + e.message; }
   };
 }
-/* ══════════ 云端同步（Supabase REST API） ══════════ */
-function _sbUrl(){ return (DB.get('sbUrl')||'').replace(/\/+$/,''); }
-function _sbKey(){ return DB.get('sbKey')||''; }
-function _sbHeaders(){
-  return {
-    'Content-Type':'application/json',
-    'apikey': _sbKey(),
-    'Authorization': 'Bearer '+_sbKey(),
-    'Prefer': 'return=minimal'
-  };
+/* ══════════ 云端同步（腾讯云 CloudBase） ══════════ */
+function _tcbEnv(){ return (DB.get('tcbEnv')||'').trim(); }
+
+var _tcbApp=null, _tcbAppPromise=null;
+function _getTcbApp(){
+  if(_tcbApp) return Promise.resolve(_tcbApp);
+  if(_tcbAppPromise) return _tcbAppPromise;
+  if(!_tcbEnv()) return Promise.resolve(null);
+  _tcbAppPromise = new Promise(function(resolve,reject){
+    function init(){
+      try{
+        var app=cloudbase.init({env:_tcbEnv()});
+        app.auth({persistence:'local'}).signInAnonymously().then(function(){
+          _tcbApp=app; _tcbAppPromise=null; resolve(app);
+        }).catch(function(e){_tcbAppPromise=null;reject(e);});
+      }catch(e){_tcbAppPromise=null;reject(e);}
+    }
+    if(window.cloudbase){init();return;}
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.8.0/dist/index.umd.js';
+    s.onload=init;
+    s.onerror=function(){_tcbAppPromise=null;reject(new Error('SDK加载失败'));};
+    document.head.appendChild(s);
+  });
+  return _tcbAppPromise;
 }
 
-/* 把单个档案推送到云端，显示错误 */
-var _cloudErrTs = 0;
-function cloudPush(profileName, profileData){
-  var base=_sbUrl(); if(!base||!_sbKey()) return;
-  var url = base+'/rest/v1/profiles';
-  fetch(url,{
-    method:'POST',
-    headers: Object.assign({},_sbHeaders(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
-    body: JSON.stringify({username: profileName, data: profileData})
-  }).then(function(r){
-    if(!r.ok) r.text().then(function(t){
-      var now=Date.now();
-      if(now-_cloudErrTs>300000){_cloudErrTs=now;_syncToast('⚠ 上传失败 '+r.status+': '+t.substring(0,80), 8000);}
-    });
+var _cloudErrTs=0;
+function cloudPush(profileName,profileData){
+  if(!_tcbEnv()) return;
+  _getTcbApp().then(function(app){
+    if(!app) return;
+    return app.database().collection('profiles').doc(profileName).set({data:profileData});
   }).catch(function(e){
     var now=Date.now();
-    if(now-_cloudErrTs>300000){_cloudErrTs=now;_syncToast('⚠ 上传出错: '+e.message, 8000);}
+    if(now-_cloudErrTs>300000){_cloudErrTs=now;_syncToast('⚠ 上传出错: '+(e.message||e),8000);}
   });
 }
 
-/* 从云端拉取单个档案，返回 Promise<data|null> */
 function cloudPull(profileName){
-  var base=_sbUrl(); if(!base||!_sbKey()) return Promise.resolve(null);
-  var url = base+'/rest/v1/profiles?username=eq.'+encodeURIComponent(profileName)+'&select=data&limit=1';
-  return fetch(url,{headers:{'apikey':_sbKey(),'Authorization':'Bearer '+_sbKey()}})
-    .then(function(r){
-      if(!r.ok){ r.text().then(function(t){ _syncToast('⚠ 拉取失败 '+r.status+': '+t.substring(0,80), 8000); }); return null; }
-      return r.json();
-    })
-    .then(function(rows){ return (rows&&rows.length)?rows[0].data:null; })
-    .catch(function(e){ _syncToast('⚠ 网络错误: '+e.message, 8000); return null; });
+  if(!_tcbEnv()) return Promise.resolve(null);
+  return _getTcbApp().then(function(app){
+    if(!app) return null;
+    return app.database().collection('profiles').doc(profileName).get();
+  }).then(function(res){
+    if(!res||!res.data||!res.data.length) return null;
+    return res.data[0].data||null;
+  }).catch(function(e){_syncToast('⚠ 拉取失败: '+(e.message||e),8000);return null;});
 }
 
-/* 测试云端连接，并在 toast 里显示诊断结果 */
 function cloudTest(){
-  var base=_sbUrl(); var key=_sbKey();
-  if(!base||!key){ _syncToast('❌ 请先填写 URL 和 anon key，然后点保存', 5000); return; }
-  _syncToast('🔍 测试连接中…', 15000);
-  fetch(base+'/rest/v1/profiles?limit=1',{
-    headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}
-  }).then(function(r){
-    r.text().then(function(t){
-      if(r.ok){
-        _syncToast('✅ 连接成功！数据库可正常访问 ('+r.status+')', 5000);
-      } else {
-        _syncToast('❌ HTTP '+r.status+': '+t.substring(0,100), 10000);
-      }
-    });
+  if(!_tcbEnv()){_syncToast('❌ 请先填写腾讯云环境 ID 并保存',5000);return;}
+  _syncToast('🔍 测试连接中…',15000);
+  _getTcbApp().then(function(app){
+    if(!app){_syncToast('❌ 初始化失败，请检查环境 ID',8000);return null;}
+    return app.database().collection('profiles').limit(1).get();
+  }).then(function(res){
+    if(res!==undefined&&res!==null) _syncToast('✅ 连接成功！腾讯云数据库可正常访问',5000);
   }).catch(function(e){
-    var msg = e.message||String(e);
-    if(msg.indexOf('Failed to fetch')!==-1||msg.indexOf('NetworkError')!==-1){
-      _syncToast('❌ 网络被阻断（可能是 CORS/file:// 问题）: '+msg, 10000);
-    } else {
-      _syncToast('❌ 连接失败: '+msg, 10000);
-    }
+    _syncToast('❌ 连接失败: '+(e.message||String(e)),10000);
   });
 }
 
@@ -4618,7 +4608,7 @@ function save(){
     try{ DB.set("dinoIsland", JSON.stringify(S)); }catch(e){}
   }
   // 云端同步
-  if(profileName && _sbUrl()&&_sbKey()) cloudPush(profileName, Object.assign({},S));
+  if(profileName && _tcbEnv()) cloudPush(profileName, Object.assign({},S));
 }
 
 /* ══════════ 惩罚机制：断卡 → 受攻击 → 死亡 ══════════ */
@@ -5165,37 +5155,27 @@ function rabbitRender(){
     </div>
     <p class="rtip">「-1 币」只用来更正点错的勾，不用来惩罚。</p>
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
-     <p style="font-size:12px;font-weight:700;color:var(--ink);margin:0 0 6px">☁ 云端同步设置（Supabase）</p>
-     <input id="sbUrlInput" type="url" placeholder="Project URL，如 https://xxxx.supabase.co"
+     <p style="font-size:12px;font-weight:700;color:var(--ink);margin:0 0 6px">☁ 云端同步设置（腾讯云）</p>
+     <input id="tcbEnvInput" type="text" placeholder="腾讯云环境 ID，如 env-xxxxxxxx"
        style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid #ccc;border-radius:10px;font-size:12px;font-family:monospace;outline:none;margin-bottom:6px" value="">
-     <input id="sbKeyInput" type="text" placeholder="anon public key（很长的一串）"
-       style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid #ccc;border-radius:10px;font-size:12px;font-family:monospace;outline:none" value="">
      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
       <button style="font-size:12px;padding:6px 14px" onclick="
-        var u=document.getElementById('sbUrlInput').value.trim();
-        var k=document.getElementById('sbKeyInput').value.trim();
-        DB.set('sbUrl',u); DB.set('sbKey',k);
-        alert((u&&k)?'已保存！切换用户名时将自动同步。':'已清除云端同步设置。');
+        var e=document.getElementById('tcbEnvInput').value.trim();
+        DB.set('tcbEnv',e); _tcbApp=null; _tcbAppPromise=null;
+        alert(e?'已保存！切换用户名时将自动同步。':'已清除云端同步设置。');
       ">💾 保存</button>
       <button style="font-size:12px;padding:6px 14px" onclick="
         var n=getCurrentProfileName();
         if(!n){alert('请先选择一个档案');return;}
-        if(!_sbUrl()||!_sbKey()){alert('请先填写并保存 Supabase 地址和密钥');return;}
-        _syncToast('⬆ 上传中…', 10000);
-        var base=_sbUrl();
-        fetch(base+'/rest/v1/profiles',{
-          method:'POST',
-          headers:Object.assign({},_sbHeaders(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
-          body:JSON.stringify({username:n,data:Object.assign({},S)})
-        }).then(function(r){
-          if(r.ok) _syncToast('✅ 上传成功！', 3000);
-          else r.text().then(function(t){ _syncToast('❌ 上传失败 '+r.status+': '+t.substring(0,80), 8000); });
-        }).catch(function(e){ _syncToast('❌ 上传出错: '+e.message, 8000); });
+        if(!_tcbEnv()){alert('请先填写并保存腾讯云环境 ID');return;}
+        _syncToast('⬆ 上传中…',10000);
+        cloudPush(n,Object.assign({},S));
+        setTimeout(function(){_syncToast('✅ 上传完成',3000);},2500);
       ">⬆ 立即上传</button>
       <button style="font-size:12px;padding:6px 14px" onclick="
         var n=getCurrentProfileName();
         if(!n){alert('请先选择一个档案');return;}
-        if(!_sbUrl()||!_sbKey()){alert('请先填写并保存 Supabase 地址和密钥');return;}
+        if(!_tcbEnv()){alert('请先填写并保存腾讯云环境 ID');return;}
         _syncToast('⬇ 下载中…');
         cloudPull(n).then(function(r){
           if(!r){_syncToast('☁ 云端暂无数据');return;}
@@ -5207,7 +5187,7 @@ function rabbitRender(){
       ">⬇ 立即下载</button>
       <button style="font-size:12px;padding:6px 14px;background:#e8f4fd;color:#1a73e8;border:1.5px solid #1a73e8" onclick="cloudTest()">🔍 测试连接</button>
      </div>
-     <p style="font-size:11px;color:#999;margin:6px 0 0">填写好后，同一用户名在任何设备登录都会自动同步。<br>如果同步失败，点「测试连接」查看具体错误原因。</p>
+     <p style="font-size:11px;color:#999;margin:6px 0 0">填写好后，同一用户名在任何设备登录都会自动同步。<br>需先在腾讯云 CloudBase 后台建好 profiles 集合并设置公开读写权限。</p>
     </div>
    </section>
   </div>`;
@@ -5225,10 +5205,8 @@ function rabbitRender(){
       if(!S.rabbit.voice && "speechSynthesis" in window) speechSynthesis.cancel();
     };
     // 预填云端地址
-    const sbUrlInp = document.getElementById('sbUrlInput');
-    if(sbUrlInp) sbUrlInp.value = DB.get('sbUrl') || '';
-    const sbKeyInp = document.getElementById('sbKeyInput');
-    if(sbKeyInp) sbKeyInp.value = DB.get('sbKey') || '';
+    const tcbEnvInp = document.getElementById('tcbEnvInput');
+    if(tcbEnvInp) tcbEnvInp.value = DB.get('tcbEnv') || '';
     // 家长模式长按
     const rp = $("rpurse"); if(rp){
       const open=()=>{ const p=$("rparentPanel"); if(p) p.classList.add("on"); };
