@@ -4530,18 +4530,28 @@ function _getTcbApp(){
   _tcbAppPromise = new Promise(function(resolve,reject){
     function init(){
       try{
-        var app=cloudbase.init({env:_tcbEnv()});
+        var SDK=window.cloudbase||window.tcb;
+        var app=SDK.init({env:_tcbEnv()});
         app.auth({persistence:'local'}).signInAnonymously().then(function(){
           _tcbApp=app; _tcbAppPromise=null; resolve(app);
         }).catch(function(e){_tcbAppPromise=null;reject(e);});
       }catch(e){_tcbAppPromise=null;reject(e);}
     }
-    if(window.cloudbase){init();return;}
-    var s=document.createElement('script');
-    s.src='https://cdn-go.cn/cloudbase/cloudbase-js-sdk/2.8.0/index.umd.js';
-    s.onload=init;
-    s.onerror=function(){_tcbAppPromise=null;reject(new Error('SDK加载失败'));};
-    document.head.appendChild(s);
+    if(window.cloudbase||window.tcb){init();return;}
+    var urls=[
+      'https://imgcache.qq.com/qcloud/tcbjs/1.10.0/tcb.js',
+      'https://cdn-go.cn/cloudbase/cloudbase-js-sdk/2.8.0/index.umd.js'
+    ];
+    var idx=0;
+    function tryNext(){
+      if(idx>=urls.length){_tcbAppPromise=null;reject(new Error('SDK加载失败，请检查网络'));return;}
+      var s=document.createElement('script');
+      s.src=urls[idx++];
+      s.onload=function(){if(window.cloudbase||window.tcb)init();else tryNext();};
+      s.onerror=tryNext;
+      document.head.appendChild(s);
+    }
+    tryNext();
   });
   return _tcbAppPromise;
 }
