@@ -9273,7 +9273,8 @@ function bkHomeSearch(val){
   var html=hits.slice(0,80).map(function(r){
     var ch=r.ch,pl=r.pl,ep=r.ep;
     var thumbInner=ep&&ep.v
-      ?'<img src="https://img.youtube.com/vi/'+ep.v+'/mqdefault.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'">';
+      ?'<img src="https://img.youtube.com/vi/'+ep.v+'/mqdefault.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'">':
+      '';
     var thumb='<div class="ep-num" style="position:relative;overflow:hidden;width:56px;height:56px;min-width:56px;border-radius:10px;background:'+ch.color+';display:flex;align-items:center;justify-content:center;padding:0">'+thumbInner+'</div>';
     var title,sub,onclick;
     if(r.type==='flat'){
