@@ -7141,6 +7141,7 @@ function pgEnglishStickers(){
   stickers.forEach(function(s){if(!byDate[s.date])byDate[s.date]=[];byDate[s.date].push(s);});
   var dates=Object.keys(byDate).sort(function(a,b){return b<a?-1:b>a?1:0;});
   var html='<div class="card sect">'
+    +'<div class="ep-back" onclick="enMode=\'learn\';render()">← 返回英语</div>'
     +'<div class="secthead" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
     +'<h3>📷 CapWords 贴纸</h3>'
     +'<label style="cursor:pointer;background:var(--brand);color:#fff;border-radius:20px;padding:8px 18px;font-size:14px;font-weight:700;display:inline-block">'
