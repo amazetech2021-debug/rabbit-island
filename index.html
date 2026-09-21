@@ -4538,7 +4538,7 @@ function _getTcbApp(){
     }
     if(window.cloudbase){init();return;}
     var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.8.0/dist/index.umd.js';
+    s.src='https://cdn-go.cn/cloudbase/cloudbase-js-sdk/2.8.0/index.umd.js';
     s.onload=init;
     s.onerror=function(){_tcbAppPromise=null;reject(new Error('SDK加载失败'));};
     document.head.appendChild(s);
