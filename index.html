@@ -9471,8 +9471,6 @@ function playBookVideo(chId,plIdx,epIdx){
   var ch=BOOK_LIBRARY.find(function(x){return x.id===chId;});if(!ch)return;
   var pl=ch.playlists[plIdx];if(!pl)return;
   var ep=pl.episodes[epIdx||0];if(!ep)return;
-  var m=$('mbox');
-  m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var isBili=!!ep.bili;
   var _biliBase=ep.bili&&!ep.bili.startsWith('http')?'https://www.bilibili.com/video/'+ep.bili:ep.bili;
   var openUrl=isBili?_biliBase:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
@@ -9483,6 +9481,8 @@ function playBookVideo(chId,plIdx,epIdx){
   save();
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
+  var m=$('mbox');
+  if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbHtml=isBili
     ?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:'+ch.color+'"></div>'
     :'<img src="https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg" style="width:100%;display:block;opacity:0.85" onerror="this.style.display=\'none\'">';
@@ -10792,11 +10792,11 @@ function playYtVideo(chId,plIdx,epIdx){
     S.watchedVideos[vidKey]=wr;
   }
   save();
-  var m=$('mbox');
-  m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var ytUrl=ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v;
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=ytUrl;}else{window.open(ytUrl,'_blank');}return;
+  var m=$('mbox');
+  if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbUrl='https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg';
   var titleShort=ep.t.length>70?ep.t.substring(0,70)+'…':ep.t;
   var plShort=pl.name.length>40?pl.name.substring(0,40)+'…':pl.name;
