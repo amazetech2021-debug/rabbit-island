@@ -4391,6 +4391,8 @@ function load(){
   if(!Array.isArray(S.rewardLog)) S.rewardLog = [];
   if(!S.gemDone || typeof S.gemDone !== 'object' || Array.isArray(S.gemDone)) S.gemDone = {};
   if(!S.watchedVideos || typeof S.watchedVideos !== 'object' || Array.isArray(S.watchedVideos)) S.watchedVideos = {};
+  // Migrate old watchedVideos (string date → {count,lastWatch})
+  Object.keys(S.watchedVideos).forEach(function(k){ var v=S.watchedVideos[k]; if(typeof v!=='object'||!v) S.watchedVideos[k]={count:1,lastWatch:typeof v==='string'?v:today()}; });
   if(!S.checkinHistory || typeof S.checkinHistory !== 'object' || Array.isArray(S.checkinHistory)) S.checkinHistory = {};
   if(!S.cnt.gem) S.cnt.gem = 0;
   // Migrate old learned records (boolean true → {count:1,...})
@@ -9405,9 +9407,10 @@ function _renderBkPage(pg){
     var pl=x.pl;
     if(isFlat){
       var ep=x.ep;if(!ep)return '';
+      var bkKey0=(ep.bili||ep.v)||(ch.id+'|'+x.idx+'|'+x.epIdx);
       return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+x.idx+','+x.epIdx+')">'+
         _bkThumbDiv(ch,ep)+
-        '<div class="ep-titles"><b>'+htmlEsc(ep.t)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span></div>'+
+        '<div class="ep-titles"><b>'+htmlEsc(ep.t)+'</b><span>'+(ep.bili?'📺 B站':'📋 绘本合集')+'</span>'+_watchBadge(bkKey0)+'</div>'+
         '<div class="ep-play-btn">▶</div></button>';
     } else {
       return '<button class="ep-item" onclick="openBookPlaylist(\''+ch.id+'\','+x.idx+')">'+
@@ -9455,9 +9458,10 @@ function _renderBkPlPage(pg){
   var slice=pl.episodes.slice((pg-1)*_PAGE,pg*_PAGE);
   var html=slice.map(function(ep,i){
     var realIdx=(pg-1)*_PAGE+i;
+    var bkKey=(ep.bili||ep.v)||(ch.id+'|'+plIdx+'|'+realIdx);
     return '<button class="ep-item" onclick="playBookVideo(\''+ch.id+'\','+plIdx+','+realIdx+')">'+
       _bkThumbDiv(ch,ep)+
-      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b></div>'+
+      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b>'+_watchBadge(bkKey)+'</div>'+
       '<div class="ep-play-btn">▶</div></button>';
   }).join('');
   $('bk-pl-list').innerHTML=html+_mkPager(pl.episodes.length,pg,'bkPlGoPage');
@@ -9472,6 +9476,11 @@ function playBookVideo(chId,plIdx,epIdx){
   var isBili=!!ep.bili;
   var _biliBase=ep.bili&&!ep.bili.startsWith('http')?'https://www.bilibili.com/video/'+ep.bili:ep.bili;
   var openUrl=isBili?_biliBase:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
+  // 永久记录已看（count-based）
+  if(!S.watchedVideos) S.watchedVideos={};
+  var bkKey=(ep.bili||ep.v)||(chId+'|'+plIdx+'|'+(epIdx||0));
+  if(bkKey){var bwr=S.watchedVideos[bkKey];if(!bwr||typeof bwr!=='object')bwr={count:0,lastWatch:''};bwr.count++;bwr.lastWatch=today();S.watchedVideos[bkKey]=bwr;}
+  save();
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
   var thumbHtml=isBili
@@ -10600,10 +10609,11 @@ function searchYtVideos(q){
     ?'<div style="text-align:center;padding:40px 0;color:var(--ink-soft);font-size:15px">😕 没有找到相关视频</div>'
     :results.map(function(r){
       var thumb='https://img.youtube.com/vi/'+r.ep.v+'/default.jpg';
+      var srchKey=r.ep.v||(r.ch.id+'|'+r.plIdx+'|'+r.epIdx);
       return '<button class="yt-search-row" onclick="playYtVideo(\''+r.ch.id+'\','+r.plIdx+','+r.epIdx+')">'+
         '<img src="'+thumb+'" class="yt-search-thumb" onerror="this.style.display=\'none\'">'+
         '<div class="yt-search-info">'+
-        '<div class="yt-search-title">'+htmlEsc(r.ep.t.length>65?r.ep.t.substring(0,65)+'…':r.ep.t)+'</div>'+
+        '<div class="yt-search-title">'+htmlEsc(r.ep.t.length>65?r.ep.t.substring(0,65)+'…':r.ep.t)+_watchBadge(srchKey)+'</div>'+
         '<div class="yt-search-meta">'+htmlEsc(r.ch.name)+' · '+htmlEsc(r.pl.name.length>38?r.pl.name.substring(0,38)+'…':r.pl.name)+'</div>'+
         '</div><div class="yt-search-arrow">▶</div></button>';
     }).join('');
@@ -10665,6 +10675,21 @@ function pgCartoon(){
 }
 
 /* 层2：合集列表 */
+function _watchRec(key){
+  if(!S.watchedVideos||!key) return null;
+  var r=S.watchedVideos[key];
+  if(!r) return null;
+  if(typeof r!=='object') return {count:1,lastWatch:typeof r==='string'?r:''};
+  return r;
+}
+function _watchBadge(key){
+  var r=_watchRec(key);
+  if(!r||!r.count) return '';
+  var c=r.count;
+  if(c>=5) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#388E3C;background:#C8E6C9;border:1.5px solid #4CAF50;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
+  if(c>=3) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#558B2F;background:#E0F2E1;border:1.5px solid #81C784;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#689F38;background:#F2FAF3;border:1.5px solid #B7DEBB;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
+}
 function _ytThumb(vid,color,emoji){
   var ts='position:relative;overflow:hidden;width:56px;height:56px;min-width:56px;border-radius:10px;background:'+color+';display:flex;align-items:center;justify-content:center;padding:0';
   if(!vid)return '<div class="ep-num" style="'+ts+'"></div>';
@@ -10688,10 +10713,9 @@ function _renderYtChPage(pg){
     if(ch.flat){
       var ep=pl.episodes[0];if(!ep)return '';
       var vidKey0=ep.v||(chId+'|'+idx+'|0');
-      var watched0=S.watchedVideos&&S.watchedVideos[vidKey0];
       return '<button class="ep-item" onclick="playYtVideo(\''+chId+'\','+idx+',0)">'+
         _ytThumb(ep.v,ch.color,ch.emoji)+
-        '<div class="ep-titles"><b style="font-size:13px">'+htmlEsc(pl.name)+'</b>'+(watched0?'<span style="font-size:11px;color:#27ae60;font-weight:700;margin-left:4px">已看✅</span>':'')+'</div>'+
+        '<div class="ep-titles"><b style="font-size:13px">'+htmlEsc(pl.name)+'</b>'+_watchBadge(vidKey0)+'</div>'+
         '<div class="ep-play-btn">▶</div></button>';
     } else {
       var ep0=pl.episodes[0];
@@ -10729,11 +10753,9 @@ function _renderYtPlPage(pg){
   var html=slice.map(function(ep,i){
     var realIdx=(pg-1)*_PAGE+i;
     var vidKey=ep.v||(chId+'|'+plIdx+'|'+realIdx);
-    var watched=S.watchedVideos&&S.watchedVideos[vidKey];
-    var watchBadge=watched?'<span style="font-size:11px;color:#27ae60;font-weight:700;margin-left:4px">已看✅</span>':'';
     return '<button class="ep-item" onclick="playYtVideo(\''+chId+'\','+plIdx+','+realIdx+')">'+
       _ytThumb(ep.v,ch.color,ch.emoji)+
-      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b>'+watchBadge+'</div>'+
+      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b>'+_watchBadge(vidKey)+'</div>'+
       '<div class="ep-play-btn">▶</div></button>';
   }).join('');
   $('yt-pl-list').innerHTML=html+_mkPager(pl.episodes.length,pg,'ytPlGoPage');
@@ -10759,10 +10781,15 @@ function playYtVideo(chId,plIdx,epIdx){
   var pl=ch.playlists[plIdx];if(!pl)return;
   var ep=pl.episodes[epIdx];if(!ep)return;
   _ytCurCh=chId;_ytCurPl=plIdx;_ytCurIdx=epIdx;
-  // 永久记录已看视频
+  // 永久记录已看视频（count-based，每次播放+1）
   if(!S.watchedVideos) S.watchedVideos={};
   var vidKey = ep.v || (chId+'|'+plIdx+'|'+epIdx);
-  if(vidKey) S.watchedVideos[vidKey] = today();
+  if(vidKey){
+    var wr=S.watchedVideos[vidKey];
+    if(!wr||typeof wr!=='object') wr={count:0,lastWatch:''};
+    wr.count++; wr.lastWatch=today();
+    S.watchedVideos[vidKey]=wr;
+  }
   save();
   var m=$('mbox');
   m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
