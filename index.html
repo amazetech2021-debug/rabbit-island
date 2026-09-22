@@ -5457,7 +5457,7 @@ function hzListHTML(){
       const key = hzGrade+"-"+u+"-"+o.e[0];
       const mc = _masteryClass(S.learnedHz[key]);
       return `<button class="tile ${mc}" data-act="hz" data-g="${hzGrade}" data-u="${htmlEsc(u)}" data-c="${htmlEsc(o.e[0])}">
-        <span class="emo">${o.e[2]||"📝"}</span><b>${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span></button>`;
+        <span class="emo">${o.e[2]||"📝"}</span><b>${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedHz[key])}</button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(u)}</h3><em>${list.length} 字</em></div>
       <div class="tilegrid">${cells}</div></div>`;
@@ -5512,6 +5512,16 @@ function _masteryClass(rec){
   if(rec.count >= 5) return "r3";
   if(rec.count >= 3) return "r2";
   return "r1";
+}
+function _learnBadge(rec){
+  if(!rec||!rec.count) return '';
+  var c=rec.count;
+  var s='display:inline-flex;align-items:center;gap:1px;font-size:10px;font-weight:800;border-radius:20px;padding:0 5px;margin-top:2px';
+  if(c>=20) return '<span style="'+s+';color:#fff;background:#E53935;border:1.5px solid #C62828">'+c+'</span>';
+  if(c>=10) return '<span style="'+s+';color:#7B3F00;background:#FFE082;border:1.5px solid #FFB300">⭐'+c+'</span>';
+  if(c>=5)  return '<span style="'+s+';color:#388E3C;background:#C8E6C9;border:1.5px solid #4CAF50">👁'+c+'</span>';
+  if(c>=3)  return '<span style="'+s+';color:#558B2F;background:#E0F2E1;border:1.5px solid #81C784">👁'+c+'</span>';
+  return '<span style="'+s+';color:#689F38;background:#F2FAF3;border:1.5px solid #B7DEBB">👁'+c+'</span>';
 }
 function tapHz(g, u, ch){
   const row = hzRowOf(g, u, ch);
@@ -6039,7 +6049,7 @@ function pyListHTML(){
       const key = cat+"-"+it[0];
       const mc = _masteryClass(S.learnedPy[key]);
       return `<button class="pytile ${mc}" data-act="py" data-cat="${htmlEsc(cat)}" data-i="${i}">
-        <b>${htmlEsc(it[0])}</b><span>${htmlEsc(pyEg(it))}</span></button>`;
+        <b>${htmlEsc(it[0])}</b><span>${htmlEsc(pyEg(it))}</span>${_learnBadge(S.learnedPy[key])}</button>`;
     }).join("");
     return `<div class="card sect">
       <div class="secthead"><h3>${PY_LABEL[cat]||cat}</h3><em>${list.length}个</em></div>
@@ -7038,7 +7048,7 @@ function enListHTML(){
       const act = (enSub==="alphabet") ? "abc" : "en";
       return `<button class="wtile ${mc}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
         <span class="em">${o.e[2]||"🔤"}</span><span class="w">${htmlEsc(o.e[0])}</span>
-        <span class="cn">${htmlEsc(o.e[1]||"")}</span></button>`;
+        <span class="cn">${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedEn[key])}</button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(c)}</h3><em>${list.length} ${isPh?"句":"词"}</em></div>
       <div class="wgrid ${isPh?"ph":(enSub==="alphabet")?"abc":""}">${cells}</div></div>`;
@@ -10685,6 +10695,7 @@ function _watchBadge(key){
   var r=_watchRec(key);
   if(!r||!r.count) return '';
   var c=r.count;
+  if(c>=20) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#fff;background:#E53935;border:1.5px solid #C62828;border-radius:20px;padding:1px 7px;margin-left:5px">'+c+'</span>';
   if(c>=10) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#7B3F00;background:#FFE082;border:1.5px solid #FFB300;border-radius:20px;padding:1px 7px;margin-left:5px">⭐'+c+'</span>';
   if(c>=5)  return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#388E3C;background:#C8E6C9;border:1.5px solid #4CAF50;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
   if(c>=3)  return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#558B2F;background:#E0F2E1;border:1.5px solid #81C784;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
