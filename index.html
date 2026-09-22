@@ -4891,7 +4891,27 @@ function scrollTabsIntoView(){
     }
   });
 }
+function checkNewDay(){
+  if(S.day !== today()){
+    S.day = today();
+    S.got = {hz:0,math:0,py:0,en:0,poem:0,think:0};
+    S.cnt = {hz:0,math:0,py:0,en:0,poem:0,think:0,gem:0};
+    S.claimed = [];
+    save();
+  }
+  if(S.rabbit && S.rabbit.day !== today()){
+    S.rabbit.day = today();
+    S.rabbit.done = [];
+    S.rabbit.counted = false;
+    if(S.rabbit.lastDay && dayGap(S.rabbit.lastDay, today()) >= 2){
+      S.rabbit.streak = 0;
+      S.rabbit.bonusAt = 0;
+    }
+    save();
+  }
+}
 function render(){
+  checkNewDay();
   paintSide(); paintEnergy();
   const p = PAGES.find(x=>x.k===cur);
   $("ptitle").textContent = cur==="home" ? "🐰 开心兔兔养成岛" : (p.e&&p.e[0]==="<"?p.n:p.e+" "+p.n);
