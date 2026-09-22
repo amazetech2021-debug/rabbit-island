@@ -8563,7 +8563,8 @@ function parentRewardsHTML(){
   var html = '<div class="rrsec"><div class="rrhead">🎁 兑换奖励 · 可用 <b>'+days+'</b> 天</div><div class="rrlist">';
   REWARDS.forEach(function(r){
     var ok = days >= r.days;
-    html += '<button class="rrbtn'+(ok?'':' dim')+'" '+(ok?'onclick="giftBuy(''+r.id+'');setTimeout(rabbitRender,300)"':'')+'>'+r.e+' '+r.n+'<small>'+r.days+'天</small></button>';
+    var onclk = ok ? 'onclick="giftBuy(&#39;'+r.id+'&#39;);setTimeout(rabbitRender,300)"' : '';
+    html += '<button class="rrbtn'+(ok?'':' dim')+'" '+onclk+'>'+r.e+' '+r.n+'<small>'+r.days+'天</small></button>';
   });
   html += '</div></div>';
   return html;
