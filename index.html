@@ -5602,6 +5602,12 @@ function tapHz(g, u, ch){
 function cardHz(g, u, ch, autoSpeak){
   const row = hzRowOf(g, u, ch);
   if(!row) return;
+  if(autoSpeak){
+    const _k = g+"-"+u+"-"+row[0];
+    if(!S.learnedHz[_k]) S.learnedHz[_k] = {count:0, lastReview:today(), collected:false};
+    S.learnedHz[_k].count++; S.learnedHz[_k].lastReview = today();
+    S.cnt.hz++; save();
+  }
   const arr = (HANZI_GRADED[g]||HANZI_GRADED[1])[u]||[];
   const idx = arr.findIndex(e=>e[0]===ch);
   const key = g+"-"+u+"-"+row[0];
@@ -5620,8 +5626,8 @@ function cardHz(g, u, ch, autoSpeak){
       <span>💡</span><div><b>字理小故事：</b>${htmlEsc(row[4]||"")}</div></div>
     <div class="meta">${g}年级 · ${htmlEsc(u)} · ${idx+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.hz++;earn(1,'hz');save();cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.hz++;earn(1,'hz');save();cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('hz','${jsEsc(key)}');closeModal();hzPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的字库"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
@@ -6155,6 +6161,12 @@ function cardPy(cat, i, autoSpeak){
   const arr = PINYIN[cat]||[];
   const it = arr[i];
   if(!it) return;
+  if(autoSpeak){
+    const _k = cat+"-"+it[0];
+    if(!S.learnedPy[_k]) S.learnedPy[_k] = {count:0, lastReview:today(), collected:false};
+    S.learnedPy[_k].count++; S.learnedPy[_k].lastReview = today();
+    S.cnt.py++; save();
+  }
   const a = it[0], pron = it[1], tip = it[2], eg = it[3]||"", tones = it[4]||"";
   const key = cat+"-"+a, rec = S.learnedPy[key];
   const egHtml = String(eg).split(" ").filter(Boolean)
@@ -6176,8 +6188,8 @@ function cardPy(cat, i, autoSpeak){
     ${tonesHtml}${warn}
     <div class="meta">${htmlEsc(cat)} · ${i+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.py++;earn(1,'py');save();cardPy('${htmlEsc(cat)}','${i-1}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.py++;earn(1,'py');save();cardPy('${htmlEsc(cat)}','${i+1}',true)})">下一个 →</button></div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i-1}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i+1}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('py','${jsEsc(key)}');closeModal();pyPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 收藏"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
@@ -7275,6 +7287,12 @@ function cardEn(cat, i, sub, autoSpeak){
   const arr = (enSrc(sub)[cat]||[]);
   const it = arr[i];
   if(!it) return;
+  if(autoSpeak){
+    const _k = cat+"-"+it[0];
+    if(!S.learnedEn[_k]) S.learnedEn[_k] = {count:0, lastReview:today(), collected:false};
+    S.learnedEn[_k].count++; S.learnedEn[_k].lastReview = today();
+    S.cnt.en++; save();
+  }
   const key = cat+"-"+it[0], rec = S.learnedEn[key];
   const big = String(it[0]).length > 14 ? 30 : (String(it[0]).length > 8 ? 38 : 50);
   const hasPrev = i>0, hasNext = i<arr.length-1;
@@ -7285,8 +7303,8 @@ function cardEn(cat, i, sub, autoSpeak){
     <div class="words" style="font-size:19px;cursor:pointer" onclick="speak('${jsEsc(it[1]||"")}','zh-CN')">${htmlEsc(it[1]||"")}</div>
     <div class="meta">${htmlEsc(cat)} · ${i+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.en++;earn(1,'en');save();cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){S.cnt.en++;earn(1,'en');save();cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('en','${jsEsc(key)}');closeModal();enPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的词库"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
