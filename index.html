@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- build:v20260922-1227 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -4929,9 +4929,12 @@ function rabbitCheckLvUp(before){
 }
 // 模块→兔兔任务的映射
 const _moduleToTask = {hz:"learn_hz", py:"learn_py", math:"learn_math", en:"learn_en", poem:"learn_poem", think:"learn_think"};
+const _moduleThreshold = {think:5, poem:1};
 function rabbitAutoCheck(key){
   const tid = _moduleToTask[key];
   if(!tid || S.rabbit.done.includes(tid)) return;
+  const thresh = _moduleThreshold[key]||1;
+  if((S.cnt[key]||0) < thresh) return;
   const t = RABBIT_CFG.tasks.learn.find(x=>x.id===tid);
   if(!t) return;
   // 每日上限检查
