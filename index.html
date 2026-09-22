@@ -4292,15 +4292,16 @@ function renderProfileGrid(){
   </button>`+
   '';
 }
+var _justImported = false;
 function selectProfile(name){
-  // 先保存当前档案
-  if(getCurrentProfileName() && S) {
+  // 先保存当前档案（导入后跳过，否则会覆盖刚导入的数据）
+  if(!_justImported && getCurrentProfileName() && S) {
     const profiles = getAllProfiles();
     profiles[getCurrentProfileName()] = S;
     saveAllProfiles(profiles);
   }
+  _justImported = false;
   setCurrentProfileName(name);
-  // 先从本地加载，再拉云端（有则合并覆盖）
   load();
   hideProfileOverlay();
   render();
@@ -4469,6 +4470,7 @@ function importSave(){
       saveAllProfiles(parsed);
       var names = Object.keys(parsed);
       document.body.removeChild(overlay);
+      _justImported = true;
       alert('导入成功！档案：' + (names.length ? names.join('、') : '（空）') + '\n\n请重新选择档案。');
       showProfileOverlay();
     } catch(e){ errTip.textContent = '解析失败：' + e.message; }
