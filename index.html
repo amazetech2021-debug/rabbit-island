@@ -333,20 +333,21 @@ body{
 .rabbit-wrap .rbrand{flex:1;font-size:17px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#c05a8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .rabbit-wrap .rbrand small{display:block;font-size:10px;font-weight:500;color:#a78bfa;letter-spacing:2.5px;-webkit-text-fill-color:#a78bfa}
 .rabbit-wrap .rrsec{margin-top:10px;background:rgba(255,255,255,.5);border-radius:12px;padding:10px 12px}
-.rabbit-wrap .rrhead{font-size:12px;color:#7c3aed;font-weight:700;margin-bottom:8px}
-.rabbit-wrap .rrlist{display:flex;flex-wrap:wrap;gap:6px}
-.rabbit-wrap .rrbtn{display:flex;align-items:center;gap:4px;border:1.5px solid #dcc8f8;border-radius:10px;background:#f3eeff;padding:5px 10px;cursor:pointer;font-size:12px;font-family:inherit;color:#4c1d95;font-weight:600}
-.rabbit-wrap .rrbtn.dim{opacity:.4;cursor:default}
-.rabbit-wrap .rrbtn small{background:#7c3aed;color:#fff;border-radius:6px;padding:1px 5px;font-size:10px;margin-left:3px;font-weight:700}
+.rabbit-wrap .rrhead{font-size:13px;color:#7c3aed;font-weight:700;margin-bottom:10px}
+.rabbit-wrap .rrlist{display:flex;flex-wrap:wrap;gap:8px}
+.rabbit-wrap .rradj{padding:7px 18px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-family:inherit;font-weight:700}
+.rabbit-wrap .rminus{background:#fce7f3;color:#9d174d}
+.rabbit-wrap .rplus{background:#d1fae5;color:#065f46}
+.rabbit-wrap .rplus3{background:#dbeafe;color:#1e40af}
+.rabbit-wrap .rplus5{background:#ede9fe;color:#4c1d95}
+.rabbit-wrap .rrtip{margin:8px 0 0;font-size:11px;color:var(--ink-soft)}
 .rabbit-wrap .rgrowth{flex:1;min-width:180px;display:flex;align-items:center;gap:8px}
 .rabbit-wrap .rgrowth svg{width:130px;height:32px;flex:none}
 .rabbit-wrap .rgrowth .rlv{font-size:12px;color:var(--ink-soft);white-space:nowrap}
 .rabbit-wrap .rgrowth .rlv b{display:block;font-size:14px;color:var(--ink)}
-.rabbit-wrap .rstatbar{display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;user-select:none}
-.rabbit-wrap .rstat-pill{display:flex;align-items:center;gap:3px;padding:7px 13px;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap;border:none;font-family:inherit}
-.rabbit-wrap .rcal-pill{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3)}
-.rabbit-wrap .rreward-pill{background:#fff3e0;color:#c05a0e}
-.rabbit-wrap .rtotal-pill{background:#fffbe6;color:#a16207}
+.rabbit-wrap .rstatbar{display:flex;align-items:center;gap:7px;flex-shrink:0;user-select:none}
+.rabbit-wrap .rstat-pill{display:flex;align-items:center;justify-content:center;gap:4px;width:96px;padding:8px 0;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap;border:none;font-family:inherit;background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;box-shadow:0 2px 10px rgba(109,40,217,.35)}
+.rabbit-wrap button.rstat-pill{cursor:pointer}
 .rabbit-wrap .riconbtn{border:2px solid var(--line,#cfe0bd);background:var(--paper);color:var(--ink);width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer;flex:none}
 .rabbit-wrap .riconbtn[aria-pressed="false"]{opacity:.4}
 .rabbit-wrap .rmain{display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:start}
@@ -8555,14 +8556,21 @@ function pgGift(){
 }
 function parentRewardsHTML(){
   var days = S.rewardDays||0;
-  var html = '<div class="rrsec"><div class="rrhead">🎁 兑换奖励 · 可用 <b>'+days+'</b> 天</div><div class="rrlist">';
-  REWARDS.forEach(function(r){
-    var ok = days >= r.days;
-    var onclk = ok ? 'onclick="giftBuy(&#39;'+r.id+'&#39;);setTimeout(rabbitRender,300)"' : '';
-    html += '<button class="rrbtn'+(ok?'':' dim')+'" '+onclk+'>'+r.e+' '+r.n+'<small>'+r.days+'天</small></button>';
-  });
-  html += '</div></div>';
-  return html;
+  return '<div class="rrsec">'+
+    '<div class="rrhead">🎁 可兑换天数管理 · 当前 <b>'+days+'</b> 天</div>'+
+    '<div class="rrlist">'+
+      '<button class="rradj rminus" onclick="parentAdjDays(-1)">－1天</button>'+
+      '<button class="rradj rplus" onclick="parentAdjDays(1)">＋1天</button>'+
+      '<button class="rradj rplus3" onclick="parentAdjDays(3)">＋3天</button>'+
+      '<button class="rradj rplus5" onclick="parentAdjDays(5)">＋5天</button>'+
+    '</div>'+
+    '<p class="rrtip">增加天数奖励孩子，减少天数用于更正。</p>'+
+  '</div>';
+}
+function parentAdjDays(n){
+  S.rewardDays = Math.max(0,(S.rewardDays||0)+n);
+  save(); rabbitRender();
+  toast((n>0?'已增加'+n+'天可兑换天数 🎉':'已减少1天可兑换天数')+'，当前：'+S.rewardDays+'天');
 }
 function giftBuy(id){
   const r = REWARDS.find(x => x.id === id);
