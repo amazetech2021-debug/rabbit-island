@@ -10686,8 +10686,9 @@ function _watchBadge(key){
   var r=_watchRec(key);
   if(!r||!r.count) return '';
   var c=r.count;
-  if(c>=5) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#388E3C;background:#C8E6C9;border:1.5px solid #4CAF50;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
-  if(c>=3) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#558B2F;background:#E0F2E1;border:1.5px solid #81C784;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
+  if(c>=10) return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#7B3F00;background:#FFE082;border:1.5px solid #FFB300;border-radius:20px;padding:1px 7px;margin-left:5px">⭐'+c+'</span>';
+  if(c>=5)  return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#388E3C;background:#C8E6C9;border:1.5px solid #4CAF50;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
+  if(c>=3)  return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#558B2F;background:#E0F2E1;border:1.5px solid #81C784;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
   return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#689F38;background:#F2FAF3;border:1.5px solid #B7DEBB;border-radius:20px;padding:1px 7px;margin-left:5px">👁'+c+'</span>';
 }
 function _ytThumb(vid,color,emoji){
