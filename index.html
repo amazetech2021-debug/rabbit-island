@@ -5019,7 +5019,7 @@ function rabbitToggleTask(t){
     if(bonus) S.rabbit.bonusAt=S.rabbit.streak;
   }
   if(bonus){
-    setTimeout(()=>{ rabbitAddCoin(bonus,true); rabbitSay(why+"，额外奖励 "+bonus+" 个胡萝卜币！"); rabbitCheckLvUp(before); },1400);
+    setTimeout(()=>{ rabbitAddCoin(bonus,true); rabbitSay(why+"，坚持真棒！继续加油！"); rabbitCheckLvUp(before); },1400);
   }else{
     rabbitCheckLvUp(before);
     if(S.rabbit.done.length===rabbitAllTasks().length) setTimeout(()=>rabbitSay(RABBIT_CFG.lines.dayClear),1200);
