@@ -4667,6 +4667,8 @@ var CHECKIN_GOALS = {
   py:  {need:10, label:'拼音', emoji:'🔤'},
   math:{need:20, label:'数学', emoji:'🔢'},
   en:  {need:10, label:'英语', emoji:'🗣️'},
+  poem:{need:1,  label:'古诗', emoji:'📜'},
+  think:{need:5, label:'思维', emoji:'🎯'},
   gem: {need:1,  label:'Gemini课', emoji:'✨'}
 };
 
@@ -4776,7 +4778,7 @@ function checkin(){
   const got = 5 + bonus;
   // 保存打卡记录
   if(!S.checkinHistory) S.checkinHistory = {};
-  S.checkinHistory[today()] = {hz:S.cnt.hz,math:S.cnt.math,py:S.cnt.py,en:S.cnt.en,gem:S.cnt.gem};
+  S.checkinHistory[today()] = {hz:S.cnt.hz,math:S.cnt.math,py:S.cnt.py,en:S.cnt.en,poem:S.cnt.poem,think:S.cnt.think,gem:S.cnt.gem};
   S.energy += got; save(); paintEnergy(); flyEnergy(got);
   petReact('happy');
   modal(`<div class="e">📋</div><h3>打卡成功！</h3>
@@ -5133,9 +5135,6 @@ function rabbitRender(){
     </section>
     <section class="rpanel">
      ${_checkinProgressPanel()}
-     <h2>今天要做的事<span>今天 +${earned}🥕 · 累计 ${R.coin}🥕</span></h2>
-     ${tasksHtml}
-     <div class="rstreak">连续打卡 <b>${R.streak}</b> 天　·　满 3 天 +3，满 7 天再 +5</div>
     </section>
    </div>
    <section class="rpanel rshop">
