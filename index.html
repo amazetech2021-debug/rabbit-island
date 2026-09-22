@@ -52,9 +52,6 @@ body{
 .pill{display:flex;align-items:center;gap:5px;background:var(--paper);border-radius:22px;
   padding:8px 15px;font-weight:900;font-size:17px;box-shadow:var(--shadow)}
 .pill.small{font-size:15px;padding:7px 12px}
-.topright{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.toppill{display:flex;align-items:center;gap:4px;background:var(--paper);border-radius:18px;padding:6px 12px;font-weight:800;font-size:13px;box-shadow:var(--shadow);white-space:nowrap;color:#4c1d95}
-button.toppill{border:none;cursor:pointer;color:var(--brand);font-family:inherit;font-weight:800}
 .scroll{flex:1;overflow-y:auto;padding:4px 16px 40px;-webkit-overflow-scrolling:touch}
 
 .card{background:var(--paper);border-radius:22px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
@@ -332,8 +329,8 @@ button.toppill{border:none;cursor:pointer;color:var(--brand);font-family:inherit
 /* ══════════ 小白兔养成岛样式 ══════════ */
 .rabbit-wrap *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 .rabbit-wrap{color:#2c4a2e;font-family:var(--font);font-size:15px;line-height:1.6}
-.rabbit-wrap .rtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#f3eeff 0%,#fff4e8 100%);border:2px solid #dcc8f8;border-radius:20px;padding:12px 16px;box-shadow:0 4px 18px rgba(130,80,200,.1);margin-bottom:14px}
-.rabbit-wrap .rbrand{font-size:17px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#c05a8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rabbit-wrap .rtop{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f3eeff 0%,#fff4e8 100%);border:2px solid #dcc8f8;border-radius:20px;padding:12px 16px;box-shadow:0 4px 18px rgba(130,80,200,.1);margin-bottom:14px}
+.rabbit-wrap .rbrand{flex:1;font-size:17px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#c05a8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .rabbit-wrap .rbrand small{display:block;font-size:10px;font-weight:500;color:#a78bfa;letter-spacing:2.5px;-webkit-text-fill-color:#a78bfa}
 .rabbit-wrap .rrsec{margin-top:10px;background:rgba(255,255,255,.5);border-radius:12px;padding:10px 12px}
 .rabbit-wrap .rrhead{font-size:12px;color:#7c3aed;font-weight:700;margin-bottom:8px}
@@ -345,8 +342,11 @@ button.toppill{border:none;cursor:pointer;color:var(--brand);font-family:inherit
 .rabbit-wrap .rgrowth svg{width:130px;height:32px;flex:none}
 .rabbit-wrap .rgrowth .rlv{font-size:12px;color:var(--ink-soft);white-space:nowrap}
 .rabbit-wrap .rgrowth .rlv b{display:block;font-size:14px;color:var(--ink)}
-.rabbit-wrap .rpurse{display:flex;align-items:center;gap:5px;padding:8px 16px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;border-radius:14px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;box-shadow:0 3px 10px rgba(124,58,237,.3)}
-.rabbit-wrap .rpurse .rn{font-family:var(--num);font-size:22px;font-weight:700}
+.rabbit-wrap .rstatbar{display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;user-select:none}
+.rabbit-wrap .rstat-pill{display:flex;align-items:center;gap:3px;padding:7px 13px;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap;border:none;font-family:inherit}
+.rabbit-wrap .rcal-pill{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.3)}
+.rabbit-wrap .rreward-pill{background:#fff3e0;color:#c05a0e}
+.rabbit-wrap .rtotal-pill{background:#fffbe6;color:#a16207}
 .rabbit-wrap .riconbtn{border:2px solid var(--line,#cfe0bd);background:var(--paper);color:var(--ink);width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer;flex:none}
 .rabbit-wrap .riconbtn[aria-pressed="false"]{opacity:.4}
 .rabbit-wrap .rmain{display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:start}
@@ -802,11 +802,6 @@ button.toppill{border:none;cursor:pointer;color:var(--brand);font-family:inherit
   <div class="main">
     <div class="top">
       <div class="title" id="ptitle">🐰 开心兔兔养成岛</div>
-      <div class="topright">
-        <button class="toppill" onclick="showCheckinCalendar()">📅 打卡日历</button>
-        <div class="toppill" id="epill">🎁 <span id="eval">0</span>&thinsp;天可兑</div>
-        <div class="toppill">🌟 <span id="totalDaysVal">0</span>&thinsp;天</div>
-      </div>
     </div>
     <div class="scroll" id="page"></div>
   </div>
@@ -4563,9 +4558,7 @@ function earn(n, key){
   return n;
 }
 function paintEnergy(){
-  var rd = (S.rewardDays !== undefined ? S.rewardDays : Object.keys(S.checkinHistory||{}).length);
-  $("eval").textContent = rd;
-  var tdEl = $("totalDaysVal"); if(tdEl) tdEl.textContent = Object.keys(S.checkinHistory||{}).length;
+  // rtop 里的数值由 rabbitRender() 模板直接渲染，无需 DOM 更新
 }
 
 /* ══════════ 复习系统：通用工具函数 ══════════ */
@@ -5146,8 +5139,10 @@ function rabbitRender(){
     </button>
     <div class="rbrand">小白兔养成岛<small>CARROT ISLAND</small></div>
     
-    <div class="rpurse" id="rpurse" title="长按 1.5 秒进入家长模式">
-     <span aria-hidden="true">📅</span><span class="rn">${totalCheckins}</span><span>天打卡</span>
+    <div class="rstatbar" id="rpurse" title="长按 1.5 秒进入家长模式">
+     <button class="rstat-pill rcal-pill" onclick="showCheckinCalendar()">📅 打卡日历</button>
+     <div class="rstat-pill rreward-pill">🎁 ${S.rewardDays||0}&thinsp;天可兑</div>
+     <div class="rstat-pill rtotal-pill">🌟 ${totalCheckins}&thinsp;天</div>
     </div>
    </header>
    <div class="rmain">
