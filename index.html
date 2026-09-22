@@ -633,8 +633,9 @@ body{
 .tile b{font-size:30px;font-weight:900;line-height:1.1}
 .tile span{font-size:11.5px;color:var(--ink-soft);font-weight:700;line-height:1.25;
   max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
-.tile.done{background:#F2FAF3;border-color:#B7DEBB}
-.tile.done::after{content:"\2713";position:absolute;top:2px;right:5px;font-size:11px;font-weight:900;color:var(--green-d)}
+.tile.r1{background:#F2FAF3;border-color:#B7DEBB}
+.tile.r2{background:#E0F2E1;border-color:#81C784}
+.tile.r3{background:#C8E6C9;border-color:#4CAF50}
 
 .pygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
 .pytile{position:relative;border:2px solid var(--line);background:#fff;border-radius:14px;padding:9px 2px 7px;
@@ -643,7 +644,9 @@ body{
 .pytile:active{transform:scale(.93);border-color:var(--green)}
 .pytile b{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:.5px;line-height:1.2}
 .pytile span{font-size:11px;color:var(--ink-soft);font-weight:700}
-.pytile.done{background:#F2FAF3;border-color:#B7DEBB}
+.pytile.r1{background:#F2FAF3;border-color:#B7DEBB}
+.pytile.r2{background:#E0F2E1;border-color:#81C784}
+.pytile.r3{background:#C8E6C9;border-color:#4CAF50}
 
 .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
 .wtile{position:relative;border:2px solid var(--line);background:#fff;border-radius:16px;padding:11px 5px 9px;
@@ -653,8 +656,9 @@ body{
 .wtile .em{font-size:29px;line-height:1.1}
 .wtile .w{font-size:15.5px;font-weight:900;color:#E5443C;word-break:break-word;line-height:1.2}
 .wtile .cn{font-size:11.5px;color:var(--ink-soft);font-weight:700}
-.wtile.done{background:#F2FAF3;border-color:#B7DEBB}
-.wtile.done::after{content:"\2713";position:absolute;top:3px;right:6px;font-size:11px;font-weight:900;color:var(--green-d)}
+.wtile.r1{background:#F2FAF3;border-color:#B7DEBB}
+.wtile.r2{background:#E0F2E1;border-color:#81C784}
+.wtile.r3{background:#C8E6C9;border-color:#4CAF50}
 /* 短语格子：句子长，铺宽一点、允许换行 */
 .wgrid.ph{grid-template-columns:repeat(auto-fill,minmax(152px,1fr))}
 .wgrid.ph .em{font-size:24px}
@@ -4389,6 +4393,10 @@ function load(){
   if(!S.watchedVideos || typeof S.watchedVideos !== 'object' || Array.isArray(S.watchedVideos)) S.watchedVideos = {};
   if(!S.checkinHistory || typeof S.checkinHistory !== 'object' || Array.isArray(S.checkinHistory)) S.checkinHistory = {};
   if(!S.cnt.gem) S.cnt.gem = 0;
+  // Migrate old learned records (boolean true → {count:1,...})
+  Object.keys(S.learnedHz).forEach(k=>{ if(typeof S.learnedHz[k]!=='object'||!S.learnedHz[k]) S.learnedHz[k]={count:1,lastReview:today(),collected:false}; });
+  Object.keys(S.learnedPy).forEach(k=>{ if(typeof S.learnedPy[k]!=='object'||!S.learnedPy[k]) S.learnedPy[k]={count:1,lastReview:today(),collected:false}; });
+  Object.keys(S.learnedEn).forEach(k=>{ if(typeof S.learnedEn[k]!=='object'||!S.learnedEn[k]) S.learnedEn[k]={count:1,lastReview:today(),collected:false}; });
   if(S.rabbit.day !== today()){ S.rabbit.day = today(); S.rabbit.done = []; S.rabbit.counted = false; if(S.rabbit.lastDay && dayGap(S.rabbit.lastDay, today()) >= 2){ S.rabbit.streak = 0; S.rabbit.bonusAt = 0; } }
   applyPenalty();
   save();
@@ -5446,8 +5454,8 @@ function hzListHTML(){
     total += list.length;
     const cells = list.map(o => {
       const key = hzGrade+"-"+u+"-"+o.e[0];
-      const done = !!S.learnedHz[key];
-      return `<button class="tile ${done?"done":""}" data-act="hz" data-g="${hzGrade}" data-u="${htmlEsc(u)}" data-c="${htmlEsc(o.e[0])}">
+      const mc = _masteryClass(S.learnedHz[key]);
+      return `<button class="tile ${mc}" data-act="hz" data-g="${hzGrade}" data-u="${htmlEsc(u)}" data-c="${htmlEsc(o.e[0])}">
         <span class="emo">${o.e[2]||"📝"}</span><b>${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span></button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(u)}</h3><em>${list.length} 字</em></div>
@@ -5475,9 +5483,14 @@ function pgHanzi(){
      <input id="hzKw" placeholder="搜汉字 / 拼音 / 组词" value="${htmlEsc(hzKw)}" oninput="hzKw=this.value;hzPaint()">
      <button class="fbtn" onclick="hzKw='';$('hzKw').value='';hzPaint()">清空</button>
    </div>
-   <div class="tiptext">👆 点一下听发音（自动记为学会 +⚡1）　·　👉 长按看拼音、组词和字理小故事</div>
+   <div class="tiptext">👆 点一下听发音（每次练习 +⚡1，边框越深代表越熟练）　·　👉 长按看拼音、组词和字理小故事</div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 2px 10px;font-size:12px;color:var(--ink-soft);font-weight:700;align-items:center">
+     <span style="border:2px solid #B7DEBB;background:#F2FAF3;border-radius:8px;padding:2px 8px">浅绿 = 练过1-2次</span>
+     <span style="border:2px solid #81C784;background:#E0F2E1;border-radius:8px;padding:2px 8px">中绿 = 练过3-4次</span>
+     <span style="border:2px solid #4CAF50;background:#C8E6C9;border-radius:8px;padding:2px 8px">深绿 = 练过5次+✨</span>
+   </div>
    <div id="hzList">${hzListHTML()}</div>
-   <div class="meta">今日已学 ${S.cnt.hz} 个 ｜ 累计 ${Object.keys(S.learnedHz).length} 字</div>`;
+   <div class="meta">今日已练 ${S.cnt.hz} 次 ｜ 累计汉字 ${Object.keys(S.learnedHz).length} 个</div>`;
   setupTileTap();
 }
 /* 兜底：万一以后又混进「X字 X词」这种占位组词，直接当没有词，
@@ -5493,17 +5506,22 @@ function hzRowOf(g, u, ch){
   const gd = HANZI_GRADED[g] || HANZI_GRADED[1];
   return (gd[u] || []).find(e => e[0] === ch);
 }
+function _masteryClass(rec){
+  if(!rec || !rec.count) return "";
+  if(rec.count >= 5) return "r3";
+  if(rec.count >= 3) return "r2";
+  return "r1";
+}
 function tapHz(g, u, ch){
   const row = hzRowOf(g, u, ch);
   if(!row) return;
   speakHanzi(row[0], row[3]);
   const key = g+"-"+u+"-"+row[0];
   if(!S.learnedHz[key]){
-    S.learnedHz[key] = {count:1, lastReview:today(), collected:false};
-    S.cnt.hz++; earn(1,"hz");
-  }else{
-    S.learnedHz[key].count++; S.learnedHz[key].lastReview = today();
+    S.learnedHz[key] = {count:0, lastReview:today(), collected:false};
   }
+  S.learnedHz[key].count++; S.learnedHz[key].lastReview = today();
+  S.cnt.hz++; earn(1,"hz");
   save(); paintEnergy(); hzPaint();
 }
 function cardHz(g, u, ch, autoSpeak){
@@ -6017,8 +6035,9 @@ function pyListHTML(){
   return Object.keys(PINYIN).map(cat => {
     const list = PINYIN[cat];
     const cells = list.map((it,i) => {
-      const key = cat+"-"+it[0], done = !!S.learnedPy[key];
-      return `<button class="pytile ${done?"done":""}" data-act="py" data-cat="${htmlEsc(cat)}" data-i="${i}">
+      const key = cat+"-"+it[0];
+      const mc = _masteryClass(S.learnedPy[key]);
+      return `<button class="pytile ${mc}" data-act="py" data-cat="${htmlEsc(cat)}" data-i="${i}">
         <b>${htmlEsc(it[0])}</b><span>${htmlEsc(pyEg(it))}</span></button>`;
     }).join("");
     return `<div class="card sect">
@@ -6034,9 +6053,14 @@ function pgPinyin(){
    <div class="tabs"><button class="tab ${pyMode==="learn"?"on":""}" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab ${pyMode==="table"?"on":""}" onclick="pyMode='table';render()">🔊 拼音表</button>
      <button class="tab ${pyMode==="review"?"on":""}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?" ("+Object.keys(S.learnedPy).length+")":""}</button></div>
-   <div class="tiptext">👆 点一下听发音（自动记为学会 +⚡1）　·　👉 长按看口诀、例字和四声</div>
+   <div class="tiptext">👆 点一下听发音（每次练习 +⚡1，多练边框越深代表越熟练）　·　👉 长按看口诀、例字和四声</div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 2px 10px;font-size:12px;color:var(--ink-soft);font-weight:700;align-items:center">
+     <span style="border:2px solid #B7DEBB;background:#F2FAF3;border-radius:8px;padding:2px 8px">浅绿 = 练过1-2次</span>
+     <span style="border:2px solid #81C784;background:#E0F2E1;border-radius:8px;padding:2px 8px">中绿 = 练过3-4次</span>
+     <span style="border:2px solid #4CAF50;background:#C8E6C9;border-radius:8px;padding:2px 8px">深绿 = 练过5次+✨</span>
+   </div>
    <div id="pyList">${pyListHTML()}</div>
-   <div class="meta">今日已练 ${S.cnt.py} 个 ｜ 累计 ${Object.keys(S.learnedPy).length} 个</div>`;
+   <div class="meta">今日已练 ${S.cnt.py} 次 ｜ 累计拼音 ${Object.keys(S.learnedPy).length} 个</div>`;
   setupTileTap();
 }
 function tapPy(cat, i){
@@ -6045,11 +6069,10 @@ function tapPy(cat, i){
   speakPinyinItem(it[1]);
   const key = cat+"-"+it[0];
   if(!S.learnedPy[key]){
-    S.learnedPy[key] = {count:1, lastReview:today(), collected:false};
-    S.cnt.py++; earn(1,"py");
-  }else{
-    S.learnedPy[key].count++; S.learnedPy[key].lastReview = today();
+    S.learnedPy[key] = {count:0, lastReview:today(), collected:false};
   }
+  S.learnedPy[key].count++; S.learnedPy[key].lastReview = today();
+  S.cnt.py++; earn(1,"py");
   save(); paintEnergy(); pyPaint();
 }
 function cardPy(cat, i, autoSpeak){
@@ -7010,9 +7033,9 @@ function enListHTML(){
     total += list.length;
     const cells = list.map(o => {
       const key = c+"-"+o.e[0];
-      const done = !!S.learnedEn[key];
+      const mc = _masteryClass(S.learnedEn[key]);
       const act = (enSub==="alphabet") ? "abc" : "en";
-      return `<button class="wtile ${done?"done":""}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
+      return `<button class="wtile ${mc}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
         <span class="em">${o.e[2]||"🔤"}</span><span class="w">${htmlEsc(o.e[0])}</span>
         <span class="cn">${htmlEsc(o.e[1]||"")}</span></button>`;
     }).join("");
@@ -7127,9 +7150,14 @@ function pgEnglish(){
      <input id="enKw" placeholder="${searchPh}" value="${htmlEsc(enKw)}" oninput="enKw=this.value;enPaint()">
      <button class="fbtn" onclick="enKw='';$('enKw').value='';enPaint()">清空</button>
    </div>
-   <div class="tiptext">👆 点一下听读音（自动记为学会 +⚡1）　·　👉 长按看大卡片</div>
+   <div class="tiptext">👆 点一下听读音（每次练习 +⚡1，边框越深代表越熟练）　·　👉 长按看大卡片</div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 2px 10px;font-size:12px;color:var(--ink-soft);font-weight:700;align-items:center">
+     <span style="border:2px solid #B7DEBB;background:#F2FAF3;border-radius:8px;padding:2px 8px">浅绿 = 练过1-2次</span>
+     <span style="border:2px solid #81C784;background:#E0F2E1;border-radius:8px;padding:2px 8px">中绿 = 练过3-4次</span>
+     <span style="border:2px solid #4CAF50;background:#C8E6C9;border-radius:8px;padding:2px 8px">深绿 = 练过5次+✨</span>
+   </div>
    <div id="enList">${enListHTML()}</div>
-   <div class="meta">今日已学 ${S.cnt.en} 个 ｜ 累计 ${Object.keys(S.learnedEn).length} 条</div>`;
+   <div class="meta">今日已练 ${S.cnt.en} 次 ｜ 累计单词 ${Object.keys(S.learnedEn).length} 个</div>`;
   setupTileTap();
 }
 function tapEn(cat, i, sub){
@@ -7161,11 +7189,10 @@ function tapEn(cat, i, sub){
 
   const key = cat+"-"+it[0];
   if(!S.learnedEn[key]){
-    S.learnedEn[key] = {count:1, lastReview:today(), collected:false};
-    S.cnt.en++; earn(1,"en");
-  }else{
-    S.learnedEn[key].count++; S.learnedEn[key].lastReview = today();
+    S.learnedEn[key] = {count:0, lastReview:today(), collected:false};
   }
+  S.learnedEn[key].count++; S.learnedEn[key].lastReview = today();
+  S.cnt.en++; earn(1,"en");
   save(); paintEnergy(); enPaint();
 }
 function cardEn(cat, i, sub, autoSpeak){
