@@ -5153,10 +5153,7 @@ function rabbitRender(){
       <video id="rvideo" playsinline preload="none"></video>
       <div class="rrest">${RABBIT_CFG.lines.resting}</div>
      </div>
-     <div class="rbubble" id="rbubble">你回来啦，我在窝里等你呢。</div>
-     <button class="rhug" id="rhugBtn">🤍 抱一抱（免费）</button>
-     ${(()=>{const si=RABBIT_CFG.shop.find(x=>x.id===R.showcase); return si?`<div class="rshowcase" onclick="rabbitBuy(RABBIT_CFG.shop.find(x=>x.id==='${si.id}'))" title="点击播放「${si.name}」">
-       <span class="rsc-label">📍 展示中</span><img src="${rabbitSrc(si.file.replace('.mp4','.jpg'))}" alt="${si.name}" loading="lazy" onerror="this.style.display=\'none\'"><span class="rsc-name">${si.name}</span></div>`:'';})()}
+
     </section>
     <section class="rpanel">
      ${_checkinProgressPanel()}
