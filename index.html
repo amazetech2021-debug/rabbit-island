@@ -52,6 +52,9 @@ body{
 .pill{display:flex;align-items:center;gap:5px;background:var(--paper);border-radius:22px;
   padding:8px 15px;font-weight:900;font-size:17px;box-shadow:var(--shadow)}
 .pill.small{font-size:15px;padding:7px 12px}
+.topright{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.toppill{display:flex;align-items:center;gap:4px;background:var(--paper);border-radius:18px;padding:6px 12px;font-weight:800;font-size:13px;box-shadow:var(--shadow);white-space:nowrap;color:#4c1d95}
+button.toppill{border:none;cursor:pointer;color:var(--brand);font-family:inherit;font-weight:800}
 .scroll{flex:1;overflow-y:auto;padding:4px 16px 40px;-webkit-overflow-scrolling:touch}
 
 .card{background:var(--paper);border-radius:22px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
@@ -332,6 +335,12 @@ body{
 .rabbit-wrap .rtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#f3eeff 0%,#fff4e8 100%);border:2px solid #dcc8f8;border-radius:20px;padding:12px 16px;box-shadow:0 4px 18px rgba(130,80,200,.1);margin-bottom:14px}
 .rabbit-wrap .rbrand{font-size:17px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#c05a8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .rabbit-wrap .rbrand small{display:block;font-size:10px;font-weight:500;color:#a78bfa;letter-spacing:2.5px;-webkit-text-fill-color:#a78bfa}
+.rabbit-wrap .rrsec{margin-top:10px;background:rgba(255,255,255,.5);border-radius:12px;padding:10px 12px}
+.rabbit-wrap .rrhead{font-size:12px;color:#7c3aed;font-weight:700;margin-bottom:8px}
+.rabbit-wrap .rrlist{display:flex;flex-wrap:wrap;gap:6px}
+.rabbit-wrap .rrbtn{display:flex;align-items:center;gap:4px;border:1.5px solid #dcc8f8;border-radius:10px;background:#f3eeff;padding:5px 10px;cursor:pointer;font-size:12px;font-family:inherit;color:#4c1d95;font-weight:600}
+.rabbit-wrap .rrbtn.dim{opacity:.4;cursor:default}
+.rabbit-wrap .rrbtn small{background:#7c3aed;color:#fff;border-radius:6px;padding:1px 5px;font-size:10px;margin-left:3px;font-weight:700}
 .rabbit-wrap .rgrowth{flex:1;min-width:180px;display:flex;align-items:center;gap:8px}
 .rabbit-wrap .rgrowth svg{width:130px;height:32px;flex:none}
 .rabbit-wrap .rgrowth .rlv{font-size:12px;color:var(--ink-soft);white-space:nowrap}
@@ -793,7 +802,11 @@ body{
   <div class="main">
     <div class="top">
       <div class="title" id="ptitle">🐰 开心兔兔养成岛</div>
-      <div class="pill" id="epill">📅 <span id="eval">0</span> 天</div>
+      <div class="topright">
+        <button class="toppill" onclick="showCheckinCalendar()">📅 打卡日历</button>
+        <div class="toppill" id="epill">🎁 <span id="eval">0</span>&thinsp;天可兑</div>
+        <div class="toppill">🌟 <span id="totalDaysVal">0</span>&thinsp;天</div>
+      </div>
     </div>
     <div class="scroll" id="page"></div>
   </div>
@@ -4549,7 +4562,11 @@ function earn(n, key){
   rabbitAutoCheck(key);
   return n;
 }
-function paintEnergy(){ $("eval").textContent = (S.rewardDays !== undefined ? S.rewardDays : Object.keys(S.checkinHistory||{}).length); }
+function paintEnergy(){
+  var rd = (S.rewardDays !== undefined ? S.rewardDays : Object.keys(S.checkinHistory||{}).length);
+  $("eval").textContent = rd;
+  var tdEl = $("totalDaysVal"); if(tdEl) tdEl.textContent = Object.keys(S.checkinHistory||{}).length;
+}
 
 /* ══════════ 复习系统：通用工具函数 ══════════ */
 // mode: 'hz' | 'py' | 'en' | 'poem'
@@ -5150,7 +5167,7 @@ function rabbitRender(){
     </section>
    </div>
    <section class="rpanel rshop">
-    <h2>兔兔换装间<span>已解锁 ${R.owned.length}/${RABBIT_CFG.shop.length} · 累计打卡${totalCheckins}天</span></h2>
+    <h2>兔兔换装间</h2>
     <div class="rgrid">${shopHtml}</div>
    </section>
    <section class="rpanel rparent" id="rparentPanel">
@@ -5165,6 +5182,7 @@ function rabbitRender(){
      <button onclick="$('rparentPanel').classList.remove('on')">收起</button>
     </div>
     <p class="rtip">「+1天」奖励孩子特别棒的表现；「-1天」用来更正误操作。</p>
+    ${parentRewardsHTML()}
    </section>
   </div>`;
 
@@ -8539,6 +8557,16 @@ function pgGift(){
      <div class="gfgrid">${cards}</div>
    </div>
    ${log ? `<div class="card sect"><div class="secthead"><h3>🧾 兑换记录</h3><em>最近 10 条</em></div>${log}</div>` : ""}`;
+}
+function parentRewardsHTML(){
+  var days = S.rewardDays||0;
+  var html = '<div class="rrsec"><div class="rrhead">🎁 兑换奖励 · 可用 <b>'+days+'</b> 天</div><div class="rrlist">';
+  REWARDS.forEach(function(r){
+    var ok = days >= r.days;
+    html += '<button class="rrbtn'+(ok?'':' dim')+'" '+(ok?'onclick="giftBuy(''+r.id+'');setTimeout(rabbitRender,300)"':'')+'>'+r.e+' '+r.n+'<small>'+r.days+'天</small></button>';
+  });
+  html += '</div></div>';
+  return html;
 }
 function giftBuy(id){
   const r = REWARDS.find(x => x.id === id);
