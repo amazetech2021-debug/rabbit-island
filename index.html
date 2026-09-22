@@ -4335,7 +4335,8 @@ const BLANK = {
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
   memo:null, rewardLog:[],
-  stickers:[]
+  stickers:[],
+  gemDone:{}, watchedVideos:{}, checkinHistory:{}
 };
 let S;
 function migrateLearned(){
@@ -4375,7 +4376,7 @@ function load(){
   if(S.day !== today()){                      // 跨天重置当日计数
     S.day = today();
     S.got = {hz:0,math:0,py:0,en:0,poem:0,think:0};
-    S.cnt = {hz:0,math:0,py:0,en:0,poem:0,think:0};
+    S.cnt = {hz:0,math:0,py:0,en:0,poem:0,think:0,gem:0};
     S.claimed = [];
   }
   // 小白兔养成岛数据初始化
@@ -4384,6 +4385,10 @@ function load(){
   // 备忘录 / 奖励记录 初始化
   if(!Array.isArray(S.memo)) S.memo = MEMO_DEFAULT.map(t => ({t:t, d:false}));
   if(!Array.isArray(S.rewardLog)) S.rewardLog = [];
+  if(!S.gemDone || typeof S.gemDone !== 'object' || Array.isArray(S.gemDone)) S.gemDone = {};
+  if(!S.watchedVideos || typeof S.watchedVideos !== 'object' || Array.isArray(S.watchedVideos)) S.watchedVideos = {};
+  if(!S.checkinHistory || typeof S.checkinHistory !== 'object' || Array.isArray(S.checkinHistory)) S.checkinHistory = {};
+  if(!S.cnt.gem) S.cnt.gem = 0;
   if(S.rabbit.day !== today()){ S.rabbit.day = today(); S.rabbit.done = []; S.rabbit.counted = false; if(S.rabbit.lastDay && dayGap(S.rabbit.lastDay, today()) >= 2){ S.rabbit.streak = 0; S.rabbit.bonusAt = 0; } }
   applyPenalty();
   save();
@@ -4646,9 +4651,113 @@ function stageOf(){
 function stageIndex(){ let i=0; STAGES.forEach((st,k)=>{ if(S.grow>=st[0]) i=k; }); return i; }
 
 /* ══════════ 打卡 ══════════ */
+
+// 每日打卡条件（5个模块）
+var CHECKIN_GOALS = {
+  hz:  {need:20, label:'认字', emoji:'📖'},
+  py:  {need:10, label:'拼音', emoji:'🔤'},
+  math:{need:20, label:'数学', emoji:'🔢'},
+  en:  {need:10, label:'英语', emoji:'🗣️'},
+  gem: {need:1,  label:'Gemini课', emoji:'✨'}
+};
+
+function _checkinReady(){
+  var c = S.cnt || {};
+  return Object.keys(CHECKIN_GOALS).every(function(k){
+    return (c[k]||0) >= CHECKIN_GOALS[k].need;
+  });
+}
+
+function _checkinProgressPanel(){
+  var c = S.cnt || {};
+  var html = '<div style="background:linear-gradient(135deg,#f5f0ff,#e8e0ff);border-radius:16px;padding:14px;margin-bottom:12px">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  html += '<div style="font-weight:700;font-size:14px;color:#6c5ce7">📋 今日打卡进度</div>';
+  var ready = _checkinReady();
+  var alreadyDone = (S.lastCheck === today());
+  if(alreadyDone){
+    html += '<div style="font-size:12px;font-weight:700;color:#00b894;background:#d4edda;padding:3px 10px;border-radius:20px">✅ 已打卡</div>';
+  } else if(ready){
+    html += '<button onclick="checkin()" style="font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none;padding:6px 14px;border-radius:20px;cursor:pointer">🎉 打卡！</button>';
+  } else {
+    html += '<div style="font-size:11px;color:#999">完成后解锁</div>';
+  }
+  html += '</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+  Object.keys(CHECKIN_GOALS).forEach(function(k){
+    var g = CHECKIN_GOALS[k];
+    var cur = c[k]||0;
+    var done = cur >= g.need;
+    html += '<div style="flex:1;min-width:80px;background:'+(done?'#d4edda':'#fff')+';border:2px solid '+(done?'#4caf50':'#e0d8ff')+';border-radius:12px;padding:7px 8px;text-align:center">';
+    html += '<div style="font-size:18px">'+g.emoji+'</div>';
+    html += '<div style="font-size:11px;font-weight:700;color:'+(done?'#27ae60':'#6c5ce7')+'">'+g.label+'</div>';
+    html += '<div style="font-size:12px;color:#555;margin-top:2px">';
+    if(done){ html += '<span style="color:#27ae60;font-weight:800">✓</span>'; }
+    else { html += '<b>'+cur+'</b>/<span style="color:#999">'+g.need+'</span>'; }
+    html += '</div></div>';
+  });
+  html += '</div>';
+  // 打卡日历按钮
+  html += '<div style="text-align:right;margin-top:8px"><button onclick="showCheckinCalendar()" style="background:none;border:none;color:#6c5ce7;font-size:12px;cursor:pointer;font-family:inherit">📅 打卡日历 ›</button></div>';
+  html += '</div>';
+  return html;
+}
+
+function showCheckinCalendar(){
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth(); // 0-indexed
+  var monthLabel = (year+'-'+(month+1<10?'0':'')+(month+1));
+  var firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var todayStr = today();
+  var html = '<div style="font-size:16px;font-weight:700;color:#6c5ce7;margin-bottom:12px;text-align:center">📅 打卡日历 · '+year+'年'+(month+1)+'月</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">';
+  ['日','一','二','三','四','五','六'].forEach(function(d){
+    html += '<div style="font-size:11px;font-weight:700;color:#999;padding:4px 0">'+d+'</div>';
+  });
+  for(var i=0;i<firstDay;i++) html += '<div></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var ds = year+'-'+(month+1<10?'0':'')+(month+1)+'-'+(d<10?'0':'')+d;
+    var done = !!S.checkinHistory[ds];
+    var isToday = ds === todayStr;
+    var bg = done ? '#6c5ce7' : (isToday ? '#e8e0ff' : '#f5f5f5');
+    var color = done ? '#fff' : (isToday ? '#6c5ce7' : '#666');
+    var border = isToday ? '2px solid #6c5ce7' : '2px solid transparent';
+    html += '<div style="background:'+bg+';color:'+color+';border:'+border+';border-radius:8px;padding:7px 4px;font-size:13px;font-weight:'+(isToday||done?'700':'400')+'">'+d+(done?'<br><span style="font-size:8px">✓</span>':'')+'</div>';
+  }
+  html += '</div>';
+  var totalDone = Object.keys(S.checkinHistory).filter(function(k){ return k.startsWith(monthLabel); }).length;
+  html += '<div style="text-align:center;margin-top:12px;font-size:13px;color:#6c5ce7;font-weight:700">本月已打卡 <b>'+totalDone+'</b> 天 🎉</div>';
+  html += '<br><button class="big" onclick="closeModal()" style="background:var(--brand);color:#fff;border:none">关闭</button>';
+  modal('<div style="max-height:80vh;overflow-y:auto">'+html+'</div>');
+}
+
+function completeGemLesson(num){
+  if(!S.gemDone) S.gemDone = {};
+  if(S.gemDone[num] === today()){
+    toast("今天已完成本课了 ✅");
+    return;
+  }
+  S.gemDone[num] = today();
+  S.cnt.gem = (S.cnt.gem||0) + 1;
+  earn(5,"gem");
+  save();
+  toast("🎉 Gemini课程完成！打卡进度更新");
+  render();
+}
+
 function checkin(){
   if(S.lastCheck === today()){ toast("今天已经打过卡啦 ✅"); return; }
   if(S.dead){ toast("小兔兔已经不在了，先复活它吧"); return; }
+  if(!_checkinReady()){
+    // 显示还差什么
+    var c = S.cnt||{};
+    var missing = Object.keys(CHECKIN_GOALS).filter(function(k){ return (c[k]||0)<CHECKIN_GOALS[k].need; });
+    var mStr = missing.map(function(k){ return CHECKIN_GOALS[k].emoji+CHECKIN_GOALS[k].label+' ('+((c[k]||0))+'/'+CHECKIN_GOALS[k].need+')'; }).join('、');
+    toast("还需完成："+mStr);
+    return;
+  }
   const gap = S.lastCheck ? dayGap(S.lastCheck, today()) : 99;
   S.streak = gap === 1 ? S.streak + 1 : 1;
   S.lastCheck = today(); S.totalDays++;
@@ -4656,6 +4765,9 @@ function checkin(){
   S.water = Math.min(100, S.water + 10);
   const bonus = Math.min(S.streak, 7);
   const got = 5 + bonus;
+  // 保存打卡记录
+  if(!S.checkinHistory) S.checkinHistory = {};
+  S.checkinHistory[today()] = {hz:S.cnt.hz,math:S.cnt.math,py:S.cnt.py,en:S.cnt.en,gem:S.cnt.gem};
   S.energy += got; save(); paintEnergy(); flyEnergy(got);
   petReact('happy');
   modal(`<div class="e">📋</div><h3>打卡成功！</h3>
@@ -5008,6 +5120,7 @@ function rabbitRender(){
        <span class="rsc-label">📍 展示中</span><img src="${rabbitSrc(si.file.replace('.mp4','.jpg'))}" alt="${si.name}" loading="lazy" onerror="this.style.display=\'none\'"><span class="rsc-name">${si.name}</span></div>`:'';})()}
     </section>
     <section class="rpanel">
+     ${_checkinProgressPanel()}
      <h2>今天要做的事<span>今天 +${earned}🥕 · 累计 ${R.coin}🥕</span></h2>
      ${tasksHtml}
      <div class="rstreak">连续打卡 <b>${R.streak}</b> 天　·　满 3 天 +3，满 7 天再 +5</div>
@@ -8005,7 +8118,7 @@ function spkG(num,type,idx){
   var l = GEMINI_LESSONS.find(function(x){return x.num===num;});
   if(!l) return;
   var txt = type==='w' ? l.words[idx] : l.sents[idx];
-  if(txt) speak(txt,'en-US');
+  if(txt){ speak(txt,'en-US'); S.cnt.en=(S.cnt.en||0)+1; earn(1,"en"); save(); }
 }
 function pgGemini(){
   if(_gemLesson !== null){ pgGeminiLesson(_gemLesson); return; }
@@ -8159,6 +8272,14 @@ function pgGeminiLesson(num){
     content = ihtml;
   }
 
+  // 完成本课按钮
+  var gemDoneToday = S.gemDone && S.gemDone[num] === today();
+  var completeBtn = '<div style="margin-top:14px;padding:0 4px">'
+    + (gemDoneToday
+       ? '<div style="background:#d4edda;border-radius:14px;padding:12px;text-align:center;color:#27ae60;font-weight:700;font-size:15px">✅ 今天已完成本课！</div>'
+       : '<button onclick="completeGemLesson('+num+')" style="width:100%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:14px;padding:14px 0;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">✅ 完成本课（计入打卡）</button>')
+    + '</div>';
+
   $("page").innerHTML = '<div style="padding:12px">'
     + '<button onclick="_gemLesson=null;pgGemini()" style="background:none;border:none;color:var(--brand);font-size:14px;cursor:pointer;padding:4px 0 8px">&larr; 返回课程列表</button>'
     + '<div style="text-align:center;margin-bottom:12px">'
@@ -8168,6 +8289,7 @@ function pgGeminiLesson(num){
     + '</div>'
     + tabBar
     + '<div style="margin-top:10px">'+content+'</div>'
+    + completeBtn
     + '</div>';
 }
 /* ══════════ 古诗 ══════════ */
@@ -10538,9 +10660,11 @@ function _renderYtChPage(pg){
     var pl=x.pl,idx=x.idx;
     if(ch.flat){
       var ep=pl.episodes[0];if(!ep)return '';
+      var vidKey0=ep.v||(chId+'|'+idx+'|0');
+      var watched0=S.watchedVideos&&S.watchedVideos[vidKey0];
       return '<button class="ep-item" onclick="playYtVideo(\''+chId+'\','+idx+',0)">'+
         _ytThumb(ep.v,ch.color,ch.emoji)+
-        '<div class="ep-titles"><b style="font-size:13px">'+htmlEsc(pl.name)+'</b></div>'+
+        '<div class="ep-titles"><b style="font-size:13px">'+htmlEsc(pl.name)+'</b>'+(watched0?'<span style="font-size:11px;color:#27ae60;font-weight:700;margin-left:4px">已看✅</span>':'')+'</div>'+
         '<div class="ep-play-btn">▶</div></button>';
     } else {
       var ep0=pl.episodes[0];
@@ -10577,9 +10701,12 @@ function _renderYtPlPage(pg){
   var slice=pl.episodes.slice((pg-1)*_PAGE,pg*_PAGE);
   var html=slice.map(function(ep,i){
     var realIdx=(pg-1)*_PAGE+i;
+    var vidKey=ep.v||(chId+'|'+plIdx+'|'+realIdx);
+    var watched=S.watchedVideos&&S.watchedVideos[vidKey];
+    var watchBadge=watched?'<span style="font-size:11px;color:#27ae60;font-weight:700;margin-left:4px">已看✅</span>':'';
     return '<button class="ep-item" onclick="playYtVideo(\''+chId+'\','+plIdx+','+realIdx+')">'+
       _ytThumb(ep.v,ch.color,ch.emoji)+
-      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b></div>'+
+      '<div class="ep-titles" style="flex:1"><b style="font-size:13px">'+htmlEsc(ep.t)+'</b>'+watchBadge+'</div>'+
       '<div class="ep-play-btn">▶</div></button>';
   }).join('');
   $('yt-pl-list').innerHTML=html+_mkPager(pl.episodes.length,pg,'ytPlGoPage');
@@ -10605,6 +10732,11 @@ function playYtVideo(chId,plIdx,epIdx){
   var pl=ch.playlists[plIdx];if(!pl)return;
   var ep=pl.episodes[epIdx];if(!ep)return;
   _ytCurCh=chId;_ytCurPl=plIdx;_ytCurIdx=epIdx;
+  // 永久记录已看视频
+  if(!S.watchedVideos) S.watchedVideos={};
+  var vidKey = ep.v || (chId+'|'+plIdx+'|'+epIdx);
+  if(vidKey) S.watchedVideos[vidKey] = today();
+  save();
   var m=$('mbox');
   m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var ytUrl=ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v;
