@@ -4277,13 +4277,13 @@ function renderProfileGrid(){
   const cur = getCurrentProfileName();
   grid.innerHTML = names.map(name=>{
     const p = profiles[name];
-    const coins = (p.rabbit && p.rabbit.coin) ? p.rabbit.coin : 0;
     const streak = (p.rabbit && p.rabbit.streak) ? p.rabbit.streak : 0;
+    const owned = (p.rabbit && p.rabbit.owned) ? p.rabbit.owned.length : 0;
     const av = p._avatar || "🐰";
     return `<button class="profile-card${name===cur?' selected':''}" onclick="selectProfile('${name.replace(/'/g,"\\'")}')">
       <div class="pavatar">${av}</div>
       <div class="pname">${name}</div>
-      <div class="pcoins">🥕 ${coins} 币 · ${streak}天连续</div>
+      <div class="pcoins">📅 ${streak}天连续 · 已解锁${owned}套皮肤</div>
     </button>`;
   }).join("")+
   `<button class="profile-card add-card" onclick="showAddProfileForm()">
@@ -4882,7 +4882,7 @@ const RABBIT_CFG = {
   ],
   lines:{
     hello:["你回来啦，我在窝里等你呢。","今天想先做哪一样？我陪你。","早上好，我把耳朵竖起来听你念书。"],
-    earn:["你做完了，我收到 {n} 个胡萝卜币！","叮——{n} 个币进兔窝啦。","我数一数……{n} 个，存好了。"],
+    earn:["你做完了，超棒！","学完了！你真厉害。","叮——今日任务完成！"],
     undo:["这个先不算，等你做完再来点。"],
     idle:["我在窝里等你，已经 {n} 天没见到你了。","我一直在的，你什么时候来都行。"],
     resting:"小白兔在窝里休息<br>喂它、或者给它换衣服，它才会动起来",
@@ -4963,9 +4963,28 @@ function rabbitAutoCheck(key){
     if(bonus) S.rabbit.bonusAt=S.rabbit.streak;
   }
   if(bonus){
-    setTimeout(()=>{ rabbitAddCoin(bonus,true); rabbitSay(why+"，额外奖励 "+bonus+" 个胡萝卜币！"); },1400);
+    setTimeout(()=>{ rabbitAddCoin(bonus,true); rabbitSay(why+"，坚持真棒！继续加油！"); },1400);
   }
-  if(cur!=="home") toast("在「"+t.name+"」中完成了学习，+"+t.coin+" 🥕");
+  if(cur!=="home") toast("在「"+t.name+"」中完成了学习 ✅");
+}
+
+function rabbitAddCheckinDay(){
+  if(!S.checkinHistory) S.checkinHistory = {};
+  let i = 1;
+  while(S.checkinHistory['bonus_'+i]) i++;
+  S.checkinHistory['bonus_'+i] = {bonus:true};
+  save(); rabbitRender();
+  toast("已奖励1天打卡 🎉 累计"+Object.keys(S.checkinHistory).length+"天");
+}
+function rabbitRemoveCheckinDay(){
+  if(!S.checkinHistory || Object.keys(S.checkinHistory).length===0){ toast("打卡天数已为0"); return; }
+  const keys = Object.keys(S.checkinHistory);
+  // 优先删除bonus，再删最近真实打卡
+  const bonusKeys = keys.filter(k=>k.startsWith('bonus_'));
+  const keyToRemove = bonusKeys.length>0 ? bonusKeys[bonusKeys.length-1] : keys.sort().pop();
+  delete S.checkinHistory[keyToRemove];
+  save(); rabbitRender();
+  toast("已减少1天打卡，当前累计"+Object.keys(S.checkinHistory).length+"天");
 }
 function rabbitAllTasks(){ return [...RABBIT_CFG.tasks.learn, ...RABBIT_CFG.tasks.habit]; }
 
@@ -5118,7 +5137,7 @@ function rabbitRender(){
      <div class="rlv"><b>Lv.${lv} ${curLv.name}</b><span>${nextLv?"累计还需 "+(nextLv.need-R.growth)+" 成长值 → "+nextLv.name:"成长值 "+R.growth+" · 满级 🎉"}</span></div>
     </div>
     <div class="rpurse" id="rpurse" title="长按 1.5 秒进入家长模式">
-     <span aria-hidden="true">🥕</span><span class="rn">${R.coin}</span><span>胡萝卜币</span>
+     <span aria-hidden="true">📅</span><span class="rn">${totalCheckins}</span><span>天打卡</span>
     </div>
     <button class="riconbtn" id="rvoiceBtn" aria-pressed="${R.voice}" title="小白兔说话">🔊</button>
    </header>
@@ -5145,17 +5164,15 @@ function rabbitRender(){
    <section class="rpanel rparent" id="rparentPanel">
     <h2>家长模式</h2>
     <div class="rrow">
-     <button onclick="rabbitAddCoin(1,true)">+1 币</button>
-     <button onclick="rabbitAddCoin(3,true)">+3 币（毅力币）</button>
-     <button onclick="rabbitAddCoin(5,true)">+5 币</button>
-     <button onclick="rabbitAddCoin(-1,true)">-1 币（更正误点）</button>
-     <button class="rwarn" onclick="if(confirm('清空今天的打卡？')){S.rabbit.done=[];S.rabbit.counted=false;save();rabbitRender();}">清空今天的打卡</button>
-     <button class="rwarn" onclick="if(confirm('全部重置？')){S.rabbit={coin:0,growth:0,owned:[],voice:S.rabbit.voice,day:today(),done:[],streak:0,lastDay:null,prevLastDay:null,bonusAt:0,counted:false,showcase:null};save();rabbitRender();rabbitSay('我们从头开始，我还是会等你。');}">全部重置</button>
+     <button onclick="rabbitAddCheckinDay()">🎉 +1天 奖励打卡</button>
+     <button onclick="rabbitRemoveCheckinDay()">↩️ -1天 更正打卡</button>
+     <button class="rwarn" onclick="if(confirm('清空今日学习记录？')){S.rabbit.done=[];S.rabbit.counted=false;save();rabbitRender();}">清空今日学习</button>
+     <button class="rwarn" onclick="if(confirm('全部重置？所有打卡和皮肤记录都会清空。')){S.rabbit={coin:0,growth:0,owned:[],voice:S.rabbit.voice,day:today(),done:[],streak:0,lastDay:null,prevLastDay:null,bonusAt:0,counted:false,showcase:null};S.checkinHistory={};save();rabbitRender();rabbitSay('我们从头开始，我还是会等你。');}">全部重置</button>
      <button onclick="exportSave()">📤 导出存档</button>
      <button onclick="importSave()">📥 导入存档</button>
      <button onclick="$('rparentPanel').classList.remove('on')">收起</button>
     </div>
-    <p class="rtip">「-1 币」只用来更正点错的勾，不用来惩罚。</p>
+    <p class="rtip">「+1天」奖励孩子特别棒的表现；「-1天」用来更正误操作。</p>
    </section>
   </div>`;
 
