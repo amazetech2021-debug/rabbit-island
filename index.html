@@ -4871,14 +4871,14 @@ const RABBIT_CFG = {
     {need:150,name:"打滚兔"},{need:240,name:"时尚兔"},{need:360,name:"兔明星"}
   ],
   shop:[
-    {id:"milk",name:"喂牛奶",kind:"喂养",level:1,price:8,file:"1_小白兔吃奶.mp4",line:"牛奶好香呀，我要长高高！"},
-    {id:"grass",name:"喂青草",kind:"喂养",level:2,price:12,file:"2_小白兔吃草.mp4",line:"嫩嫩的草，咔嚓咔嚓，好吃！"},
-    {id:"carrot",name:"喂胡萝卜",kind:"喂养",level:3,price:18,file:"3_小白兔吃胡萝卜.mp4",line:"胡萝卜！这是我最最喜欢的！"},
-    {id:"roll",name:"陪我打滚",kind:"互动",level:4,price:25,file:"4_小白兔打滚.mp4",line:"咕噜噜——今天太开心啦！"},
-    {id:"scarf",name:"小围巾",kind:"装扮",level:4,price:30,file:"5_小白兔带围巾.mp4",line:"围上围巾，我一点都不冷了。"},
-    {id:"band",name:"蝴蝶发箍",kind:"装扮",level:5,price:38,file:"6_小白兔戴发箍.mp4",line:"发箍戴好，我今天是最神气的兔子。"},
-    {id:"pink",name:"粉裙子",kind:"装扮",level:5,price:45,file:"7_小白兔粉裙子.mp4",line:"粉裙子转一圈，好看吗？"},
-    {id:"red",name:"红裙子",kind:"装扮",level:6,price:55,file:"8_小白兔红裙子.mp4",line:"红裙子是压轴的，只有兔明星才穿得上。"}
+    {id:"milk",  name:"喂牛奶",   kind:"喂养",days:1, file:"1_小白兔吃奶.mp4",    line:"牛奶好香呀，我要长高高！"},
+    {id:"grass", name:"喂青草",   kind:"喂养",days:3, file:"2_小白兔吃草.mp4",    line:"嫩嫩的草，咔嚓咔嚓，好吃！"},
+    {id:"carrot",name:"喂胡萝卜", kind:"喂养",days:7, file:"3_小白兔吃胡萝卜.mp4",line:"胡萝卜！这是我最最喜欢的！"},
+    {id:"roll",  name:"陪我打滚", kind:"互动",days:14,file:"4_小白兔打滚.mp4",    line:"咕噜噜——今天太开心啦！"},
+    {id:"scarf", name:"小围巾",   kind:"装扮",days:21,file:"5_小白兔带围巾.mp4",  line:"围上围巾，我一点都不冷了。"},
+    {id:"band",  name:"蝴蝶发箍", kind:"装扮",days:30,file:"6_小白兔戴发箍.mp4",  line:"发箍戴好，我今天是最神气的兔子。"},
+    {id:"pink",  name:"粉裙子",   kind:"装扮",days:45,file:"7_小白兔粉裙子.mp4",  line:"粉裙子转一圈，好看吗？"},
+    {id:"red",   name:"红裙子",   kind:"装扮",days:60,file:"8_小白兔红裙子.mp4",  line:"红裙子是压轴的，只有兔明星才穿得上。"}
   ],
   lines:{
     hello:["你回来啦，我在窝里等你呢。","今天想先做哪一样？我陪你。","早上好，我把耳朵竖起来听你念书。"],
@@ -4887,11 +4887,11 @@ const RABBIT_CFG = {
     idle:["我在窝里等你，已经 {n} 天没见到你了。","我一直在的，你什么时候来都行。"],
     resting:"小白兔在窝里休息<br>喂它、或者给它换衣服，它才会动起来",
     hug:["抱一下就够啦，我又有力气了。","你的手好暖和。"],
-    notEnough:["还差 {n} 个胡萝卜币，明天做完任务就够了。"],
-    locked:["这个要等我长成「{name}」才能用哦。"],
-    unlock:["谢谢你！这是我第 {n} 件宝贝。"],
+    notEnough:["还差 {n} 天打卡才能解锁这个，加油！"],
+    locked:["打卡满{n}天就能解锁这个啦，继续加油！"],
+    unlock:["耶！解锁了！这是我第 {n} 件宝贝～"],
     levelUp:["我升级啦！现在我是「{name}」！"],
-    allDone:["八件全收齐了，你把我养成了兔明星。我们去做下一件事吧！"],
+    allDone:["所有皮肤全解锁了！你超厉害的，我们继续加油吧！"],
     dayClear:["今天的任务全做完了，你好厉害。"]
   }
 };
@@ -5009,21 +5009,23 @@ function rabbitToggleTask(t){
 
 function rabbitBuy(item){
   if(S.rabbit.owned.includes(item.id)){
-    // 已拥有：播放视频，并固定到展示位
+    // 已解锁：播放视频，并固定到展示位
     S.rabbit.showcase = item.id;
     save(); rabbitRender();
     rabbitPlay(item.file, item.line);
     return;
   }
-  const lv = rabbitLvIdx()+1;
-  if(lv<item.level){ rabbitSay(RABBIT_CFG.lines.locked.replace("{name}",RABBIT_CFG.levels[item.level-1].name)); return; }
-  if(S.rabbit.coin<item.price){ rabbitSay(RABBIT_CFG.lines.notEnough[0].replace("{n}",item.price-S.rabbit.coin)); return; }
-  if(!confirm("用 "+item.price+" 个胡萝卜币换「"+item.name+"」吗？\n（换完还剩 "+(S.rabbit.coin-item.price)+" 个）")) return;
-  S.rabbit.coin -= item.price;
+  const totalCheckins = Object.keys(S.checkinHistory||{}).length;
+  if(totalCheckins < item.days){
+    const left = item.days - totalCheckins;
+    rabbitSay(RABBIT_CFG.lines.notEnough[0].replace("{n}", left));
+    return;
+  }
+  // 打卡天数达标，免费解锁
   S.rabbit.owned.push(item.id);
-  S.rabbit.showcase = item.id; // 新买也自动固定到展示位
+  S.rabbit.showcase = item.id;
   save(); rabbitRender();
-  rabbitPlay(item.file, RABBIT_CFG.lines.unlock.replace("{n}",String(S.rabbit.owned.length)));
+  rabbitPlay(item.file, RABBIT_CFG.lines.unlock.replace("{n}", String(S.rabbit.owned.length)));
   if(S.rabbit.owned.length===RABBIT_CFG.shop.length) setTimeout(()=>rabbitSay(RABBIT_CFG.lines.allDone),5200);
 }
 
@@ -5073,20 +5075,19 @@ function rabbitRender(){
     }).join("")+`</div>`
   ).join("");
 
+  const totalCheckins = Object.keys(S.checkinHistory||{}).length;
   const shopHtml = RABBIT_CFG.shop.map(it=>{
     const owned = R.owned.includes(it.id);
-    const state = owned?"owned":(lv<it.level?"locked":(R.coin>=it.price?"afford":"wait"));
+    const canUnlock = totalCheckins >= it.days;
+    const state = owned ? "owned" : (canUnlock ? "afford" : "locked");
     let priceLabel = "";
     let costHint = "";
-    if(state==="locked"){
-      priceLabel = `🔒 Lv.${it.level} 升级解锁`;
-      costHint = `<div class="rpr-cost">🥕 还需 ${it.price} 个萝卜币</div>`;
-    } else if(state==="wait"){
-      const diff = it.price - R.coin;
-      priceLabel = `🥕 ${it.price} 个`;
-      costHint = `<div class="rpr-cost">还差 ${diff} 个🥕</div>`;
-    } else if(state==="afford"){
-      priceLabel = `✨ 🥕 ${it.price} 个`;
+    if(state === "locked"){
+      const left = it.days - totalCheckins;
+      priceLabel = `📅 打卡${it.days}天解锁`;
+      costHint = `<div class="rpr-cost">还差 ${left} 天打卡</div>`;
+    } else if(state === "afford"){
+      priceLabel = `✨ 已满${it.days}天 · 点击解锁`;
     }
     return `<button class="ritem" data-state="${state}" onclick="rabbitBuy(RABBIT_CFG.shop.find(x=>x.id==='${it.id}'))">
       <div class="rthumb"><img src="${rabbitSrc(it.file.replace('.mp4','.jpg'))}" alt="" loading="lazy" onerror="this.style.display=\'none\'">
@@ -5138,7 +5139,7 @@ function rabbitRender(){
     </section>
    </div>
    <section class="rpanel rshop">
-    <h2>兔窝小铺<span>已拥有 ${R.owned.length} / ${RABBIT_CFG.shop.length}</span></h2>
+    <h2>兔兔换装间<span>已解锁 ${R.owned.length}/${RABBIT_CFG.shop.length} · 累计打卡${totalCheckins}天</span></h2>
     <div class="rgrid">${shopHtml}</div>
    </section>
    <section class="rpanel rparent" id="rparentPanel">
