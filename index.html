@@ -329,15 +329,25 @@ body{
 /* ══════════ 小白兔养成岛样式 ══════════ */
 .rabbit-wrap *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 .rabbit-wrap{color:#2c4a2e;font-family:var(--font);font-size:15px;line-height:1.6}
-.rabbit-wrap .rtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--paper);border:2px solid var(--line,#cfe0bd);border-radius:16px;padding:10px 14px;box-shadow:var(--shadow);margin-bottom:12px}
-.rabbit-wrap .rbrand{font-size:17px;font-weight:700}
-.rabbit-wrap .rbrand small{display:block;font-size:10px;font-weight:400;color:var(--ink-soft);letter-spacing:2px}
+.rabbit-wrap .rtop{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f3eeff 0%,#fff4e8 100%);border:2px solid #dcc8f8;border-radius:20px;padding:12px 16px;box-shadow:0 4px 18px rgba(130,80,200,.1);margin-bottom:14px}
+.rabbit-wrap .rbrand{flex:1;font-size:17px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#c05a8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rabbit-wrap .rbrand small{display:block;font-size:10px;font-weight:500;color:#a78bfa;letter-spacing:2.5px;-webkit-text-fill-color:#a78bfa}
+.rabbit-wrap .rrsec{margin-top:10px;background:rgba(255,255,255,.5);border-radius:12px;padding:10px 12px}
+.rabbit-wrap .rrhead{font-size:13px;color:#7c3aed;font-weight:700;margin-bottom:10px}
+.rabbit-wrap .rrlist{display:flex;flex-wrap:wrap;gap:8px}
+.rabbit-wrap .rradj{padding:7px 18px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-family:inherit;font-weight:700}
+.rabbit-wrap .rminus{background:#fce7f3;color:#9d174d}
+.rabbit-wrap .rplus{background:#d1fae5;color:#065f46}
+.rabbit-wrap .rplus3{background:#dbeafe;color:#1e40af}
+.rabbit-wrap .rplus5{background:#ede9fe;color:#4c1d95}
+.rabbit-wrap .rrtip{margin:8px 0 0;font-size:11px;color:var(--ink-soft)}
 .rabbit-wrap .rgrowth{flex:1;min-width:180px;display:flex;align-items:center;gap:8px}
 .rabbit-wrap .rgrowth svg{width:130px;height:32px;flex:none}
 .rabbit-wrap .rgrowth .rlv{font-size:12px;color:var(--ink-soft);white-space:nowrap}
 .rabbit-wrap .rgrowth .rlv b{display:block;font-size:14px;color:var(--ink)}
-.rabbit-wrap .rpurse{display:flex;align-items:baseline;gap:4px;padding:5px 12px;background:var(--orange,#ef7a2e);color:#fff;border-radius:12px;cursor:pointer;user-select:none;font-size:11px}
-.rabbit-wrap .rpurse .rn{font-family:var(--num);font-size:22px;font-weight:700}
+.rabbit-wrap .rstatbar{display:flex;align-items:center;gap:7px;flex-shrink:0;user-select:none}
+.rabbit-wrap .rstat-pill{display:flex;align-items:center;justify-content:center;gap:4px;width:96px;padding:8px 0;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap;border:none;font-family:inherit;background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;box-shadow:0 2px 10px rgba(109,40,217,.35)}
+.rabbit-wrap button.rstat-pill{cursor:pointer}
 .rabbit-wrap .riconbtn{border:2px solid var(--line,#cfe0bd);background:var(--paper);color:var(--ink);width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer;flex:none}
 .rabbit-wrap .riconbtn[aria-pressed="false"]{opacity:.4}
 .rabbit-wrap .rmain{display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:start}
@@ -793,7 +803,6 @@ body{
   <div class="main">
     <div class="top">
       <div class="title" id="ptitle">🐰 开心兔兔养成岛</div>
-      <div class="pill" id="epill">⚡ <span id="eval">0</span></div>
     </div>
     <div class="scroll" id="page"></div>
   </div>
@@ -4338,7 +4347,7 @@ const BLANK = {
   day:"", got:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
-  memo:null, rewardLog:[],
+  memo:null, rewardLog:[], rewardDays:0,
   stickers:[],
   gemDone:{}, watchedVideos:{}, checkinHistory:{}
 };
@@ -4395,6 +4404,7 @@ function load(){
   Object.keys(S.watchedVideos).forEach(function(k){ var v=S.watchedVideos[k]; if(typeof v!=='object'||!v) S.watchedVideos[k]={count:1,lastWatch:typeof v==='string'?v:today()}; });
   if(!S.checkinHistory || typeof S.checkinHistory !== 'object' || Array.isArray(S.checkinHistory)) S.checkinHistory = {};
   if(!S.cnt.gem) S.cnt.gem = 0;
+  if(S.rewardDays === undefined || S.rewardDays === null) S.rewardDays = Object.keys(S.checkinHistory||{}).length;
   // Migrate old learned records (boolean true → {count:1,...})
   Object.keys(S.learnedHz).forEach(k=>{ if(typeof S.learnedHz[k]!=='object'||!S.learnedHz[k]) S.learnedHz[k]={count:1,lastReview:today(),collected:false}; });
   Object.keys(S.learnedPy).forEach(k=>{ if(typeof S.learnedPy[k]!=='object'||!S.learnedPy[k]) S.learnedPy[k]={count:1,lastReview:today(),collected:false}; });
@@ -4461,36 +4471,31 @@ function importSave(){
   cancelBtn.textContent = '取消';
   cancelBtn.style.cssText = 'margin-top:8px;margin-left:8px;padding:8px 18px;background:#ccc;color:#333;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer';
   msg.innerHTML = '<b style="font-size:15px">📥 导入存档</b><p style="font-size:13px;color:#666;margin:4px 0 0">粘贴之前导出的存档数据，或上传 .json 文件，将覆盖当前所有档案。</p>';
-  var fileRow = document.createElement('div');
-  fileRow.style.cssText = 'margin:8px 0 0;display:flex;align-items:center;gap:8px';
   var fileLabel = document.createElement('label');
-  fileLabel.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;border-radius:12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap';
+  fileLabel.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;border-radius:12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;margin:8px 0 0;white-space:nowrap';
   fileLabel.textContent = '📂 选择文件';
   var fileInput = document.createElement('input');
   fileInput.type = 'file'; fileInput.accept = '.json,application/json';
   fileInput.style.cssText = 'display:none';
-  fileInput.onchange = function(){
-    var file = fileInput.files && fileInput.files[0];
-    if(!file){ return; }
-    var reader = new FileReader();
-    reader.onload = function(e){
-      ta.value = e.target.result || '';
-      errTip.textContent = '📄 文件已加载，点击导入按钮确认';
-      errTip.style.color = '#4caf50';
-    };
-    reader.onerror = function(){ errTip.textContent = '文件读取失败，请重试'; errTip.style.color = '#e53935'; };
-    reader.readAsText(file, 'utf-8');
-  };
-  fileLabel.appendChild(fileInput);
   var fileName = document.createElement('span');
-  fileName.style.cssText = 'font-size:12px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px';
-  fileName.textContent = '未选择文件';
-  fileInput.onchange = (function(orig){ return function(){
+  fileName.style.cssText = 'font-size:12px;color:#888;margin-left:8px';
+  fileName.textContent = '';
+  fileInput.onchange = function(){
     var file = fileInput.files && fileInput.files[0];
     if(!file) return;
     fileName.textContent = file.name;
-    orig();
-  }; })(fileInput.onchange);
+    var reader = new FileReader();
+    reader.onload = function(e){
+      ta.value = e.target.result || '';
+      errTip.textContent = '📄 文件已加载，点击导入确认';
+      errTip.style.color = '#4caf50';
+    };
+    reader.onerror = function(){ errTip.textContent = '文件读取失败'; errTip.style.color = '#e53935'; };
+    reader.readAsText(file, 'utf-8');
+  };
+  fileLabel.appendChild(fileInput);
+  var fileRow = document.createElement('div');
+  fileRow.style.cssText = 'display:flex;align-items:center;margin:6px 0 0';
   fileRow.appendChild(fileLabel);
   fileRow.appendChild(fileName);
   msg.appendChild(ta);
@@ -4594,7 +4599,9 @@ function earn(n, key){
   rabbitAutoCheck(key);
   return n;
 }
-function paintEnergy(){ $("eval").textContent = S.energy; }
+function paintEnergy(){
+  // rtop 里的数值由 rabbitRender() 模板直接渲染，无需 DOM 更新
+}
 
 /* ══════════ 复习系统：通用工具函数 ══════════ */
 // mode: 'hz' | 'py' | 'en' | 'poem'
@@ -4827,11 +4834,10 @@ function checkin(){
   // 保存打卡记录
   if(!S.checkinHistory) S.checkinHistory = {};
   S.checkinHistory[today()] = {hz:S.cnt.hz,math:S.cnt.math,py:S.cnt.py,en:S.cnt.en,poem:S.cnt.poem,think:S.cnt.think,gem:S.cnt.gem};
-  S.energy += got; save(); paintEnergy(); flyEnergy(got);
+  S.energy += got; S.rewardDays = (S.rewardDays||0) + 1; save(); paintEnergy();
   petReact('happy');
-  modal(`<div class="e">📋</div><h3>打卡成功！</h3>
-    <p>连续第 <b>${S.streak}</b> 天啦，获得 <b>${got}</b> 点能量<br>
-    （基础 5 + 连续奖励 ${bonus}）<br>小兔兔体力回复 ${CFG.checkinHp} 点，水分 +10</p>
+  modal(`<div class="e">🌟</div><h3>打卡成功！</h3>
+    <p>连续打卡 <b>${S.streak}</b> 天 🎉<br>奖励天数 +1，可用 <b>${S.rewardDays}</b> 天去兑换奖励<br>小兔兔体力回复 ${CFG.checkinHp} 点，水分 +10</p>
     <button class="big g" onclick="closeModal();render()">继续</button>`);
 }
 function revive(){
@@ -5021,8 +5027,9 @@ function rabbitAddCheckinDay(){
   let i = 1;
   while(S.checkinHistory['bonus_'+i]) i++;
   S.checkinHistory['bonus_'+i] = {bonus:true};
-  save(); rabbitRender();
-  toast("已奖励1天打卡 🎉 累计"+Object.keys(S.checkinHistory).length+"天");
+  S.rewardDays = (S.rewardDays||0) + 1;
+  save(); rabbitRender(); paintEnergy();
+  toast("已奖励1天打卡 🎉 可兑换天数："+S.rewardDays+"天");
 }
 function rabbitRemoveCheckinDay(){
   if(!S.checkinHistory || Object.keys(S.checkinHistory).length===0){ toast("打卡天数已为0"); return; }
@@ -5031,8 +5038,9 @@ function rabbitRemoveCheckinDay(){
   const bonusKeys = keys.filter(k=>k.startsWith('bonus_'));
   const keyToRemove = bonusKeys.length>0 ? bonusKeys[bonusKeys.length-1] : keys.sort().pop();
   delete S.checkinHistory[keyToRemove];
-  save(); rabbitRender();
-  toast("已减少1天打卡，当前累计"+Object.keys(S.checkinHistory).length+"天");
+  if(S.rewardDays > 0) S.rewardDays = (S.rewardDays||1) - 1;
+  save(); rabbitRender(); paintEnergy();
+  toast("已减少1天，可兑换天数："+S.rewardDays+"天");
 }
 function rabbitAllTasks(){ return [...RABBIT_CFG.tasks.learn, ...RABBIT_CFG.tasks.habit]; }
 
@@ -5172,22 +5180,12 @@ function rabbitRender(){
       <span class="pavt">${curAv}</span><span>${curProfileName||"未选择"}</span>
     </button>
     <div class="rbrand">小白兔养成岛<small>CARROT ISLAND</small></div>
-    <div class="rgrowth">
-     <svg viewBox="0 0 170 44" aria-hidden="true">
-      <defs><clipPath id="carrotClip"><path d="M22,9 C18,16 18,28 22,35 L156,25.5 C162,24 162,20 156,18.5 Z"/></clipPath></defs>
-      <ellipse cx="13" cy="11" rx="9" ry="4" fill="#7fb069" transform="rotate(-25 13 11)"/>
-      <ellipse cx="10" cy="22" rx="10" ry="4" fill="#7fb069"/>
-      <ellipse cx="13" cy="33" rx="9" ry="4" fill="#7fb069" transform="rotate(25 13 33)"/>
-      <path d="M22,9 C18,16 18,28 22,35 L156,25.5 C162,24 162,20 156,18.5 Z" fill="#f6ddc9"/>
-      <rect id="carrotFill" x="22" y="0" width="${(140*Math.max(0,Math.min(1,pct))).toFixed(1)}" height="44" fill="var(--orange,#ef7a2e)" clip-path="url(#carrotClip)"/>
-      <path d="M22,9 C18,16 18,28 22,35 L156,25.5 C162,24 162,20 156,18.5 Z" fill="none" stroke="#c85c18" stroke-width="2.5"/>
-     </svg>
-     <div class="rlv"><b>Lv.${lv} ${curLv.name}</b><span>${nextLv?"累计还需 "+(nextLv.need-R.growth)+" 成长值 → "+nextLv.name:"成长值 "+R.growth+" · 满级 🎉"}</span></div>
+    
+    <div class="rstatbar" id="rpurse" title="长按 1.5 秒进入家长模式">
+     <button class="rstat-pill rcal-pill" onclick="showCheckinCalendar()">📅 打卡日历</button>
+     <div class="rstat-pill rreward-pill">🎁 ${S.rewardDays||0}&thinsp;天可兑</div>
+     <div class="rstat-pill rtotal-pill">🌟 ${totalCheckins}&thinsp;天</div>
     </div>
-    <div class="rpurse" id="rpurse" title="长按 1.5 秒进入家长模式">
-     <span aria-hidden="true">📅</span><span class="rn">${totalCheckins}</span><span>天打卡</span>
-    </div>
-    <button class="riconbtn" id="rvoiceBtn" aria-pressed="${R.voice}" title="小白兔说话">🔊</button>
    </header>
    <div class="rmain">
     <section class="rpanel">
@@ -5196,17 +5194,14 @@ function rabbitRender(){
       <video id="rvideo" playsinline preload="none"></video>
       <div class="rrest">${RABBIT_CFG.lines.resting}</div>
      </div>
-     <div class="rbubble" id="rbubble">你回来啦，我在窝里等你呢。</div>
-     <button class="rhug" id="rhugBtn">🤍 抱一抱（免费）</button>
-     ${(()=>{const si=RABBIT_CFG.shop.find(x=>x.id===R.showcase); return si?`<div class="rshowcase" onclick="rabbitBuy(RABBIT_CFG.shop.find(x=>x.id==='${si.id}'))" title="点击播放「${si.name}」">
-       <span class="rsc-label">📍 展示中</span><img src="${rabbitSrc(si.file.replace('.mp4','.jpg'))}" alt="${si.name}" loading="lazy" onerror="this.style.display=\'none\'"><span class="rsc-name">${si.name}</span></div>`:'';})()}
+
     </section>
     <section class="rpanel">
      ${_checkinProgressPanel()}
     </section>
    </div>
    <section class="rpanel rshop">
-    <h2>兔兔换装间<span>已解锁 ${R.owned.length}/${RABBIT_CFG.shop.length} · 累计打卡${totalCheckins}天</span></h2>
+    <h2>兔兔换装间</h2>
     <div class="rgrid">${shopHtml}</div>
    </section>
    <section class="rpanel rparent" id="rparentPanel">
@@ -5221,6 +5216,7 @@ function rabbitRender(){
      <button onclick="$('rparentPanel').classList.remove('on')">收起</button>
     </div>
     <p class="rtip">「+1天」奖励孩子特别棒的表现；「-1天」用来更正误操作。</p>
+    ${parentRewardsHTML()}
    </section>
   </div>`;
 
@@ -8564,47 +8560,69 @@ function pgLinks(){
 /* ══════════ 奖励中心 ══════════ */
 /* 想改奖品/价格，直接改这个表：e=图标 n=名字 cost=需要多少⚡ d=说明 */
 const REWARDS = [
-  {id:"money", e:"💰", n:"1元零花钱",     cost:100, d:"学习赚零花钱，存进小金库"},
-  {id:"ice",  e:"🍦", n:"吃冰淇淋",       cost:200,  d:"清凉美味的冰淇淋一个"},
-  {id:"tv",   e:"📺", n:"看电视10分钟",   cost:300,  d:"看喜欢的动画片10分钟"},
-  {id:"book", e:"📚", n:"挑一本新绘本",   cost:300,  d:"去书店自己选一本"},
-  {id:"toy",  e:"🎈", n:"买个小玩具",     cost:500, d:"挑选一个喜欢的小玩具"},
-  {id:"food", e:"🍔", n:"点一次想吃的",   cost:500, d:"这一餐你说了算"},
-  {id:"park", e:"🎡", n:"去游乐场玩",     cost:1000, d:"去游乐场尽情玩一次"}
+  {id:"money", e:"💰", n:"1元零花钱",    days:1,  d:"打卡1天就能领到"},
+  {id:"ice",   e:"🍦", n:"吃冰淇淋",     days:1,  d:"清凉美味的冰淇淋一个"},
+  {id:"tv",    e:"📺", n:"看电视20分钟", days:1,  d:"看喜欢的动画片20分钟"},
+  {id:"food",  e:"🍔", n:"点一次想吃的", days:3,  d:"这一餐你说了算"},
+  {id:"toy",   e:"🎈", n:"买个小玩具",   days:7,  d:"挑选一个喜欢的小玩具"},
+  {id:"book",  e:"📚", n:"挑选一本绘本", days:7,  d:"去书店自己选一本"},
+  {id:"claw",  e:"🎰", n:"抓娃娃",        days:7,  d:"去抓一次娃娃，自己挑机器"},
+  {id:"park",  e:"🎡", n:"去游乐场玩",   days:15, d:"去游乐场尽情玩一次"}
 ];
 function pgGift(){
+  const avail = S.rewardDays !== undefined ? S.rewardDays : Object.keys(S.checkinHistory||{}).length;
   const cards = REWARDS.map(r => {
-    const ok = S.energy >= r.cost;
+    const ok = avail >= r.days;
     return `<div class="gfcard">
       <div class="e">${r.e}</div>
       <div class="n">${htmlEsc(r.n)}</div>
-      <div class="c">⚡ ${r.cost} 能量</div>
+      <div class="c">📅 打卡 ${r.days} 天</div>
       <div class="d">${htmlEsc(r.d)}</div>
-      <button class="gfbtn" ${ok?"":"disabled"} onclick="giftBuy('${r.id}')">${ok?"兑换奖励":"还差 "+(r.cost-S.energy)}</button>
+      <button class="gfbtn" ${ok?"":"disabled"} onclick="giftBuy('${r.id}')">${ok?"✨ 兑换奖励":"还差 "+(r.days-avail)+" 天"}</button>
     </div>`;
   }).join("");
   const log = (S.rewardLog||[]).slice(0,10).map(x =>
     `<div class="task"><span class="e">${x.e||"🎁"}</span>
       <div class="t"><b>${htmlEsc(x.n)}</b><span>${htmlEsc(x.t)} 兑换</span></div>
-      <span class="rw">-⚡${x.c||""}</span></div>`).join("");
+      <span class="rw">-${x.c||""}天</span></div>`).join("");
   $("page").innerHTML = `
    <div class="card sect">
-     <div class="secthead"><h3>🎁 奖励中心</h3><em>当前 ⚡ ${S.energy} · 累计获得 ⚡ ${S.totalEnergy||0}</em></div>
-     <div class="tiptext">用学习赚来的能量换取现实里的小奖励，说到做到哦！</div>
+     <div class="secthead"><h3>🎁 奖励中心</h3><em>可用天数 📅 ${avail} 天 · 打卡赚取</em></div>
+     <div class="tiptext">每天打卡就能积累天数，用来换取现实里的小奖励～</div>
      <div class="gfgrid">${cards}</div>
    </div>
    ${log ? `<div class="card sect"><div class="secthead"><h3>🧾 兑换记录</h3><em>最近 10 条</em></div>${log}</div>` : ""}`;
 }
+function parentRewardsHTML(){
+  var days = S.rewardDays||0;
+  return '<div class="rrsec">'+
+    '<div class="rrhead">🎁 可兑换天数管理 · 当前 <b>'+days+'</b> 天</div>'+
+    '<div class="rrlist">'+
+      '<button class="rradj rminus" onclick="parentAdjDays(-1)">－1天</button>'+
+      '<button class="rradj rplus" onclick="parentAdjDays(1)">＋1天</button>'+
+      '<button class="rradj rplus3" onclick="parentAdjDays(3)">＋3天</button>'+
+      '<button class="rradj rplus5" onclick="parentAdjDays(5)">＋5天</button>'+
+    '</div>'+
+    '<p class="rrtip">增加天数奖励孩子，减少天数用于更正。</p>'+
+  '</div>';
+}
+function parentAdjDays(n){
+  S.rewardDays = Math.max(0,(S.rewardDays||0)+n);
+  save(); rabbitRender();
+  toast((n>0?'已增加'+n+'天可兑换天数 🎉':'已减少1天可兑换天数')+'，当前：'+S.rewardDays+'天');
+}
 function giftBuy(id){
   const r = REWARDS.find(x => x.id === id);
   if(!r) return;
-  if(S.energy < r.cost){ toast("能量还不够，再去学一会儿～"); return; }
-  S.energy -= r.cost;
-  S.rewardLog.unshift({id:r.id, n:r.n, e:r.e, c:r.cost, t:today()});
+  const avail = S.rewardDays !== undefined ? S.rewardDays : Object.keys(S.checkinHistory||{}).length;
+  if(avail < r.days){ toast("打卡天数还不够，继续加油～"); return; }
+  if(S.rewardDays === undefined) S.rewardDays = avail;
+  S.rewardDays -= r.days;
+  S.rewardLog.unshift({id:r.id, n:r.n, e:r.e, c:r.days, t:today()});
   if(S.rewardLog.length > 30) S.rewardLog.length = 30;
   save(); paintEnergy();
   modal(`<div class="e">${r.e}</div><h3>兑换成功！</h3>
-    <p>「${htmlEsc(r.n)}」已经记下啦。<br>快去找爸爸妈妈领奖励吧 🎉</p>
+    <p>「${htmlEsc(r.n)}」已经记下啦 🎉<br>快去找爸爸妈妈领奖励吧！<br>剩余可用天数：${S.rewardDays} 天</p>
     <button class="big g" onclick="closeModal();pgGift()">好的</button>`);
 }
 
