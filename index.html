@@ -10783,16 +10783,18 @@ function playYtVideo(chId,plIdx,epIdx){
   var ep=pl.episodes[epIdx];if(!ep)return;
   _ytCurCh=chId;_ytCurPl=plIdx;_ytCurIdx=epIdx;
   // 永久记录已看视频（count-based，每次播放+1）
-  if(!S.watchedVideos) S.watchedVideos={};
-  var vidKey = ep.v || (chId+'|'+plIdx+'|'+epIdx);
-  if(vidKey){
-    var wr=S.watchedVideos[vidKey];
-    if(!wr||typeof wr!=='object') wr={count:0,lastWatch:''};
-    wr.count++; wr.lastWatch=today();
-    S.watchedVideos[vidKey]=wr;
-  }
-  save();
   var ytUrl=ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v;
+  try{
+    if(!S.watchedVideos) S.watchedVideos={};
+    var vidKey = ep.v || (chId+'|'+plIdx+'|'+epIdx);
+    if(vidKey){
+      var wr=S.watchedVideos[vidKey];
+      if(!wr||typeof wr!=='object') wr={count:0,lastWatch:''};
+      wr.count++; wr.lastWatch=today();
+      S.watchedVideos[vidKey]=wr;
+    }
+    save();
+  }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=ytUrl;}else{window.open(ytUrl,'_blank');}return;
   var m=$('mbox');
