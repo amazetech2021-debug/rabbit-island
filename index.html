@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- build:v20260922-1227 -->
+<!DOCTYPE html><!-- build:v20260922-1238 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -9487,10 +9487,12 @@ function playBookVideo(chId,plIdx,epIdx){
   var _biliBase=ep.bili&&!ep.bili.startsWith('http')?'https://www.bilibili.com/video/'+ep.bili:ep.bili;
   var openUrl=isBili?_biliBase:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
   // 永久记录已看（count-based）
-  if(!S.watchedVideos) S.watchedVideos={};
-  var bkKey=(ep.bili||ep.v)||(chId+'|'+plIdx+'|'+(epIdx||0));
-  if(bkKey){var bwr=S.watchedVideos[bkKey];if(!bwr||typeof bwr!=='object')bwr={count:0,lastWatch:''};bwr.count++;bwr.lastWatch=today();S.watchedVideos[bkKey]=bwr;}
-  save();
+  try{
+    if(!S.watchedVideos) S.watchedVideos={};
+    var bkKey=(ep.bili||ep.v)||(chId+'|'+plIdx+'|'+(epIdx||0));
+    if(bkKey){var bwr=S.watchedVideos[bkKey];if(!bwr||typeof bwr!=='object')bwr={count:0,lastWatch:''};bwr.count++;bwr.lastWatch=today();S.watchedVideos[bkKey]=bwr;}
+    save();
+  }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
   if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
   var m=$('mbox');
