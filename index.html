@@ -360,11 +360,10 @@ body{
 .rabbit-wrap .rtgroup{margin-bottom:10px}
 .rabbit-wrap .rtgroup>p{margin:0 0 4px;font-size:11px;color:var(--ink-soft);letter-spacing:1px}
 .rabbit-wrap .rtask{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 10px;margin-bottom:5px;border-radius:11px;cursor:pointer;border:2px solid var(--line,#cfe0bd);background:var(--field,#e7f0da);font-family:var(--font);font-size:14px;color:var(--ink)}
-.rabbit-wrap .rtask .rbox{width:20px;height:20px;flex:none;border-radius:6px;border:2px solid var(--ink-soft,#6f8d70);background:var(--paper);display:grid;place-items:center;font-size:12px;color:#fff}
+.rabbit-wrap .rtask .rbox{display:none}
 .rabbit-wrap .rtask .rval{margin-left:auto;font-family:var(--num);font-size:12px;color:#c85c18}
 .rabbit-wrap .rtask[data-done="1"]{background:#dff0d0;border-color:var(--orange,#ef7a2e)}
-.rabbit-wrap .rtask[data-done="1"] .rbox{background:var(--orange,#ef7a2e);border-color:var(--orange,#ef7a2e)}
-.rabbit-wrap .rtask[data-done="1"] .rname{text-decoration:line-through;color:var(--ink-soft)}
+.rabbit-wrap .rtask[data-done="1"] .rname{color:var(--ink-soft)}
 .rabbit-wrap .rstreak{font-size:12px;color:var(--ink-soft);border-top:2px dotted var(--line,#cfe0bd);padding-top:6px}
 .rabbit-wrap .rstreak b{font-family:var(--num);color:#c85c18;font-size:15px}
 .rabbit-wrap .rshop{margin-top:12px}
@@ -5065,7 +5064,7 @@ function rabbitRender(){
       const done = R.done.includes(t.id);
       const srcArr = arr===RABBIT_CFG.tasks.learn ? 'learn' : 'habit';
       return `<button class="rtask" data-done="${done?1:0}" onclick="rabbitToggleTask(RABBIT_CFG.tasks.${srcArr}.find(x=>x.id==='${t.id}'))">
-        <span class="rbox">✓</span><span class="rname">${t.name}</span><span class="rval">+${t.coin}</span></button>`;
+        <span class="rname">${t.name}</span><span class="rval">+${t.coin}</span></button>`;
     }).join("")+`</div>`
   ).join("");
 
