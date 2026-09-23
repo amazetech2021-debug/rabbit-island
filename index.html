@@ -377,6 +377,11 @@ body{
 .rabbit-wrap .rstreak{font-size:12px;color:var(--ink-soft);border-top:2px dotted var(--line,#cfe0bd);padding-top:6px}
 .rabbit-wrap .rstreak b{font-family:var(--num);color:#c85c18;font-size:15px}
 .rabbit-wrap .rshop{margin-top:12px}
+.rshop-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;padding:8px 0}
+.rshop-pgbtn{background:linear-gradient(135deg,#a855f7,#6d28d9);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .15s}
+.rshop-pgbtn:disabled{background:#ccc;cursor:default}
+.rshop-pgbtn:not(:disabled):hover{transform:scale(1.06)}
+.rshop-pginfo{font-size:13px;font-weight:700;color:var(--ink-soft)}
 .rabbit-wrap .rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .rabbit-wrap .ritem{border:2px solid var(--line,#cfe0bd);background:var(--field,#e7f0da);border-radius:14px;padding:6px;cursor:pointer;text-align:center;font-family:var(--font);color:var(--ink);font-size:14px}
 .rabbit-wrap .ritem .rthumb{aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:#dfe9d3;margin-bottom:5px;position:relative}
@@ -4903,6 +4908,7 @@ function render(){
 }
 
 /* ══════════ 小白兔养成岛配置与逻辑 ══════════ */
+let _shopPage = 0;
 const RABBIT_CFG = {
   petName:"小白兔", videoDir:"pet/", idlePoster:"idle.jpg",
   tasks:{
@@ -4934,7 +4940,13 @@ const RABBIT_CFG = {
     {id:"scarf", name:"小围巾",   kind:"装扮",days:5,file:"5_小白兔带围巾.mp4",  line:"围上围巾，我一点都不冷了。"},
     {id:"band",  name:"蝴蝶发箍", kind:"装扮",days:6,file:"6_小白兔戴发箍.mp4",  line:"发箍戴好，我今天是最神气的兔子。"},
     {id:"pink",  name:"粉裙子",   kind:"装扮",days:7,file:"7_小白兔粉裙子.mp4",  line:"粉裙子转一圈，好看吗？"},
-    {id:"red",   name:"红裙子",   kind:"装扮",days:8,file:"8_小白兔红裙子.mp4",  line:"红裙子是压轴的，只有兔明星才穿得上。"}
+    {id:"red",   name:"红裙子",   kind:"装扮",days:8,file:"8_小白兔红裙子.mp4",  line:"红裙子是压轴的，只有兔明星才穿得上。"},
+    {id:"elsa",   name:"艾莎公主裙",kind:"装扮",days:9, file:"9_小白兔艾莎公主裙.mp4",      line:"我是艾莎公主！冰雪魔法！"},
+    {id:"kuolomi",name:"阔洛米裙",  kind:"装扮",days:10,file:"10_小白兔阔洛米裙子.mp4",     line:"阔洛米裙子转一圈，好看！"},
+    {id:"pinkmao",name:"粉帽子",    kind:"装扮",days:11,file:"11_小白兔带粉帽子.mp4",        line:"粉帽子戴好，我是最可爱的！"},
+    {id:"flowers",name:"捧花花束",  kind:"互动",days:12,file:"12_小白兔捧花束.mp4",          line:"这束花送给你，谢谢你陪我！"},
+    {id:"pinkhat2",name:"公主粉帽", kind:"装扮",days:13,file:"13_小白兔带着粉色帽子.mp4",   line:"公主帽戴好，出发去冒险！"},
+    {id:"pandabag",name:"熊猫书包", kind:"装扮",days:14,file:"14_小白兔背着熊猫小书包.mp4", line:"熊猫书包背上，我要去上学啦！"}
   ],
   lines:{
     hello:["你回来啦，我在窝里等你呢。","今天想先做哪一样？我陪你。","早上好，我把耳朵竖起来听你念书。"],
@@ -5153,7 +5165,11 @@ function rabbitRender(){
   ).join("");
 
   const totalCheckins = Object.keys(S.checkinHistory||{}).length;
-  const shopHtml = RABBIT_CFG.shop.map(it=>{
+  const _shopPageSize = 8;
+  const _shopTotalPages = Math.ceil(RABBIT_CFG.shop.length / _shopPageSize);
+  if(_shopPage >= _shopTotalPages) _shopPage = 0;
+  const _shopItems = RABBIT_CFG.shop.slice(_shopPage * _shopPageSize, (_shopPage + 1) * _shopPageSize);
+  const shopHtml = _shopItems.map(it=>{
     const owned = R.owned.includes(it.id);
     const canUnlock = totalCheckins >= it.days;
     const state = owned ? "owned" : (canUnlock ? "afford" : "locked");
@@ -5172,6 +5188,12 @@ function rabbitRender(){
       <div class="rnm">${it.name}</div>
       <div class="rpr"><span>${priceLabel}</span></div>${costHint}</button>`;
   }).join("");
+  const shopPageNav = _shopTotalPages > 1 ? `<div class="rshop-nav">
+    <button class="rshop-pgbtn" ${_shopPage===0?"disabled":""} onclick="_shopPage=Math.max(0,_shopPage-1);rabbitRender()">◀ 上一页</button>
+    <span class="rshop-pginfo">第 ${_shopPage+1} 页 / 共 ${_shopTotalPages} 页</span>
+    <button class="rshop-pgbtn" ${_shopPage>=_shopTotalPages-1?"disabled":""} onclick="_shopPage=Math.min(_shopTotalPages-1,_shopPage+1);rabbitRender()">下一页 ▶</button>
+  </div>` : "";
+
 
   const curProfileName = getCurrentProfileName();
   const curProfiles = getAllProfiles();
@@ -5205,6 +5227,7 @@ function rabbitRender(){
    <section class="rpanel rshop">
     <h2>兔兔换装间</h2>
     <div class="rgrid">${shopHtml}</div>
+     ${shopPageNav}
    </section>
    <section class="rpanel rparent" id="rparentPanel">
     <h2>家长模式</h2>
