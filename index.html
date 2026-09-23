@@ -5191,7 +5191,7 @@ function rabbitRender(){
   const shopPageNav = _shopTotalPages > 1 ? `<div class="rshop-nav">
     <button class="rshop-pgbtn" ${_shopPage===0?"disabled":""} onclick="_shopPage=Math.max(0,_shopPage-1);rabbitRender()">◀ 上一页</button>
     <span class="rshop-pginfo">第 ${_shopPage+1} 页 / 共 ${_shopTotalPages} 页</span>
-    <button class="rshop-pgbtn" ${_shopPage>=_shopTotalPages-1?"disabled":""} onclick="_shopPage=Math.min(_shopTotalPages-1,_shopPage+1);rabbitRender()">下一页 ▶</button>
+    <button class="rshop-pgbtn" ${_shopPage>=_shopTotalPages-1?"disabled":""} onclick="_shopPage=Math.min(${_shopTotalPages-1},_shopPage+1);rabbitRender()">下一页 ▶</button>
   </div>` : "";
 
 
