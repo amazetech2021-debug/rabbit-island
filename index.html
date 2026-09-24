@@ -279,9 +279,8 @@ body{
 .pline.on .ptext{color:var(--brand)}
 .poem .py2{font-size:13px;color:var(--green-d);font-weight:700;letter-spacing:1px;display:block;margin-bottom:-6px}
 .poem .mean{margin-top:20px;text-align:left}
-.rc-badge{display:inline-flex;align-items:center;gap:2px;font-size:11px;padding:2px 6px;border-radius:20px;font-weight:700;vertical-align:middle;margin-left:4px;line-height:1;border:1.5px solid currentColor;background:#fff}
-.rc-badge .rc-eye{font-size:12px;line-height:1}
-.rclo{color:#34c759;border-color:#34c759}.rcmid{color:#00b386;border-color:#00b386}.rchi{color:#f59e0b;border-color:#f59e0b}
+.rc-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;vertical-align:middle;margin-left:3px;line-height:1.5}
+.rclo{background:#d1fae5;color:#065f46}.rcmid{background:#bbf7d0;color:#047857}.rchi{background:#fde68a;color:#b45309}
 .book{text-align:center;padding:22px 18px}
 .book .sc{font-size:76px;line-height:1.1;margin-bottom:12px}
 .book .tx{font-size:19px;font-weight:700;line-height:1.75;min-height:96px}
@@ -4206,8 +4205,7 @@ function stopRecite(){
   clearTimeout(reciteTimer);
   stopSpeak();
   document.querySelectorAll('.pline').forEach(el => el.classList.remove('on'));
-  const b = document.getElementById('reciteBtn');
-  if(b) b.innerHTML = '<span class="e">🔊</span>朗诵这首诗';
+  // reciteBtn removed - auto-play mode
 }
 function recitePoem(){
   if(reciting){ stopRecite(); return; }
@@ -4215,8 +4213,7 @@ function recitePoem(){
   const poem = gradePoems[poemIdx];
   const title = poem[0], author = poem[1], lines = poem[2];
   reciting = true;
-  const b = document.getElementById('reciteBtn');
-  if(b) b.innerHTML = '<span class="e">⏸</span>停止';
+  // auto-play mode - no button
   let i = 0;
   const readLines = () => {
     if(!reciting) return;
@@ -8493,7 +8490,7 @@ function pgPoem(){
     const rc = (S.poemRead && S.poemRead[p[0]]) ? (S.poemRead[p[0]].count || 0) : 0;
     const head = (p[2]||[]).slice(0,2).map(l => `<div>${htmlEsc(l)}</div>`).join("");
     const rcBadge = rc > 0
-      ? `<span class="rc-badge ${rc>=5?'rchi':rc>=2?'rcmid':'rclo'}"><span class="rc-eye">👁</span>${rc}</span>`
+      ? `<span class="rc-badge ${rc>=5?'rchi':rc>=2?'rcmid':'rclo'}">${rc}读</span>`
       : '';
     return `<button class="pmcard ${done?"done":""}" onclick="poemIdx=${i};render()">
       <div class="ttl">${i+1}. ${htmlEsc(p[0])}${done?" ✓":""}${rcBadge}</div>
@@ -8532,13 +8529,8 @@ function pgPoemDetail(list){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab on" onclick="poemIdx=-1;render()">← 返回古诗列表</button></div>
    <div class="card poem">
-     <h2>${htmlEsc(t)}</h2><div class="au">${htmlEsc(au)}</div>
+     <h2 style="cursor:pointer" onclick="speakPoemLine('${jsEsc(t)}')">${htmlEsc(t)}</h2><div class="au" style="cursor:pointer" onclick="speakPoemLine('${jsEsc(au)}')">${htmlEsc(au)}</div>
      ${poemLines}
-     <div style="margin-top:16px">
-       <button class="big g" id="reciteBtn" onclick="recitePoem()" style="width:100%;padding:14px">
-         <span class="e">🔊</span>朗诵这首诗
-       </button>
-     </div>
      <div class="story mean" onclick="speak('${esMean}','zh-CN')" style="cursor:pointer"><span>📖</span><div><b>诗的意思：</b>${htmlEsc(mean)}</div></div>
      <div class="trio">
        <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="width:100%">${done?"✓ 已背会":"✓ 我会背了"}</button>
@@ -8549,6 +8541,8 @@ function pgPoemDetail(list){
      </div>
      <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听 · 已读 ${(S.poemRead&&S.poemRead[t])?S.poemRead[t].count:0} 次</div>
    </div>`;
+  // 进入诗词页面自动开始朗诵
+  if(!reciting){ setTimeout(recitePoem, 400); }
 }
 function learnPoem(t){
   if(S.learnedPoem[t]) return;
