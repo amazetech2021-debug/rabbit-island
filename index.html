@@ -8532,12 +8532,10 @@ function pgPoemDetail(list){
      <h2 style="cursor:pointer" onclick="speakPoemLine('${jsEsc(t)}')">${htmlEsc(t)}</h2><div class="au" style="cursor:pointer" onclick="speakPoemLine('${jsEsc(au)}')">${htmlEsc(au)}</div>
      ${poemLines}
      <div class="story mean" onclick="speak('${esMean}','zh-CN')" style="cursor:pointer"><span>📖</span><div><b>诗的意思：</b>${htmlEsc(mean)}</div></div>
-     <div class="trio">
-       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="width:100%">${done?"✓ 已背会":"✓ 我会背了"}</button>
-       <div class="row">
-         <button class="big p" onclick="poemIdx=(poemIdx-1+${list.length})%${list.length};render()">← 上一首</button>
-         <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()">下一首 →</button>
-       </div>
+     <div class="row" style="gap:8px;margin-top:16px">
+       <button class="big p" onclick="poemIdx=(poemIdx-1+${list.length})%${list.length};render()" style="flex:1">← 上一首</button>
+       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="flex:1.4">${done?"✓ 已背会":"✓ 我会背了"}</button>
+       <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()" style="flex:1">下一首 →</button>
      </div>
      <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听 · 已读 ${(S.poemRead&&S.poemRead[t])?S.poemRead[t].count:0} 次</div>
    </div>`;
