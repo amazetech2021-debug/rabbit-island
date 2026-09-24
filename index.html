@@ -279,6 +279,8 @@ body{
 .pline.on .ptext{color:var(--brand)}
 .poem .py2{font-size:13px;color:var(--green-d);font-weight:700;letter-spacing:1px;display:block;margin-bottom:-6px}
 .poem .mean{margin-top:20px;text-align:left}
+.rc-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;vertical-align:middle;margin-left:3px;line-height:1.5}
+.rclo{background:#d1fae5;color:#065f46}.rcmid{background:#bbf7d0;color:#047857}.rchi{background:#fde68a;color:#b45309}
 .book{text-align:center;padding:22px 18px}
 .book .sc{font-size:76px;line-height:1.1;margin-bottom:12px}
 .book .tx{font-size:19px;font-weight:700;line-height:1.75;min-height:96px}
@@ -4166,21 +4168,37 @@ function speakFast(text, lang){ speak(text, lang); }
    古诗朗读：豆包 → 浏览器兜底，一句一句读
    ══════════════════════════════════════════════════════════════ */
 function speakPoemLine(line, done){
+  const gen = ++_poemSpeakGen;
   const key = 'poem|' + line;
-  const guardMs = 900 + String(line).length * 380;
+  const guardMs = 900 + String(line).length * 480;
   let fired = false;
   const finish = () => { if(fired) return; fired = true; done && done(); };
-  const guard = setTimeout(finish, guardMs + 2500);
-  const end = () => { clearTimeout(guard); finish(); };
-
+  const guard = setTimeout(finish, guardMs + 3000);
+  const end = () => {
+    if(_poemSpeakGen !== gen) return; /* stale：新的行已经开始朗读，丢弃 */
+    clearTimeout(guard); finish();
+  };
+  TTS.busy = true;
   if(TTS.cache.has(key)){ playUrl(TTS.cache.get(key), null, end); return; }
   const fallback = () => {
+    if(_poemSpeakGen !== gen) return;
     ttsBrowser(String(line), false);
-    setTimeout(end, guardMs);
+    /* 浏览器TTS无结束回调，轮询 speechSynthesis.speaking 确认真正播完 */
+    const deadline = Date.now() + guardMs + 1000;
+    const poll = () => {
+      if(_poemSpeakGen !== gen) return;
+      if(window.speechSynthesis && speechSynthesis.speaking && Date.now() < deadline){
+        setTimeout(poll, 80);
+      } else {
+        end();
+      }
+    };
+    setTimeout(poll, 220);
   };
   ttsDoubao(line, key, fallback, end);
 }
 
+let _poemSpeakGen = 0;
 var reciting = false, reciteTimer = null;
 function stopRecite(){
   reciting = false;
@@ -4207,7 +4225,16 @@ function recitePoem(){
     if(cur) cur.classList.add('on');
     speakPoemLine(lines[i], () => {
       i++;
-      reciteTimer = setTimeout(readLines, 420);
+      /* done 回调后轮询一下，确认 TTS 真的结束才推进，避免 stale audio 干扰下一句 */
+      const deadline = Date.now() + 1200;
+      const waitDone = () => {
+        if(!reciting) return;
+        const sp = TTS.busy || (TTS.cur && !TTS.cur.paused)
+                   || (window.speechSynthesis && speechSynthesis.speaking);
+        if(sp && Date.now() < deadline){ setTimeout(waitDone, 60); return; }
+        reciteTimer = setTimeout(readLines, 300);
+      };
+      setTimeout(waitDone, 100);
     });
   };
   // 标题读完 → 作者读完 → 逐行读诗句
@@ -4347,7 +4374,7 @@ const dayGap = (a,b) => Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00
 const BLANK = {
   grow:0, hp:100, water:100, dead:false, level:0,
   lastCheck:"", streak:0, totalDays:0, wearing:{}, fedCount:0,
-  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{},
+  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{}, poemRead:{},
   day:"",
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
@@ -8451,6 +8478,7 @@ function pgGeminiLesson(num){
 }
 /* ══════════ 古诗 ══════════ */
 let poemGrade = 1, poemIdx = -1;
+let _lastPoemRead = ''; /* 防止同首诗同天重复计入 */
 const GRADES = [1,2,3,4,5,6];
 function poemsOf(g){ return POEMS.filter(p => (p[5]||1) === g); }
 function pgPoem(){
@@ -8461,9 +8489,13 @@ function pgPoem(){
   const learned = list.filter(p => S.learnedPoem[p[0]]).length;
   const cards = list.map((p,i) => {
     const done = !!S.learnedPoem[p[0]];
+    const rc = (S.poemRead && S.poemRead[p[0]]) ? (S.poemRead[p[0]].count || 0) : 0;
     const head = (p[2]||[]).slice(0,2).map(l => `<div>${htmlEsc(l)}</div>`).join("");
+    const rcBadge = rc > 0
+      ? `<span class="rc-badge ${rc>=5?'rchi':rc>=2?'rcmid':'rclo'}">${rc}读</span>`
+      : '';
     return `<button class="pmcard ${done?"done":""}" onclick="poemIdx=${i};render()">
-      <div class="ttl">${i+1}. ${htmlEsc(p[0])}${done?" ✓":""}</div>
+      <div class="ttl">${i+1}. ${htmlEsc(p[0])}${done?" ✓":""}${rcBadge}</div>
       <div class="au2">— ${htmlEsc(p[1])}</div>
       <div class="ln">${head}</div></button>`;
   }).join("");
@@ -8480,6 +8512,17 @@ function pgPoemDetail(list){
   const p = list[poemIdx];
   const t = p[0], au = p[1], lines = p[2], mean = p[3], pinyin = p[4];
   const done = !!S.learnedPoem[t];
+  /* ── 阅读打卡：每首每天第一次打开时计入 ── */
+  const readKey = t + '|' + today();
+  if(_lastPoemRead !== readKey){
+    _lastPoemRead = readKey;
+    if(!S.poemRead) S.poemRead = {};
+    if(!S.poemRead[t]) S.poemRead[t] = {count:0, lastRead:''};
+    S.poemRead[t].count++;
+    S.poemRead[t].lastRead = today();
+    if((S.cnt.poem||0) === 0){ S.cnt.poem = 1; earn(10,'poem'); }
+    save();
+  }
   const esMean = jsEsc(mean);
   const poemLines = lines.map((l,i) => {
     const py = pinyin ? (pinyin[i]||"") : "";
@@ -8503,7 +8546,7 @@ function pgPoemDetail(list){
          <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()">下一首 →</button>
        </div>
      </div>
-     <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听</div>
+     <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听 · 已读 ${(S.poemRead&&S.poemRead[t])?S.poemRead[t].count:0} 次</div>
    </div>`;
 }
 function learnPoem(t){
