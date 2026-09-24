@@ -6612,7 +6612,19 @@ function tfCount(){
     if(i >= n){ TF.busy = false; TF.revealed = true; pgMathQ(); speak("一共 " + n + " 颗", "zh-CN"); return; }
     TF.countTo = ++i; pgMathQ();
     speak(CN_NUM[i] || String(i), "zh-CN");
-    setTimeout(step, 740);
+    /* 等语音播完再数下一颗：轮询 TTS 状态 + speechSynthesis.speaking */
+    const deadline = Date.now() + 2800;
+    const wait = () => {
+      const isSpeaking = TTS.busy
+        || (TTS.cur && !TTS.cur.paused)
+        || (window.speechSynthesis && speechSynthesis.speaking);
+      if(isSpeaking && Date.now() < deadline){
+        setTimeout(wait, 60);
+      } else {
+        setTimeout(step, 220);   /* 语音结束后稍停，节奏自然 */
+      }
+    };
+    setTimeout(wait, 200);  /* 至少 200ms 让语音先开始 */
   };
   step();
 }
