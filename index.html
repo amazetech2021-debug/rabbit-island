@@ -279,7 +279,6 @@ body{
 .pline.on .ptext{color:var(--brand)}
 .poem .py2{font-size:13px;color:var(--green-d);font-weight:700;letter-spacing:1px;display:block;margin-bottom:-6px}
 .poem .mean{margin-top:20px;text-align:left}
-/* rc-badge replaced by _learnBadge inline style */
 .book{text-align:center;padding:22px 18px}
 .book .sc{font-size:76px;line-height:1.1;margin-bottom:12px}
 .book .tx{font-size:19px;font-weight:700;line-height:1.75;min-height:96px}
@@ -4167,44 +4166,29 @@ function speakFast(text, lang){ speak(text, lang); }
    古诗朗读：豆包 → 浏览器兜底，一句一句读
    ══════════════════════════════════════════════════════════════ */
 function speakPoemLine(line, done){
-  const gen = ++_poemSpeakGen;
   const key = 'poem|' + line;
-  const guardMs = 900 + String(line).length * 480;
+  const guardMs = 900 + String(line).length * 380;
   let fired = false;
   const finish = () => { if(fired) return; fired = true; done && done(); };
-  const guard = setTimeout(finish, guardMs + 3000);
-  const end = () => {
-    if(_poemSpeakGen !== gen) return; /* stale：新的行已经开始朗读，丢弃 */
-    clearTimeout(guard); finish();
-  };
-  TTS.busy = true;
+  const guard = setTimeout(finish, guardMs + 2500);
+  const end = () => { clearTimeout(guard); finish(); };
+
   if(TTS.cache.has(key)){ playUrl(TTS.cache.get(key), null, end); return; }
   const fallback = () => {
-    if(_poemSpeakGen !== gen) return;
     ttsBrowser(String(line), false);
-    /* 浏览器TTS无结束回调，轮询 speechSynthesis.speaking 确认真正播完 */
-    const deadline = Date.now() + guardMs + 1000;
-    const poll = () => {
-      if(_poemSpeakGen !== gen) return;
-      if(window.speechSynthesis && speechSynthesis.speaking && Date.now() < deadline){
-        setTimeout(poll, 80);
-      } else {
-        end();
-      }
-    };
-    setTimeout(poll, 220);
+    setTimeout(end, guardMs);
   };
   ttsDoubao(line, key, fallback, end);
 }
 
-let _poemSpeakGen = 0;
 var reciting = false, reciteTimer = null;
 function stopRecite(){
   reciting = false;
   clearTimeout(reciteTimer);
   stopSpeak();
   document.querySelectorAll('.pline').forEach(el => el.classList.remove('on'));
-  // reciteBtn removed - auto-play mode
+  const b = document.getElementById('reciteBtn');
+  if(b) b.innerHTML = '<span class="e">🔊</span>朗诵这首诗';
 }
 function recitePoem(){
   if(reciting){ stopRecite(); return; }
@@ -4212,7 +4196,8 @@ function recitePoem(){
   const poem = gradePoems[poemIdx];
   const title = poem[0], author = poem[1], lines = poem[2];
   reciting = true;
-  // auto-play mode - no button
+  const b = document.getElementById('reciteBtn');
+  if(b) b.innerHTML = '<span class="e">⏸</span>停止';
   let i = 0;
   const readLines = () => {
     if(!reciting) return;
@@ -4222,16 +4207,7 @@ function recitePoem(){
     if(cur) cur.classList.add('on');
     speakPoemLine(lines[i], () => {
       i++;
-      /* done 回调后轮询一下，确认 TTS 真的结束才推进，避免 stale audio 干扰下一句 */
-      const deadline = Date.now() + 1200;
-      const waitDone = () => {
-        if(!reciting) return;
-        const sp = TTS.busy || (TTS.cur && !TTS.cur.paused)
-                   || (window.speechSynthesis && speechSynthesis.speaking);
-        if(sp && Date.now() < deadline){ setTimeout(waitDone, 60); return; }
-        reciteTimer = setTimeout(readLines, 300);
-      };
-      setTimeout(waitDone, 100);
+      reciteTimer = setTimeout(readLines, 420);
     });
   };
   // 标题读完 → 作者读完 → 逐行读诗句
@@ -4371,7 +4347,7 @@ const dayGap = (a,b) => Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00
 const BLANK = {
   grow:0, hp:100, water:100, dead:false, level:0,
   lastCheck:"", streak:0, totalDays:0, wearing:{}, fedCount:0,
-  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{}, poemRead:{},
+  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{},
   day:"",
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
@@ -8475,7 +8451,6 @@ function pgGeminiLesson(num){
 }
 /* ══════════ 古诗 ══════════ */
 let poemGrade = 1, poemIdx = -1;
-let _lastPoemRead = ''; /* 防止同首诗同天重复计入 */
 const GRADES = [1,2,3,4,5,6];
 function poemsOf(g){ return POEMS.filter(p => (p[5]||1) === g); }
 function pgPoem(){
@@ -8486,11 +8461,9 @@ function pgPoem(){
   const learned = list.filter(p => S.learnedPoem[p[0]]).length;
   const cards = list.map((p,i) => {
     const done = !!S.learnedPoem[p[0]];
-    const poemRec = (S.poemRead && S.poemRead[p[0]]) ? {count: S.poemRead[p[0]].count||0} : null;
     const head = (p[2]||[]).slice(0,2).map(l => `<div>${htmlEsc(l)}</div>`).join("");
-    const rcBadge = _learnBadge(poemRec);
     return `<button class="pmcard ${done?"done":""}" onclick="poemIdx=${i};render()">
-      <div class="ttl">${i+1}. ${htmlEsc(p[0])}${done?" ✓":""}${rcBadge}</div>
+      <div class="ttl">${i+1}. ${htmlEsc(p[0])}${done?" ✓":""}</div>
       <div class="au2">— ${htmlEsc(p[1])}</div>
       <div class="ln">${head}</div></button>`;
   }).join("");
@@ -8507,17 +8480,6 @@ function pgPoemDetail(list){
   const p = list[poemIdx];
   const t = p[0], au = p[1], lines = p[2], mean = p[3], pinyin = p[4];
   const done = !!S.learnedPoem[t];
-  /* ── 阅读打卡：每首每天第一次打开时计入 ── */
-  const readKey = t + '|' + today();
-  if(_lastPoemRead !== readKey){
-    _lastPoemRead = readKey;
-    if(!S.poemRead) S.poemRead = {};
-    if(!S.poemRead[t]) S.poemRead[t] = {count:0, lastRead:''};
-    S.poemRead[t].count++;
-    S.poemRead[t].lastRead = today();
-    if((S.cnt.poem||0) === 0){ S.cnt.poem = 1; earn(10,'poem'); }
-    save();
-  }
   const esMean = jsEsc(mean);
   const poemLines = lines.map((l,i) => {
     const py = pinyin ? (pinyin[i]||"") : "";
@@ -8526,18 +8488,23 @@ function pgPoemDetail(list){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab on" onclick="poemIdx=-1;render()">← 返回古诗列表</button></div>
    <div class="card poem">
-     <h2 style="cursor:pointer" onclick="speakPoemLine('${jsEsc(t)}')">${htmlEsc(t)}</h2><div class="au" style="cursor:pointer" onclick="speakPoemLine('${jsEsc(au)}')">${htmlEsc(au)}</div>
+     <h2>${htmlEsc(t)}</h2><div class="au">${htmlEsc(au)}</div>
      ${poemLines}
-     <div class="story mean" onclick="speak('${esMean}','zh-CN')" style="cursor:pointer"><span>📖</span><div><b>诗的意思：</b>${htmlEsc(mean)}</div></div>
-     <div style="display:flex;flex-direction:row;gap:8px;margin-top:16px;width:100%">
-       <button class="big p" onclick="poemIdx=(poemIdx-1+${list.length})%${list.length};render()" style="flex:1;padding:14px 4px;font-size:16px">← 上一首</button>
-       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="flex:1.4;padding:14px 4px;font-size:16px">${done?"✓ 已背会":"✓ 我会背了"}</button>
-       <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()" style="flex:1;padding:14px 4px;font-size:16px">下一首 →</button>
+     <div style="margin-top:16px">
+       <button class="big g" id="reciteBtn" onclick="recitePoem()" style="width:100%;padding:14px">
+         <span class="e">🔊</span>朗诵这首诗
+       </button>
      </div>
-     <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听 · 已读 ${(S.poemRead&&S.poemRead[t])?S.poemRead[t].count:0} 次</div>
+     <div class="story mean" onclick="speak('${esMean}','zh-CN')" style="cursor:pointer"><span>📖</span><div><b>诗的意思：</b>${htmlEsc(mean)}</div></div>
+     <div class="trio">
+       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="width:100%">${done?"✓ 已背会":"✓ 我会背了"}</button>
+       <div class="row">
+         <button class="big p" onclick="poemIdx=(poemIdx-1+${list.length})%${list.length};render()">← 上一首</button>
+         <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()">下一首 →</button>
+       </div>
+     </div>
+     <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听</div>
    </div>`;
-  // 进入诗词页面自动开始朗诵
-  if(!reciting){ setTimeout(recitePoem, 400); }
 }
 function learnPoem(t){
   if(S.learnedPoem[t]) return;
@@ -8618,7 +8585,85 @@ const BOOKMARKS = [
   {cat:"📺 动画视频", logo:'<img src="https://www.google.com/s2/favicons?domain=nick.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:"Nickelodeon · 尼克", d:"尼克儿童动画频道", url:"https://www.nick.com/"},
   {cat:"📺 动画视频", logo:'<img src="https://www.google.com/s2/favicons?domain=pbskids.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:"PBS Kids · 公共电视", d:"美国公共电视儿童节目", url:"https://pbskids.org/"},
   {cat:"🔭 百科探索", logo:'<img src="https://www.google.com/s2/favicons?domain=timeforkids.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:"Time for Kids · 时代", d:"儿童新闻与英语阅读", url:"https://www.timeforkids.com/?u="},
-  {cat:"🔭 百科探索", logo:'<img src="https://www.google.com/s2/favicons?domain=knowledgekids.ca&sz=128" style="width:80px;height:40px;object-fit:contain">', n:"Knowledge Kids · 知识", d:"加拿大儿童知识百科", url:"https://www.knowledgekids.ca/"}];
+  {cat:"🔭 百科探索", logo:'<img src="https://www.google.com/s2/favicons?domain=knowledgekids.ca&sz=128" style="width:80px;height:40px;object-fit:contain">', n:"Knowledge Kids · 知识", d:"加拿大儿童知识百科", url:"https://www.knowledgekids.ca/"},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'BBC Learning English', d:'BBC官方英语学习播客', url:'https://www.bbc.co.uk/learningenglish'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'A.J. Hoge', d:'轻松英语教学基础词汇', url:'https://www.youtube.com/@AJHogeEffortlessEnglish'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=allearsenglish.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'All Ears English', d:'面向中高级英语学习者', url:'https://www.allearsenglish.com/'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=eslpod.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'ESL Pod', d:'清晰慢速的英语对话', url:'https://www.eslpod.com/'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'6 Minute English', d:'BBC简短英语课程', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=voanews.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'VOA Learning English', d:'美国之音英语学习', url:'https://learningenglish.voanews.com/podcasts'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=coffeebreaklanguages.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Coffee Break English', d:'每集15分钟初学者友好', url:'https://coffeebreaklanguages.com/english/'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=leonardoenglish.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'English for Curious Minds', d:'中高级学习者深度内容', url:'https://www.leonardoenglish.com/podcasts'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=culips.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Culips ESL Podcast', d:'专业英语教师制作', url:'https://esl.culips.com/'},
+  {cat:'🎧 听力学习·播客', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Business English Pod', d:'商务英语场景表达', url:'https://www.youtube.com/@BusinessEnglishPod'},
+  {cat:'🎧 听力学习·有声书', logo:'<img src="https://www.google.com/s2/favicons?domain=librivox.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'LibriVox', d:'免费公版有声书', url:'https://librivox.org/'},
+  {cat:'🎧 听力学习·有声书', logo:'<img src="https://www.google.com/s2/favicons?domain=usf.edu&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Lit2Go', d:'免费儿童经典文学有声书', url:'https://etc.usf.edu/lit2go/'},
+  {cat:'🎧 听力学习·有声书', logo:'<img src="https://www.google.com/s2/favicons?domain=openlibrary.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Open Library', d:'互联网档案馆开放图书馆', url:'https://openlibrary.org/'},
+  {cat:'🎧 听力学习·有声书', logo:'<img src="https://www.google.com/s2/favicons?domain=loyalbooks.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Loyal Books', d:'8000+免费公版有声书', url:'http://www.loyalbooks.com/'},
+  {cat:'🎧 听力学习·科技播客', logo:'<img src="https://www.google.com/s2/favicons?domain=syntax.fm&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Syntax.fm', d:'Web开发技术播客', url:'https://syntax.fm/'},
+  {cat:'🎧 听力学习·科技播客', logo:'<img src="https://www.google.com/s2/favicons?domain=techcrunch.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'TechCrunch Podcast', d:'最新科技新闻创业趋势', url:'https://techcrunch.com/podcast'},
+  {cat:'🎧 听力学习·科技播客', logo:'<img src="https://www.google.com/s2/favicons?domain=twit.tv&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'This Week in Tech', d:'每周科技热点深度回顾', url:'https://twit.tv/shows/this-week-in-tech'},
+  {cat:'🎧 听力学习·科技播客', logo:'<img src="https://www.google.com/s2/favicons?domain=wsj.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'WSJ Tech Briefing', d:'华尔街日报科技简报', url:'https://www.wsj.com/podcasts/tech-news-briefing'},
+  {cat:'💬 口语练习·AI对话', logo:'<img src="https://www.google.com/s2/favicons?domain=cambly.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Cambly', d:'随时与母语外教视频对话', url:'https://www.cambly.com/'},
+  {cat:'💬 口语练习·AI对话', logo:'<img src="https://www.google.com/s2/favicons?domain=italki.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'italki', d:'找专业外教或语伴学英语', url:'https://www.italki.com/'},
+  {cat:'💬 口语练习·AI对话', logo:'<img src="https://www.google.com/s2/favicons?domain=elsaspeak.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Elsa Speak', d:'AI发音纠正与口语练习', url:'https://elsaspeak.com/'},
+  {cat:'💬 口语练习·AI对话', logo:'<img src="https://www.google.com/s2/favicons?domain=openai.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'ChatGPT', d:'OpenAI的AI对话工具', url:'https://chat.openai.com/'},
+  {cat:'💬 口语练习·语伴社区', logo:'<img src="https://www.google.com/s2/favicons?domain=tandem.net&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Tandem', d:'语言交换找母语者互练', url:'https://www.tandem.net/'},
+  {cat:'💬 口语练习·语伴社区', logo:'<img src="https://www.google.com/s2/favicons?domain=hellotalk.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'HelloTalk', d:'最大语言交换社区', url:'https://www.hellotalk.com/'},
+  {cat:'💬 口语练习·语伴社区', logo:'<img src="https://www.google.com/s2/favicons?domain=preply.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Preply', d:'在线外教一对一英语课', url:'https://preply.com/'},
+  {cat:'💬 口语练习·语伴社区', logo:'<img src="https://www.google.com/s2/favicons?domain=speechling.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Speechling', d:'免费AI教练批改口语', url:'https://speechling.com/'},
+  {cat:'🎬 视频学习·YouTube', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'English with Lucy', d:'英国口音语法词汇教学', url:'https://www.youtube.com/@EnglishwithLucy'},
+  {cat:'🎬 视频学习·YouTube', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'mmmEnglish', d:'口语流利度与发音训练', url:'https://www.youtube.com/@mmmEnglish_Emma'},
+  {cat:'🎬 视频学习·YouTube', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Speak English With Vanessa', d:'美式英语口语与文化', url:'https://www.youtube.com/@SpeakEnglishWithVanessa'},
+  {cat:'🎬 视频学习·YouTube', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'TED-Ed', d:'教育类TED短视频', url:'https://www.youtube.com/@TEDEd'},
+  {cat:'🎬 视频学习·在线课程', logo:'<img src="https://www.google.com/s2/favicons?domain=coursera.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Coursera English', d:'顶级大学英语在线课程', url:'https://www.coursera.org/search?query=english'},
+  {cat:'🎬 视频学习·在线课程', logo:'<img src="https://www.google.com/s2/favicons?domain=edx.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'edX English', d:'名校英语课程免费旁听', url:'https://www.edx.org/learn/english'},
+  {cat:'🎬 视频学习·在线课程', logo:'<img src="https://www.google.com/s2/favicons?domain=futurelearn.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'FutureLearn', d:'英国高校在线英语课', url:'https://www.futurelearn.com/subjects/language-courses/english'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=bbc.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'BBC News', d:'BBC英文新闻语言规范', url:'https://www.bbc.com/news'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=theguardian.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'The Guardian', d:'英国卫报高质量英文报道', url:'https://www.theguardian.com/'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=reuters.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Reuters', d:'路透社英文新闻简洁规范', url:'https://www.reuters.com/'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=npr.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'NPR', d:'美国国家公共广播英文', url:'https://www.npr.org/'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=voanews.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'VOA News', d:'美国之音慢速英语新闻', url:'https://www.voanews.com/'},
+  {cat:'📖 阅读材料·新闻资讯', logo:'<img src="https://www.google.com/s2/favicons?domain=wikipedia.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Simple English Wikipedia', d:'简单英语维基百科', url:'https://simple.wikipedia.org/'},
+  {cat:'📖 阅读材料·分级读物', logo:'<img src="https://www.google.com/s2/favicons?domain=newsela.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Newsela', d:'分级时事英语阅读', url:'https://newsela.com/'},
+  {cat:'📖 阅读材料·分级读物', logo:'<img src="https://www.google.com/s2/favicons?domain=readworks.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'ReadWorks', d:'免费英语分级阅读理解', url:'https://www.readworks.org/'},
+  {cat:'📖 阅读材料·分级读物', logo:'<img src="https://www.google.com/s2/favicons?domain=commonlit.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'CommonLit', d:'免费文学阅读讨论平台', url:'https://www.commonlit.org/'},
+  {cat:'📖 阅读材料·英语写作', logo:'<img src="https://www.google.com/s2/favicons?domain=grammarly.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Grammarly', d:'AI写作助手语法纠正', url:'https://www.grammarly.com/'},
+  {cat:'📖 阅读材料·英语写作', logo:'<img src="https://www.google.com/s2/favicons?domain=hemingwayapp.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Hemingway App', d:'检测写作复杂度可读性', url:'https://hemingwayapp.com/'},
+  {cat:'📖 阅读材料·英语写作', logo:'<img src="https://www.google.com/s2/favicons?domain=prowritingaid.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'ProWritingAid', d:'全面英语写作分析工具', url:'https://prowritingaid.com/'},
+  {cat:'🕹️ 电子游戏·词汇游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=vocabulary.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Vocabulary.com', d:'AI自适应词汇学习游戏', url:'https://www.vocabulary.com/'},
+  {cat:'🕹️ 电子游戏·词汇游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=nytimes.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Wordle', d:'每日猜词益智小游戏', url:'https://www.nytimes.com/games/wordle/index.html'},
+  {cat:'🕹️ 电子游戏·词汇游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=quizlet.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Quizlet', d:'卡片式词汇记忆游戏', url:'https://quizlet.com/'},
+  {cat:'🕹️ 电子游戏·词汇游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=duolingo.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Duolingo', d:'最流行的语言学习游戏', url:'https://www.duolingo.com/'},
+  {cat:'🕹️ 电子游戏·语法游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=grammarflip.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'GrammarFlip', d:'互动语法练习与视频', url:'https://www.grammarflip.com/'},
+  {cat:'🕹️ 电子游戏·语法游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=noredink.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'NoRedInk', d:'个性化语法写作练习', url:'https://www.noredink.com/'},
+  {cat:'🕹️ 电子游戏·英语游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=lingodeer.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Lingodeer', d:'专为亚洲学习者的游戏', url:'https://www.lingodeer.com/'},
+  {cat:'🕹️ 电子游戏·英语游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=beelinguapp.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Beelinguapp', d:'双语对照阅读学英语', url:'https://www.beelinguapp.com/'},
+  {cat:'🕹️ 电子游戏·英语游戏', logo:'<img src="https://www.google.com/s2/favicons?domain=fluentu.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'FluentU', d:'用真实视频学地道英语', url:'https://www.fluentu.com/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=britishcouncil.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'British Council', d:'英国文化协会官方平台', url:'https://learnenglish.britishcouncil.org/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=englishclub.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'EnglishClub', d:'全面英语学习资源网站', url:'https://www.englishclub.com/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=perfect-english-grammar.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Perfect English Grammar', d:'语法讲解与练习专项', url:'https://www.perfect-english-grammar.com/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=purdue.edu&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Purdue OWL', d:'普渡大学权威写作指南', url:'https://owl.purdue.edu/owl/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=ielts.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'IELTS.org', d:'雅思官方学习资源', url:'https://www.ielts.org/'},
+  {cat:'🌐 网站博客·权威网站', logo:'<img src="https://www.google.com/s2/favicons?domain=ets.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'TOEFL', d:'托福官方练习资源', url:'https://www.ets.org/toefl'},
+  {cat:'🌐 网站博客·博客论坛', logo:'<img src="https://www.google.com/s2/favicons?domain=fluentin3months.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Fluent in 3 Months', d:'快速语言学习方法博客', url:'https://www.fluentin3months.com/'},
+  {cat:'🌐 网站博客·博客论坛', logo:'<img src="https://www.google.com/s2/favicons?domain=wordreference.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Word Reference Forums', d:'语言学习者在线论坛', url:'https://forum.wordreference.com/'},
+  {cat:'📱 社交媒体·Instagram', logo:'<img src="https://www.google.com/s2/favicons?domain=instagram.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'@britishcouncil', d:'英国文化协会英语内容', url:'https://www.instagram.com/britishcouncil/'},
+  {cat:'📱 社交媒体·Instagram', logo:'<img src="https://www.google.com/s2/favicons?domain=instagram.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'@english_with_lucy', d:'Lucy的英语学习内容', url:'https://www.instagram.com/englishwithlucy/'},
+  {cat:'📱 社交媒体·TikTok', logo:'<img src="https://www.google.com/s2/favicons?domain=tiktok.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'@learnwithnick', d:'短视频英语词汇表达', url:'https://www.tiktok.com/@learnwithnick'},
+  {cat:'📱 社交媒体·TikTok', logo:'<img src="https://www.google.com/s2/favicons?domain=tiktok.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'@englishwithlucy', d:'Lucy的TikTok英语内容', url:'https://www.tiktok.com/@englishwithlucy'},
+  {cat:'📱 社交媒体·YouTube精选', logo:'<img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Real English Conversations', d:'真实生活英语对话学习', url:'https://www.youtube.com/@realenglishconversations'},
+  {cat:'🛠️ 实用工具·词典', logo:'<img src="https://www.google.com/s2/favicons?domain=merriam-webster.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Merriam-Webster', d:'权威美式英语词典', url:'https://www.merriam-webster.com/'},
+  {cat:'🛠️ 实用工具·词典', logo:'<img src="https://www.google.com/s2/favicons?domain=cambridge.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Cambridge Dictionary', d:'剑桥权威英英词典', url:'https://dictionary.cambridge.org/'},
+  {cat:'🛠️ 实用工具·词典', logo:'<img src="https://www.google.com/s2/favicons?domain=ldoceonline.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Longman Dictionary', d:'朗文当代英语词典在线版', url:'https://www.ldoceonline.com/'},
+  {cat:'🛠️ 实用工具·词典', logo:'<img src="https://www.google.com/s2/favicons?domain=collinsdictionary.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Collins Dictionary', d:'柯林斯英语词典', url:'https://www.collinsdictionary.com/'},
+  {cat:'🛠️ 实用工具·词典', logo:'<img src="https://www.google.com/s2/favicons?domain=wordhippo.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Word Hippo', d:'同义词反义词造句一站查', url:'https://www.wordhippo.com/'},
+  {cat:'🛠️ 实用工具·语料库', logo:'<img src="https://www.google.com/s2/favicons?domain=english-corpora.org&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'COCA语料库', d:'现代美式英语语料库', url:'https://www.english-corpora.org/coca/'},
+  {cat:'🛠️ 实用工具·语料库', logo:'<img src="https://www.google.com/s2/favicons?domain=ludwig.guru&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Ludwig.guru', d:'英文写作例句智能搜索', url:'https://ludwig.guru/'},
+  {cat:'🛠️ 实用工具·翻译', logo:'<img src="https://www.google.com/s2/favicons?domain=deepl.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'DeepL', d:'高质量AI翻译', url:'https://www.deepl.com/'},
+  {cat:'🛠️ 实用工具·翻译', logo:'<img src="https://www.google.com/s2/favicons?domain=translate.google.com&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Google Translate', d:'谷歌翻译支持多语言', url:'https://translate.google.com/'},
+  {cat:'🛠️ 实用工具·翻译', logo:'<img src="https://www.google.com/s2/favicons?domain=reverso.net&sz=128" style="width:80px;height:40px;object-fit:contain">', n:'Reverso', d:'上下文翻译与例句查询', url:'https://www.reverso.net/'}];
+
 
 function pgLinks(){
   var cats={}, catOrder=[];
