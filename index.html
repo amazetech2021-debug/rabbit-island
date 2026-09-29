@@ -7840,21 +7840,69 @@ function pgEnFlashCards(){
 
   var catGrid = EN_IMG_SETS.map(function(s,i){
     var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
-    var isAll = knownCnt === s.words.length;
-    return '<button onclick="_eiSet='+i+';_eiIdx=0;showEnImgCard('+i+',0)" '
-      +'style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:14px;border:2px solid var(--border);background:var(--cream-1);cursor:pointer;min-width:72px;flex:1">'
-      +'<span style="font-size:22px">'+s.icon+'</span>'
-      +'<span style="font-size:11px;font-weight:700;color:var(--ink);line-height:1.2">'+s.name+'</span>'
-      +'<span style="font-size:10px;color:'+(isAll?'#4CAF50':'var(--ink-soft)')+'">'+knownCnt+'/'+s.words.length+(isAll?' ✅':'')+'</span>'
+    var total = s.words.length;
+    var pct = total ? Math.round(knownCnt/total*100) : 0;
+    var isAll = knownCnt === total;
+    var barColor = isAll ? '#4CAF50' : (pct>=60 ? '#81C784' : (pct>=30 ? '#AED581' : '#DCE775'));
+    return '<button onclick="showEnCatWords('+i+')" '
+      +'style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 8px 14px;border-radius:20px;'
+      +'border:2.5px solid '+(isAll?'#4CAF50':'var(--border)')+';background:'+(isAll?'#F1FFF3':'var(--cream-1)')+';'
+      +'cursor:pointer;position:relative;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.07)">'
+      +(isAll?'<span style="position:absolute;top:6px;right:8px;font-size:11px">✅</span>':'')
+      +'<span style="font-size:36px;line-height:1">'+s.icon+'</span>'
+      +'<span style="font-size:13px;font-weight:800;color:var(--ink);line-height:1.2">'+s.name+'</span>'
+      +'<div style="width:100%;height:5px;background:#eee;border-radius:99px;overflow:hidden;margin-top:2px">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:99px;transition:width .4s"></div></div>'
+      +'<span style="font-size:11px;color:'+(isAll?'#388E3C':'var(--ink-soft)')+';font-weight:700">'+knownCnt+'/'+total+'</span>'
       +'</button>';
   }).join('');
 
   $('page').innerHTML =
     '<div class="tabs">'+modeTabs+'</div>'
     +'<div style="padding:12px 0">'
-    +'<div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:10px">选择分类 · 点卡片开始</div>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:8px">'+catGrid+'</div></div>';
+    +'<div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:12px">选择分类 · 点击进入</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+catGrid+'</div></div>';
 }
+
+function showEnCatWords(setIdx){
+  var s = EN_IMG_SETS[setIdx];
+  var modeTabs =
+    '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab on">📚 英语卡</button>'
+    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
+    +'<button class="tab" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
+    +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>';
+
+  var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
+
+  var wordGrid = s.words.map(function(w, wi){
+    var isKnown = !!(S.knownEn && S.knownEn[w]);
+    var zh = EN_IMG_ZH[w] || '';
+    var imgSrc = enImgSrc(s.folder, w);
+    var display = w.split(' ').map(function(p){ return p.charAt(0).toUpperCase()+p.slice(1); }).join(' ');
+    return '<button onclick="_eiSet='+setIdx+';_eiIdx='+wi+';showEnImgCard('+setIdx+','+wi+')" '
+      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px 10px;border-radius:16px;'
+      +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
+      +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative">'
+      +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:9px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700">✓</span>':'')
+      +'<img src="'+imgSrc+'" style="width:64px;height:52px;object-fit:contain;border-radius:8px" onerror="this.style.opacity=\'0.15\'">'
+      +'<span style="font-size:12px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
+      +(zh?'<span style="font-size:10.5px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
+      +'</button>';
+  }).join('');
+
+  $('page').innerHTML =
+    '<div class="tabs">'+modeTabs+'</div>'
+    +'<div style="padding:12px 0">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+    +'<button onclick="enMode=\'cards\';pgEnFlashCards()" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>'
+    +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
+    +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+wordGrid+'</div>'
+    +'</div>';
+}
+
 
 function showEnImgCard(setIdx, wordIdx){
   var set = EN_IMG_SETS[setIdx];
@@ -7884,7 +7932,7 @@ function showEnImgCard(setIdx, wordIdx){
     +'</div>'
     +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
     +'style="width:100%;padding:13px;font-size:16px;font-weight:700;border-radius:12px;border:2px solid '+kBd+';background:'+kBg+';color:'+kColor+';cursor:pointer">'+kLabel+'</button>'
-    +'<button onclick="closeModal()" style="padding:8px 22px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px">✕ 返回</button>'
+    +'<div style="display:flex;gap:8px;width:100%">'+'<button onclick="closeModal();showEnCatWords(_eiSet)" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px;font-weight:700">← 词列表</button>'+'<button onclick="closeModal()" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px">✕ 关闭</button>'+'</div>'
     +'</div>');
 }
 
