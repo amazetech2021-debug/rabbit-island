@@ -5863,9 +5863,9 @@ function pgHanziCards(){
   var bookTabs = [1,2,3,4,5,6].map(function(b){
     return '<button class="tab '+(hzCardsBook===b?'on':'')+'" onclick="hzCardsBook='+b+';pgHanziCards()">'+bookNames[b]+'</button>';
   }).join('');
-  var grid = chars.map(function(ch){
+  var grid = chars.map(function(ch, i){
     var enc = encodeURIComponent(ch);
-    return '<button onclick="showHzCard(\''+enc+'\')" '
+    return '<button onclick="showHzCard(\''+enc+'\','+i+')" '
       +'style="font-size:24px;min-width:56px;height:56px;border-radius:10px;border:1.5px solid var(--brand-light,#c8b0f0);'
       +'background:var(--cream-1);cursor:pointer;font-weight:700;color:var(--ink)">'+ch+'</button>';
   }).join('');
@@ -5877,18 +5877,27 @@ function pgHanziCards(){
     +'<div class="meta">'+bookNames[hzCardsBook]+' · 共 '+chars.length+' 字</div>';
 }
 
-function showHzCard(encodedCh){
+var _hzCardIdx = 0;
+
+function showHzCard(encodedCh, idx){
   var ch = decodeURIComponent(encodedCh);
+  var chars = CARD_CHARS[hzCardsBook] || [];
+  _hzCardIdx = (idx !== undefined) ? idx : chars.indexOf(ch);
+  if(_hzCardIdx < 0) _hzCardIdx = 0;
+
   var old = document.getElementById('hz-card-modal');
   if(old) old.remove();
+
   var url = 'https://amazetech2021-debug.github.io/rabbit-island/cards/'+hzCardsBook+'/'+encodedCh+'.jpg';
   var modal = document.createElement('div');
   modal.id = 'hz-card-modal';
   modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);z-index:9999;'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box';
+
+  // Image
   var img = document.createElement('img');
   img.src = url;
-  img.style.cssText = 'max-width:min(90vw,520px);max-height:65vh;border-radius:14px;'
+  img.style.cssText = 'max-width:min(90vw,480px);max-height:58vh;border-radius:14px;'
     +'box-shadow:0 8px 40px #0009;object-fit:contain;cursor:pointer';
   img.title = '点击听发音';
   img.onclick = function(){ speak(ch, 'zh-CN'); };
@@ -5897,22 +5906,63 @@ function showHzCard(encodedCh){
   errDiv.style.cssText = 'display:none;color:#fff;font-size:18px;padding:30px;text-align:center;border-radius:12px;background:#fff2';
   errDiv.textContent = '图片暂时无法加载，图片正在上传中请稍后再试';
   img.onerror = function(){ this.style.display='none'; errDiv.style.display='block'; };
+
+  // Nav row: ‹ prev | counter | next ›
+  var navRow = document.createElement('div');
+  navRow.style.cssText = 'display:flex;gap:10px;margin-top:16px;align-items:center';
+
+  var prevBtn = document.createElement('button');
+  prevBtn.style.cssText = 'font-size:28px;width:56px;height:56px;border-radius:50%;border:none;'
+    +'background:rgba(255,255,255,.18);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'
+    +'font-weight:700;flex-shrink:0';
+  prevBtn.textContent = '‹';
+  prevBtn.onclick = function(){
+    var cs = CARD_CHARS[hzCardsBook] || [];
+    var ni = (_hzCardIdx - 1 + cs.length) % cs.length;
+    showHzCard(encodeURIComponent(cs[ni]), ni);
+  };
+
+  var counter = document.createElement('div');
+  counter.style.cssText = 'color:rgba(255,255,255,.7);font-size:13px;min-width:60px;text-align:center;flex-shrink:0';
+  counter.textContent = (_hzCardIdx + 1) + ' / ' + chars.length;
+
+  var nextBtn = document.createElement('button');
+  nextBtn.style.cssText = 'font-size:28px;width:56px;height:56px;border-radius:50%;border:none;'
+    +'background:rgba(255,255,255,.18);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'
+    +'font-weight:700;flex-shrink:0';
+  nextBtn.textContent = '›';
+  nextBtn.onclick = function(){
+    var cs = CARD_CHARS[hzCardsBook] || [];
+    var ni = (_hzCardIdx + 1) % cs.length;
+    showHzCard(encodeURIComponent(cs[ni]), ni);
+  };
+
+  navRow.appendChild(prevBtn);
+  navRow.appendChild(counter);
+  navRow.appendChild(nextBtn);
+
+  // Speak + close row
   var btnRow = document.createElement('div');
-  btnRow.style.cssText = 'display:flex;gap:14px;margin-top:20px;align-items:center';
+  btnRow.style.cssText = 'display:flex;gap:12px;margin-top:10px;align-items:center';
+
   var speakBtn = document.createElement('button');
-  speakBtn.style.cssText = 'font-size:22px;padding:12px 32px;border-radius:28px;border:none;'
+  speakBtn.style.cssText = 'font-size:20px;padding:11px 28px;border-radius:28px;border:none;'
     +'background:#fff;color:#333;font-weight:700;cursor:pointer';
   speakBtn.textContent = '🔊 ' + ch;
   speakBtn.onclick = function(){ speak(ch, 'zh-CN'); };
+
   var closeBtn = document.createElement('button');
-  closeBtn.style.cssText = 'font-size:22px;padding:12px 20px;border-radius:28px;border:none;'
+  closeBtn.style.cssText = 'font-size:20px;padding:11px 18px;border-radius:28px;border:none;'
     +'background:rgba(255,255,255,.2);color:#fff;cursor:pointer';
   closeBtn.textContent = '✕';
   closeBtn.onclick = function(){ modal.remove(); };
+
   btnRow.appendChild(speakBtn);
   btnRow.appendChild(closeBtn);
+
   modal.appendChild(img);
   modal.appendChild(errDiv);
+  modal.appendChild(navRow);
   modal.appendChild(btnRow);
   modal.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
   document.body.appendChild(modal);
