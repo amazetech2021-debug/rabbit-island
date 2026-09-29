@@ -5585,10 +5585,10 @@ function pgHanzi(){
     units.map(u=>`<option value="${htmlEsc(u)}" ${u===hzUnit?"selected":""}>${htmlEsc(u)}</option>`).join("");
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${hzMode==="learn"?"on":""}" onclick="hzMode='learn';render()">📖 学习</button>
+     <button class="tab ${hzMode==="cards"?"on":""}" onclick="hzMode='cards';render()">🃏 认字卡</button>
      <button class="tab ${hzMode==="write"?"on":""}" onclick="hzMode='write';render()">✏️ 写字</button>
      <button class="tab ${hzMode==="quiz"?"on":""}" onclick="startHzQuiz()">🧪 测试</button>
-     <button class="tab ${hzMode==="review"?"on":""}" onclick="hzMode='review';render()">🔄 复习${Object.keys(S.learnedHz).length?" ("+Object.keys(S.learnedHz).length+")":""}</button>
-     <button class="tab ${hzMode==="cards"?"on":""}" onclick="hzMode='cards';render()">🃏 认字卡</button></div>
+     <button class="tab ${hzMode==="review"?"on":""}" onclick="hzMode='review';render()">🔄 复习${Object.keys(S.learnedHz).length?" ("+Object.keys(S.learnedHz).length+")":""}</button></div>
    <div class="filterbar">
      <select onchange="hzGrade=+this.value;hzUnit='';render()">${gopt}</select>
      <select onchange="hzUnit=this.value;hzPaint()">${uopt}</select>
@@ -5776,6 +5776,7 @@ function pgHanziWrite(units){
     // Tabs
     '<div class="tabs" style="margin-bottom:14px">'
       +'<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+      +'<button class="tab" onclick="hzMode=\'cards\';render()">🃏 认字卡</button>'
       +'<button class="tab on">✏️ 写字</button>'
       +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
       +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习</button>'
@@ -5842,6 +5843,12 @@ function pgHanziWrite(units){
   }
 }
 
+function startHzQuiz(){
+  hzMode = 'quiz';
+  _hzQuiz = null;
+  renderHzQuizPage();
+}
+
 /* ══════════ 认字卡片 (直映认字图卡) ══════════ */
 function pgHanziCards(){
   var bookNames = ["","第一册","第二册","第三册","第四册","第五册","第六册"];
@@ -5849,10 +5856,10 @@ function pgHanziCards(){
   var revCnt = Object.keys(S.learnedHz).length;
   var modeTabs =
     '<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab on">🃏 认字卡</button>'
     +'<button class="tab" onclick="hzMode=\'write\';render()">✏️ 写字</button>'
     +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
-    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(revCnt?' ('+revCnt+')':'')+'</button>'
-    +'<button class="tab on">🃏 认字卡</button>';
+    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(revCnt?' ('+revCnt+')':'')+'</button>';
   var bookTabs = [1,2,3,4,5,6].map(function(b){
     return '<button class="tab '+(hzCardsBook===b?'on':'')+'" onclick="hzCardsBook='+b+';pgHanziCards()">'+bookNames[b]+'</button>';
   }).join('');
@@ -5884,7 +5891,7 @@ function showHzCard(encodedCh){
   img.style.cssText = 'max-width:min(90vw,520px);max-height:65vh;border-radius:14px;'
     +'box-shadow:0 8px 40px #0009;object-fit:contain;cursor:pointer';
   img.title = '点击听发音';
-  img.onclick = function(){ tts(ch); };
+  img.onclick = function(){ speak(ch, 'zh-CN'); };
   var errDiv = document.createElement('div');
   errDiv.id = 'hzcard-err';
   errDiv.style.cssText = 'display:none;color:#fff;font-size:18px;padding:30px;text-align:center;border-radius:12px;background:#fff2';
@@ -5896,7 +5903,7 @@ function showHzCard(encodedCh){
   speakBtn.style.cssText = 'font-size:22px;padding:12px 32px;border-radius:28px;border:none;'
     +'background:#fff;color:#333;font-weight:700;cursor:pointer';
   speakBtn.textContent = '🔊 ' + ch;
-  speakBtn.onclick = function(){ tts(ch); };
+  speakBtn.onclick = function(){ speak(ch, 'zh-CN'); };
   var closeBtn = document.createElement('button');
   closeBtn.style.cssText = 'font-size:22px;padding:12px 20px;border-radius:28px;border:none;'
     +'background:rgba(255,255,255,.2);color:#fff;cursor:pointer';
@@ -5909,7 +5916,7 @@ function showHzCard(encodedCh){
   modal.appendChild(btnRow);
   modal.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
   document.body.appendChild(modal);
-  tts(ch);
+  speak(ch, 'zh-CN');
 }
 
 
