@@ -9976,13 +9976,15 @@ function showEnCatWords(setIdx){
     var imgSrc = enImgSrc(s.folder, w);
     var display = baseName.split(' ').map(function(p){ return p.charAt(0).toUpperCase()+p.slice(1); }).join(' ');
     return '<button onclick="_eiSet='+setIdx+';_eiIdx='+wi+';showEnImgCard('+setIdx+','+wi+')" '
-      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 10px;border-radius:14px;'
+      +'style="padding:0;border-radius:12px;overflow:hidden;'
       +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
-      +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative">'
-      +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:9px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700">✓</span>':'')
-      +'<img src="'+imgSrc+'" style="width:72px;height:58px;object-fit:contain;border-radius:8px" onerror="this.style.opacity=\'0.15\'">'
-      +'<span style="font-size:16px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
-      +(zh?'<span style="font-size:13px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
+      +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative;display:flex;flex-direction:column;width:100%">'
+      +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:10px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700;z-index:1">✓</span>':'')
+      +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:4/3;object-fit:contain;background:#f8f8f8;display:block" onerror="this.style.opacity=\'0.15\'">'
+      +'<div style="padding:5px 4px 7px;text-align:center">'
+      +'<div style="font-size:13px;font-weight:800;color:'+(isKnown?'#1565C0':'#1A237E')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</div>'
+      +(zh?'<div style="font-size:11px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</div>':'')
+      +'</div>'
       +'</button>';
   }).join('');
 
@@ -10018,7 +10020,7 @@ function showEnImgCard(setIdx, wordIdx){
   modal(
     '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px;max-width:440px;margin:0 auto;width:100%">'
     +'<div style="font-size:13px;color:#888;font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</div>'
-    +'<img src="'+imgSrc+'" style="width:100%;max-width:300px;height:200px;object-fit:contain;border-radius:16px;background:#fff;padding:10px;box-shadow:0 4px 18px rgba(0,0,0,.12)" onerror="this.style.opacity=\'0.2\'">'
+    +'<img src="'+imgSrc+'" style="width:100%;object-fit:contain;border-radius:12px;background:#fff;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
     +'<div '+enClickAttr+' style="font-size:32px;font-weight:800;color:#1565C0;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(display)+'</div>'
     +(zh?'<div '+zhClickAttr+' style="font-size:22px;color:#E5443C;font-weight:700;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(zh)+'</div>':'')
     +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
