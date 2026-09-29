@@ -7634,156 +7634,232 @@ function checkChoice(el, v){
 let enCat = "", enKw = "", enMode = "learn", enIdx = 0, enSub = "words", _enTouched = false, enFlashCat = "ABC字母";
 
 /* ══ 英语PDF闪卡数据 ══ */
-const EN_FLASH_SETS = {
-  'ABC字母': [
-    {name:'A',file:'english-cards/abc/A-flashcards(C).pdf'},
-    {name:'B',file:'english-cards/abc/B-flashcards(C).pdf'},
-    {name:'C',file:'english-cards/abc/C-flashcards(C).pdf'},
-    {name:'D',file:'english-cards/abc/D-flashcards(C).pdf'},
-    {name:'E',file:'english-cards/abc/E-flashcards(C).pdf'},
-    {name:'F',file:'english-cards/abc/F-flashcards(C).pdf'},
-    {name:'G',file:'english-cards/abc/G-flashcards(C).pdf'},
-    {name:'H',file:'english-cards/abc/H-flashcards(C).pdf'},
-    {name:'I',file:'english-cards/abc/I-flashcards(C).pdf'},
-    {name:'J',file:'english-cards/abc/J-flashcards(C).pdf'},
-    {name:'K',file:'english-cards/abc/K-flashcards(C).pdf'},
-    {name:'L',file:'english-cards/abc/L-flashcards(C).pdf'},
-    {name:'M',file:'english-cards/abc/M-flashcards(C).pdf'},
-    {name:'N',file:'english-cards/abc/N-flashcards(C).pdf'},
-    {name:'O',file:'english-cards/abc/O-flashcards(C).pdf'},
-    {name:'P',file:'english-cards/abc/P-flashcards(C).pdf'},
-    {name:'Q',file:'english-cards/abc/Q-flashcards(C).pdf'},
-    {name:'R',file:'english-cards/abc/R-flashcards(C).pdf'},
-    {name:'S',file:'english-cards/abc/S-flashcards(C).pdf'},
-    {name:'T',file:'english-cards/abc/T-flashcards(C).pdf'},
-    {name:'U',file:'english-cards/abc/U-flashcards(C).pdf'},
-    {name:'V',file:'english-cards/abc/V-flashcards(C).pdf'},
-    {name:'W',file:'english-cards/abc/W-flashcards(C).pdf'},
-    {name:'X',file:'english-cards/abc/X-flashcards(C).pdf'},
-    {name:'Y',file:'english-cards/abc/Y-flashcards(C).pdf'},
-    {name:'Z',file:'english-cards/abc/Z-flashcards(C).pdf'},
-  ],
-  '拼读Phonics': [
-    {name:'BL',file:'english-cards/phonics/BL-flashcards(C).pdf'},
-    {name:'BR',file:'english-cards/phonics/BR-flashcards(C).pdf'},
-    {name:'CH',file:'english-cards/phonics/CH-flashcards(C).pdf'},
-    {name:'CL',file:'english-cards/phonics/CL-flashcards(C).pdf'},
-    {name:'CR',file:'english-cards/phonics/CR-flashcards(C).pdf'},
-    {name:'DR',file:'english-cards/phonics/DR-flashcards(C).pdf'},
-    {name:'FL',file:'english-cards/phonics/FL-flashcards(C).pdf'},
-    {name:'FR',file:'english-cards/phonics/FR-flashcards(C).pdf'},
-    {name:'GL',file:'english-cards/phonics/GL-flashcards(C).pdf'},
-    {name:'GR',file:'english-cards/phonics/GR-flashcards(C).pdf'},
-    {name:'PL',file:'english-cards/phonics/PL-flashcards(C).pdf'},
-    {name:'PR',file:'english-cards/phonics/PR-flashcards(C).pdf'},
-    {name:'SK',file:'english-cards/phonics/SK-flashcards(C).pdf'},
-    {name:'SL',file:'english-cards/phonics/SL-flashcards(C).pdf'},
-    {name:'SM',file:'english-cards/phonics/SM-flashcards(C).pdf'},
-    {name:'SN',file:'english-cards/phonics/SN-flashcards(C).pdf'},
-    {name:'SP',file:'english-cards/phonics/SP-flashcards(C).pdf'},
-    {name:'ST',file:'english-cards/phonics/ST-flashcards(C).pdf'},
-  ],
-  '主题Theme': [
-    {name:'配饰',file:'english-cards/theme/accessories(C).pdf'},
-    {name:'鸟类',file:'english-cards/theme/birds(C).pdf'},
-    {name:'服装',file:'english-cards/theme/clothing(C).pdf'},
-    {name:'集合',file:'english-cards/theme/collective(C).pdf'},
-    {name:'颜色',file:'english-cards/theme/color.pdf'},
-    {name:'农场动物',file:'english-cards/theme/farmanimals(C).pdf'},
-    {name:'水果',file:'english-cards/theme/fruits(C).pdf'},
-    {name:'昆虫',file:'english-cards/theme/insects(C).pdf'},
-    {name:'数字',file:'english-cards/theme/numbers(C).pdf'},
-    {name:'海洋动物',file:'english-cards/theme/ocean-animals(C).pdf'},
-    {name:'序数',file:'english-cards/theme/ordinal(C).pdf'},
-    {name:'宠物',file:'english-cards/theme/pets(C).pdf'},
-    {name:'位置',file:'english-cards/theme/position(C).pdf'},
-    {name:'所有格',file:'english-cards/theme/possessive(C).pdf'},
-    {name:'代词',file:'english-cards/theme/pronouns(C).pdf'},
-    {name:'形状',file:'english-cards/theme/shapes(C).pdf'},
-    {name:'这那',file:'english-cards/theme/thisthat(C).pdf'},
-    {name:'蔬菜',file:'english-cards/theme/vegetables(C).pdf'},
-    {name:'野生动物1',file:'english-cards/theme/wild-animals1(C).pdf'},
-    {name:'野生动物2',file:'english-cards/theme/wild-animals2(C).pdf'},
-  ],
-  '动词Verbs': [
-    {name:'A',file:'english-cards/verbs/A-verbs.pdf'},
-    {name:'B',file:'english-cards/verbs/B-verbs.pdf'},
-    {name:'C',file:'english-cards/verbs/C-verbs.pdf'},
-    {name:'D',file:'english-cards/verbs/D-verbs.pdf'},
-    {name:'E',file:'english-cards/verbs/E-verbs.pdf'},
-    {name:'F',file:'english-cards/verbs/F-verbs.pdf'},
-    {name:'G',file:'english-cards/verbs/G-verbs.pdf'},
-    {name:'H',file:'english-cards/verbs/H-verbs.pdf'},
-    {name:'I',file:'english-cards/verbs/I-verbs.pdf'},
-    {name:'J',file:'english-cards/verbs/J-verbs.pdf'},
-    {name:'K',file:'english-cards/verbs/K-verbs.pdf'},
-    {name:'L',file:'english-cards/verbs/L-verbs.pdf'},
-  ],
-  '专题Topics': [
-    {name:'字母A-Z',file:'english-cards/topics/Alphabets A - Z Flashcards.pdf'},
-    {name:'动物',file:'english-cards/topics/Animal Flashcards.pdf'},
-    {name:'节日',file:'english-cards/topics/Celebrations Flashcards.pdf'},
-    {name:'品格',file:'english-cards/topics/Character Traits Flashcards.pdf'},
-    {name:'颜色',file:'english-cards/topics/Colors Flashcards.pdf'},
-    {name:'电脑',file:'english-cards/topics/Computer Technology Flashcards.pdf'},
-    {name:'表情',file:'english-cards/topics/Emoji Feelings Flashcards.pdf'},
-    {name:'情绪',file:'english-cards/topics/Emotions Flashcards.pdf'},
-    {name:'国旗',file:'english-cards/topics/Flag Flashcards.pdf'},
-    {name:'花朵',file:'english-cards/topics/Flowers Flashcards.pdf'},
-    {name:'水果',file:'english-cards/topics/Fruits Flashcards.pdf'},
-    {name:'人体',file:'english-cards/topics/Human Body Flashcards.pdf'},
-    {name:'自然',file:'english-cards/topics/Nature Flashcards.pdf'},
-    {name:'数字',file:'english-cards/topics/Numbers Flashcards.pdf'},
-    {name:'爬行类',file:'english-cards/topics/Reptiles Flashcards.pdf'},
-    {name:'学校用品',file:'english-cards/topics/School Equipment Flashcards.pdf'},
-    {name:'科学用品',file:'english-cards/topics/Science Equipment Flashcards.pdf'},
-    {name:'海洋动物',file:'english-cards/topics/Sea Animals Flashcards.pdf'},
-    {name:'形状',file:'english-cards/topics/Shapes Flashcards.pdf'},
-    {name:'太阳系',file:'english-cards/topics/Solar System Flashcards.pdf'},
-    {name:'交通',file:'english-cards/topics/Transportation Flashcards.pdf'},
-    {name:'蔬菜',file:'english-cards/topics/Vegetables Flashcards.pdf'},
-    {name:'天气',file:'english-cards/topics/Weather Flashcards.pdf'},
-    {name:'天气季节',file:'english-cards/topics/weather and seasons Flashcards.pdf'},
-  ],
-  '形状Shapes': [
-    {name:'2D形状',file:'english-cards/shapes/2D Shapes Flashcards.pdf'},
-    {name:'3D形状',file:'english-cards/shapes/3D Shapes Flashcards.pdf'},
-  ]
+const EN_IMG_ZH = {
+  'alligator':'短吻鳄','bear':'熊','cow':'奶牛','dog':'狗','elephant':'大象',
+  'fox':'狐狸','giraffe':'长颈鹿','horse':'马','iguana':'鬣蜥','jellyfish':'水母',
+  'koala':'考拉','lion':'狮子','monkey':'猴子','newt':'蝾螈','owl':'猫头鹰',
+  'pig':'猪','quail':'鹌鹑','raccoon':'浣熊','seagull':'海鸥','tiger':'老虎',
+  'urchin':'海胆','vulture':'秃鹫','whale':'鲸鱼','x-ray fish':'玻璃鱼',
+  'yak':'牦牛','zebra':'斑马',
+  'black':'黑色','blue':'蓝色','brown':'棕色','green':'绿色','grey':'灰色',
+  'orange':'橙色','pink':'粉色','purple':'紫色','red':'红色','turquoise':'蓝绿色',
+  'white':'白色','yellow':'黄色',
+  'avocado':'牛油果','banana':'香蕉','blueberry':'蓝莓','cherry':'樱桃',
+  'coconut':'椰子','dragon fruit':'火龙果','durian':'榴莲','fruit':'水果',
+  'grape':'葡萄','lemon':'柠檬','mango':'芒果','mangosteen':'山竹',
+  'papaya':'木瓜','peach':'桃子','watermelon':'西瓜',
+  'artichoke':'朝鲜蓟','broccoli':'西兰花','carrot':'胡萝卜',
+  'cauliflower':'花椰菜','celery':'芹菜','corn':'玉米','eggplant':'茄子',
+  'mushroom':'蘑菇','onion':'洋葱','peas':'豌豆','potato':'土豆',
+  'pumpkin':'南瓜','red pepper':'红椒','tomato':'西红柿','vegetable':'蔬菜',
+  'arrow':'箭头','circle':'圆形','crescent':'月牙形','cross':'十字形',
+  'cube':'正方体','cylinder':'圆柱体','diamond':'菱形','ellipse':'椭圆形',
+  'heart':'心形','heptagon':'七边形','hexagon':'六边形','nonagan':'九边形',
+  'octagon':'八边形','parallelogram':'平行四边形','pentagon':'五边形',
+  'rectangle':'长方形','rhombus':'菱形','square':'正方形','star':'星形',
+  'triangle':'三角形',
+  'zero':'零','one':'一','two':'二','three':'三','four':'四','five':'五',
+  'six':'六','seven':'七','eight':'八','nine':'九','ten':'十','number':'数字',
+  'amused':'开心的','angry':'生气的','bashful':'害羞的','calm':'平静的',
+  'cheeky':'淘气的','confident':'自信的','confused':'困惑的',
+  'disappointed':'失望的','embarassed':'尴尬的','excited':'兴奋的',
+  'happy':'快乐的','hurt':'受伤的','loved':'被爱的','nauseous':'恶心的',
+  'playful':'顽皮的','proud':'骄傲的','sad':'悲伤的','scared':'害怕的',
+  'shy':'羞涩的','sleepy':'困倦的','surprised':'惊讶的','tired':'疲倦的',
+  'upset':'沮丧的','worried':'担心的',
+  'cloudy':'多云','hurricane':'飓风','partly cloudy':'晴转多云','rain':'下雨',
+  'rainbow':'彩虹','snowy':'下雪','sunny':'晴天','thunder':'雷声',
+  'thunderstorm':'雷暴','weather':'天气','windy':'有风',
+  'airplane':'飞机','ambulance':'救护车','bicycle':'自行车','bus':'公共汽车',
+  'car':'小汽车','dump truck':'自卸卡车','excavator':'挖掘机',
+  'fire truck':'消防车','helicopter':'直升机','hoisting crane':'吊车',
+  'hot air balloon':'热气球','motor cycle':'摩托车','road roller':'压路机',
+  'rocket':'火箭','sail boat':'帆船','scooter':'踏板车','ship':'轮船',
+  'skid loader':'滑移装载机','taxi':'出租车','tracter':'拖拉机',
+  'train':'火车','truck':'卡车','van':'厢式车','yacht':'游艇',
+  'arm':'手臂','chest':'胸部','chin':'下巴','ears':'耳朵','eye':'眼睛',
+  'fingers':'手指','forehead':'额头','hair':'头发','heel':'脚跟',
+  'knees':'膝盖','legs':'腿','neck':'脖子','nose':'鼻子',
+  'shoulders':'肩膀','stomach':'肚子','teeth':'牙齿','toes':'脚趾',
+  'tongue':'舌头',
+  'angelfish':'神仙鱼','clownfish':'小丑鱼','dolphin':'海豚','eel':'鳗鱼',
+  'goldfish':'金鱼','narwhal':'独角鲸','orca':'虎鲸','seahorse':'海马',
+  'seal':'海豹','shark':'鲨鱼','squid':'鱿鱼','stingray':'魟鱼',
+  'surgeonfish':'刺尾鱼','tortoise':'陆龟',
+  'aster':'紫菀','cosmos':'波斯菊','daffodil':'水仙花','daisy':'雏菊',
+  'frangipani':'鸡蛋花','hibiscus':'芙蓉花','lily':'百合','lotus':'莲花',
+  'morning glory':'牵牛花','orchid':'兰花','pansy':'三色堇','poppy':'罂粟花',
+  'rose':'玫瑰','snowdrop':'雪花莲','sunflower':'向日葵','tulip':'郁金香',
+  'bag':'书包','calculator':'计算器','chalkboard':'黑板','clock':'时钟',
+  'crayons':'蜡笔','eraser':'橡皮擦','globe':'地球仪','glue':'胶水',
+  'ink':'墨水','lamp':'台灯','markers':'马克笔','microscope':'显微镜',
+  'notebooks':'笔记本','paint set':'颜料套装','paper clips':'回形针',
+  'pencil':'铅笔','pins':'图钉','rulers':'尺子','school':'学校',
+  'scissors':'剪刀','sharpener':'卷笔刀','stapler':'订书机',
+  'tape':'胶带','text book':'教科书',
+  'anaconda':'蟒蛇','axolotl':'美西螈','chameleon':'变色龙',
+  'coral snake':'珊瑚蛇','crocodile':'鳄鱼','gecko':'壁虎',
+  'green tree frog':'绿树蛙','green tree snake':'绿树蛇',
+  'house lizard':'家蜥','komodo dragon':'科摩多龙','salamander':'蝾螈',
+  'sea turtle':'海龟','skink':'石龙子','turtle':'乌龟',
+  'cloud':'云','flower':'花','grass':'草','leaf':'叶子','moon':'月亮',
+  'mountain':'山','plant':'植物','rock':'石头','snow':'雪','sun':'太阳',
+  'tree':'树','wind':'风',
+  'asteroid':'小行星','astronaut':'宇航员','comet':'彗星','earth':'地球',
+  'jupiter':'木星','mars':'火星','mercury':'水星','neptune':'海王星',
+  'pluto':'冥王星','saturn':'土星','uranus':'天王星','venus':'金星',
+  "april fools' day":'愚人节','bastille day':'法国国庆','birthday':'生日',
+  'chinese new year':'春节','christmas':'圣诞节','diwali':'排灯节',
+  'earth day':'地球日','easter':'复活节','eid':'开斋节',
+  'good friday':'耶稣受难日','halloweeen':'万圣节','hanukkah':'光明节',
+  'holi':'洒红节','independence day':'独立日',"new year's":'新年',
+  'remembrance day':'阵亡将士纪念日',"st patrick's day":'圣帕特里克节',
+  "teacher's day":'教师节','thanksgiving':'感恩节',"valentine's day":'情人节',
+  'cable':'数据线','digital camera':'数码相机','fax':'传真机','gps':'导航仪',
+  'headphones':'耳机','internet':'互联网','laptop':'笔记本电脑',
+  'modem':'调制解调器','monitor':'显示器','mouse':'鼠标','printer':'打印机',
+  'satellite':'卫星','tablet':'平板电脑','upload':'上传',
+  'usb':'USB接口','wifi':'无线网络',
+  'appreciation of beauty and excellence':'欣赏美好','bravery':'勇敢',
+  'creativity':'创造力','curiosity':'好奇心','fairness':'公平',
+  'forgiveness':'宽容','gratitude':'感恩','honesty':'诚实','hope':'希望',
+  'humility':'谦逊','humour':'幽默','judgement':'判断力','kindness':'善良',
+  'leadership':'领导力','love of learning':'爱学习','love':'爱',
+  'perseverance':'坚持不懈','perspective':'洞察力','prudence':'谨慎',
+  'self regulation':'自律','social intelligence':'社交智慧',
+  'spirituality':'灵性','teamwork':'团队合作','zest':'热情',
+  'arab emirates':'阿联酋','argentina':'阿根廷','austria':'奥地利',
+  'belgium':'比利时','benin':'贝宁','brazil':'巴西','bulgaria':'保加利亚',
+  'canada':'加拿大','chad':'乍得','china':'中国','colombia':'哥伦比亚',
+  'costa rica':'哥斯达黎加','cuba':'古巴','czech republic':'捷克',
+  'denmark':'丹麦','estonia':'爱沙尼亚','finland':'芬兰','france':'法国',
+  'gaza strip':'加沙地带','germany':'德国','greece':'希腊','guinea':'几内亚',
+  'honduras':'洪都拉斯','hungary':'匈牙利','iceland':'冰岛','india':'印度',
+  'ireland':'爱尔兰','israel':'以色列','italy':'意大利','jamaica':'牙买加',
+  'japan':'日本','libya':'利比亚','lithuania':'立陶宛','luxembourg':'卢森堡',
+  'madagascar':'马达加斯加','mali':'马里','monaco':'摩纳哥','morocco':'摩洛哥',
+  'netherlands':'荷兰','new zealand':'新西兰','niger':'尼日尔',
+  'nigeria':'尼日利亚','norway':'挪威','panama':'巴拿马','poland':'波兰',
+  'puerto rico':'波多黎各','romania':'罗马尼亚','russia':'俄罗斯',
+  'senegal':'塞内加尔','singapore':'新加坡','somalia':'索马里',
+  'south africa':'南非','south korea':'韩国','spain':'西班牙','sudan':'苏丹',
+  'sweden':'瑞典','syria':'叙利亚','tanzania':'坦桑尼亚','thailand':'泰国',
+  'turkey':'土耳其','ukraine':'乌克兰','united kingdom':'英国',
+  'united states':'美国','vietnam':'越南',
+  'cat':'猫','apple':'苹果','ice cream':'冰淇淋','jug':'水壶','kite':'风筝',
+  'notebook':'笔记本','queen':'女王','rabbit':'兔子','strawberry':'草莓',
+  'umbrella':'雨伞','violin':'小提琴','xylophone':'木琴','yoyo':'溜溜球',
 };
-/* enSub: "words" 单词 | "phrases" 短语 | "alphabet" 字母 —— 共用同一套平铺格式 */
-function enSrc(sub){ const s=sub||enSub; return s==="phrases"?ENG_PHRASES:s==="alphabet"?ENG_ALPHABET:ENGLISH; }
-function enListHTML(){
-  const SRC = enSrc();
-  const isPh = (enSub==="phrases");
-  const cats = Object.keys(SRC);
-  const show = (enCat && cats.indexOf(enCat)>=0) ? [enCat] : cats;
-  const kw = (enKw||"").trim().toLowerCase();
-  let total = 0;
-  const secs = show.map(c => {
-    let list = SRC[c].map((e,i)=>({e:e,i:i}));
-    if(kw) list = list.filter(o =>
-      String(o.e[0]).toLowerCase().indexOf(kw)>=0 || String(o.e[1]||"").indexOf(kw)>=0);
-    if(!list.length) return "";
-    total += list.length;
-    const cells = list.map(o => {
-      const key = c+"-"+o.e[0];
-      const mc = _masteryClass(S.learnedEn[key]);
-      const act = (enSub==="alphabet") ? "abc" : "en";
-      return `<button class="wtile ${mc}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
-        <span class="em">${o.e[2]||"🔤"}</span><span class="w">${htmlEsc(o.e[0])}</span>
-        <span class="cn">${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedEn[key])}</button>`;
-    }).join("");
-    return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(c)}</h3><em>${list.length} ${isPh?"句":"词"}</em></div>
-      <div class="wgrid ${isPh?"ph":(enSub==="alphabet")?"abc":""}">${cells}</div></div>`;
-  }).join("");
-  if(!total) return `<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">没找到「${htmlEsc(enKw)}」，换个词试试～</div>`;
-  return secs;
+
+const EN_IMG_SETS = [
+  {id:'animals', name:'动物', icon:'🦁', folder:'Animal Flashcards',
+   words:['alligator','bear','cow','dog','elephant','fox','giraffe','horse','iguana','jellyfish','koala','lion','monkey','newt','owl','pig','quail','raccoon','seagull','tiger','urchin','vulture','whale','x-ray fish','yak','zebra']},
+  {id:'colors', name:'颜色', icon:'🎨', folder:'Colors Flashcards',
+   words:['black','blue','brown','green','grey','orange','pink','purple','red','turquoise','white','yellow']},
+  {id:'fruits', name:'水果', icon:'🍎', folder:'Fruits Flashcards',
+   words:['avocado','banana','blueberry','cherry','coconut','dragon fruit','durian','fruit','grape','lemon','mango','mangosteen','orange','papaya','peach','watermelon']},
+  {id:'vegetables', name:'蔬菜', icon:'🥕', folder:'Vegetables Flashcards',
+   words:['artichoke','broccoli','carrot','cauliflower','celery','corn','eggplant','mushroom','onion','peas','potato','pumpkin','red pepper','tomato','vegetable']},
+  {id:'shapes', name:'形状', icon:'⭐', folder:'Shapes Flashcards',
+   words:['arrow','circle','crescent','cross','cube','cylinder','diamond','ellipse','heart','heptagon','hexagon','nonagan','octagon','parallelogram','pentagon','rectangle','rhombus','square','star','triangle']},
+  {id:'numbers', name:'数字', icon:'🔢', folder:'Numbers Flashcards',
+   words:['zero','one','two','three','four','five','six','seven','eight','nine','ten','number']},
+  {id:'emotions', name:'情绪', icon:'😊', folder:'Emotions Flashcards',
+   words:['amused','angry','bashful','calm','cheeky','confident','confused','disappointed','embarassed','excited','happy','hurt','loved','nauseous','playful','proud','sad','scared','shy','sleepy','surprised','tired','upset','worried']},
+  {id:'weather', name:'天气', icon:'⛅', folder:'Weather Flashcards',
+   words:['cloudy','hurricane','partly cloudy','rain','rainbow','snowy','sunny','thunder','thunderstorm','weather','windy']},
+  {id:'transport', name:'交通', icon:'🚗', folder:'Transportation Flashcards',
+   words:['airplane','ambulance','bicycle','bus','car','dump truck','excavator','fire truck','helicopter','hoisting crane','hot air balloon','motor cycle','road roller','rocket','sail boat','scooter','ship','skid loader','taxi','tracter','train','truck','van','yacht']},
+  {id:'body', name:'身体', icon:'🫀', folder:'Human Body Flashcards',
+   words:['arm','chest','chin','ears','eye','fingers','forehead','hair','heel','knees','legs','neck','nose','shoulders','stomach','teeth','toes','tongue']},
+  {id:'sea', name:'海洋动物', icon:'🐬', folder:'Sea Animals Flashcards',
+   words:['angelfish','clownfish','dolphin','eel','goldfish','jellyfish','narwhal','orca','seahorse','seal','shark','squid','stingray','surgeonfish','tortoise','whale']},
+  {id:'flowers', name:'花朵', icon:'🌸', folder:'Flowers Flashcards',
+   words:['aster','cosmos','daffodil','daisy','frangipani','hibiscus','lily','lotus','morning glory','orchid','pansy','poppy','rose','snowdrop','sunflower','tulip']},
+  {id:'school', name:'学校用品', icon:'📐', folder:'School Equipment Flashcards',
+   words:['bag','calculator','chalkboard','clock','crayons','eraser','globe','glue','ink','lamp','markers','microscope','notebooks','paint set','paper clips','pencil','pins','rulers','school','scissors','sharpener','stapler','tape','text book']},
+  {id:'reptiles', name:'爬行动物', icon:'🦎', folder:'Reptiles Flashcards',
+   words:['anaconda','axolotl','chameleon','coral snake','crocodile','gecko','green tree frog','green tree snake','house lizard','iguana','komodo dragon','newt','salamander','sea turtle','skink','turtle']},
+  {id:'nature', name:'自然', icon:'🌿', folder:'Nature Flashcards',
+   words:['cloud','flower','grass','leaf','moon','mountain','mushroom','plant','rain','rainbow','rock','snow','star','sun','tree','wind']},
+  {id:'solar', name:'太阳系', icon:'🪐', folder:'Solar System Flashcards',
+   words:['asteroid','astronaut','comet','earth','jupiter','mars','mercury','moon','neptune','pluto','rocket','saturn','star','sun','uranus','venus']},
+  {id:'celebrate', name:'节日', icon:'🎉', folder:'Celebrations Flashcards',
+   words:["april fools' day","bastille day","birthday","chinese new year","christmas","diwali","earth day","easter","eid","good friday","halloweeen","hanukkah","holi","independence day","new year's","remembrance day","st patrick's day","teacher's day","thanksgiving","valentine's day"]},
+  {id:'computer', name:'电脑科技', icon:'💻', folder:'Computer Technology Flashcards',
+   words:['cable','digital camera','fax','gps','headphones','internet','laptop','modem','monitor','mouse','printer','satellite','tablet','upload','usb','wifi']},
+  {id:'traits', name:'品格', icon:'💪', folder:'Character Traits Flashcards',
+   words:['appreciation of beauty and excellence','bravery','creativity','curiosity','fairness','forgiveness','gratitude','honesty','hope','humility','humour','judgement','kindness','leadership','love of learning','love','perseverance','perspective','prudence','self regulation','social intelligence','spirituality','teamwork','zest']},
+  {id:'flags', name:'国旗', icon:'🏳', folder:'Flag Flashcards',
+   words:['arab emirates','argentina','austria','belgium','benin','brazil','bulgaria','canada','chad','china','colombia','costa rica','cuba','czech republic','denmark','estonia','finland','france','gaza strip','germany','greece','guinea','honduras','hungary','iceland','india','ireland','israel','italy','jamaica','japan','libya','lithuania','luxembourg','madagascar','mali','monaco','morocco','netherlands','new zealand','niger','nigeria','norway','panama','poland','puerto rico','romania','russia','senegal','singapore','somalia','south africa','south korea','spain','sudan','sweden','syria','tanzania','thailand','turkey','ukraine','united kingdom','united states','vietnam']},
+  {id:'alphabet', name:'字母单词', icon:'🔤', folder:'Alphabets A - Z Flashcards',
+   words:['apple','banana','cat','dog','elephant','fox','giraffe','horse','ice cream','jug','kite','lion','mango','notebook','owl','pig','queen','rabbit','strawberry','tree','umbrella','violin','watermelon','xylophone','yoyo','zebra']},
+];
+
+function enImgSrc(folder, word){
+  return 'English Flashcards/单词卡截图/' + folder + '/' + word + '.png';
 }
-function enSwitch(sub){
-  if(enSub === sub) return;
-  enSub = sub; enCat = ""; enKw = ""; _enTouched = false; render();
+
+var _eiSet = 0, _eiIdx = 0;
+
+function pgEnFlashCards(){
+  var modeTabs =
+    '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab on">📚 英语卡</button>'
+    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
+    +'<button class="tab" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
+    +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn).length?' ('+Object.keys(S.learnedEn).length+')':'')+'</button>';
+
+  var catGrid = EN_IMG_SETS.map(function(s,i){
+    var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
+    var isAll = knownCnt === s.words.length;
+    return '<button onclick="_eiSet='+i+';_eiIdx=0;showEnImgCard('+i+',0)" '
+      +'style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:14px;border:2px solid var(--border);background:var(--cream-1);cursor:pointer;min-width:72px;flex:1">'
+      +'<span style="font-size:22px">'+s.icon+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:var(--ink);line-height:1.2">'+s.name+'</span>'
+      +'<span style="font-size:10px;color:'+(isAll?'#4CAF50':'var(--ink-soft)')+'">'+knownCnt+'/'+s.words.length+(isAll?' ✅':'')+'</span>'
+      +'</button>';
+  }).join('');
+
+  $('page').innerHTML =
+    '<div class="tabs">'+modeTabs+'</div>'
+    +'<div style="padding:12px 0">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:10px">选择分类 · 点卡片开始</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px">'+catGrid+'</div></div>';
 }
-function enPaint(){ const el = $("enList"); if(el) el.innerHTML = enListHTML(); }
+
+function showEnImgCard(setIdx, wordIdx){
+  var set = EN_IMG_SETS[setIdx];
+  var word = set.words[wordIdx];
+  var zh = EN_IMG_ZH[word] || '';
+  var imgSrc = enImgSrc(set.folder, word);
+  var isKnown = !!(S.knownEn && S.knownEn[word]);
+  var total = set.words.length;
+  var display = word.split(' ').map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
+  _eiSet = setIdx; _eiIdx = wordIdx;
+  var kBg = isKnown?'#4CAF50':'#FFD54F';
+  var kColor = isKnown?'#fff':'#333';
+  var kBd = isKnown?'#388E3C':'#FFC107';
+  var kLabel = isKnown?'✅ 已认识':'👋 认识';
+  modal('<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 14px;max-width:420px;margin:0 auto;width:100%">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px">'
+    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'-1+'+total+')%'+total+')" style="width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--cream-1);font-size:20px;cursor:pointer;flex-shrink:0">‹</button>'
+    +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</span>'
+    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'+1)%'+total+')" style="width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--cream-1);font-size:20px;cursor:pointer;flex-shrink:0">›</button>'
+    +'</div>'
+    +'<img src="'+imgSrc+'" style="max-width:240px;max-height:200px;object-fit:contain;border-radius:14px;background:#fff;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.12)" onerror="this.style.opacity=\'0.2\'">'
+    +'<div style="font-size:28px;font-weight:800;color:#1565C0;text-align:center">'+htmlEsc(display)+'</div>'
+    +(zh?'<div style="font-size:20px;color:#E5443C;font-weight:700;text-align:center">'+htmlEsc(zh)+'</div>':'')
+    +'<div style="display:flex;gap:8px;width:100%">'
+    +'<button onclick="speak(\''+jsEsc(word)+'\',\'en-US\')" class="big" style="flex:1;padding:10px 4px;font-size:14px;background:#E3F2FD;color:#1565C0;border:2px solid #BBDEFB">🔊 英文</button>'
+    +(zh?'<button onclick="speak(\''+jsEsc(zh)+'\',\'zh-CN\')" class="big" style="flex:1;padding:10px 4px;font-size:14px;background:#FFF3E0;color:#E65100;border:2px solid #FFE0B2">🔊 中文</button>':'')
+    +'</div>'
+    +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
+    +'style="width:100%;padding:13px;font-size:16px;font-weight:700;border-radius:12px;border:2px solid '+kBd+';background:'+kBg+';color:'+kColor+';cursor:pointer">'+kLabel+'</button>'
+    +'<button onclick="closeModal()" style="padding:8px 22px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px">✕ 返回</button>'
+    +'</div>');
+}
+
 
 /* ══════════ CapWords 贴纸模块 ══════════ */
 function _stickerCompress(file,cb){
