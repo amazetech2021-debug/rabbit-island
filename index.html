@@ -7741,6 +7741,32 @@ const EN_IMG_ZH = {
   'cat':'猫','apple':'苹果','ice cream':'冰淇淋','jug':'水壶','kite':'风筝',
   'notebook':'笔记本','queen':'女王','rabbit':'兔子','strawberry':'草莓',
   'umbrella':'雨伞','violin':'小提琴','xylophone':'木琴','yoyo':'溜溜球',
+  'full moon':'满月','hailstone':'冰雹','lightning':'闪电',
+  'lightning cloud':'雷云','rain drop':'雨滴',
+  'storm cloud':'暴风云','sun and clouds':'多云转晴','tornado':'龙卷风',
+  'adoring':'崇拜的','cheerful':'开朗的','content':'满足的',
+  'cool':'酷酷的','desperate':'绝望的','disdain':'轻蔑的',
+  'disgusted':'厌恶的','ecstatic':'狂喜的','elated':'兴高采烈的',
+  'embarrassed':'尴尬的','exhausted':'精疲力竭的','funny':'搞笑的',
+  'hungry':'饿的','loving':'充满爱的','neutral':'平静的',
+  'relieved':'如释重负的','shocked':'震惊的','sick':'生病的',
+  'silenced':'沉默的','silly':'傻乎乎的','sneaky':'调皮的',
+  'unenthused':'没劲的','unimpressed':'无感的',
+  'DNA':'DNA','alcohol lamp':'酒精灯','atom':'原子','bacteria':'细菌',
+  'beaker':'烧杯','brain':'大脑','bunsen burner':'本生灯','capsule':'胶囊',
+  'conical flask':'锥形烧瓶','digital thermometer':'电子温度计','dropper':'滴管',
+  'evaporating dish':'蒸发皿','face mask':'口罩','funnel':'漏斗',
+  'gas washing bottle':'洗气瓶','glove':'手套','gloves':'手套',
+  'goggles':'护目镜','lab coat':'实验服','light bulb':'灯泡',
+  'magnet':'磁铁','magnifying glass':'放大镜','measuring cylinder':'量筒',
+  'molecule':'分子','petri dish':'培养皿','pipettes':'移液管',
+  'radioactive':'放射性','reagent bottle':'试剂瓶','retort':'曲颈瓶',
+  'round flask':'圆底烧瓶','scale':'天平','spatula':'刮刀',
+  'stethoscope':'听诊器','syringe':'注射器','telescope':'望远镜',
+  'test tube holder':'试管夹','test tube rack':'试管架',
+  'test tube stand':'试管支架','test tubes':'试管','thermometer':'温度计',
+  'tongs':'坩埚钳','trash can':'垃圾桶','tweezers':'镊子',
+  'wash bottle':'洗瓶','watch glass':'表面皿',
 };
 
 const EN_IMG_SETS = [
@@ -7786,6 +7812,12 @@ const EN_IMG_SETS = [
    words:['arab emirates','argentina','austria','belgium','benin','brazil','bulgaria','canada','chad','china','colombia','costa rica','cuba','czech republic','denmark','estonia','finland','france','gaza strip','germany','greece','guinea','honduras','hungary','iceland','india','ireland','israel','italy','jamaica','japan','libya','lithuania','luxembourg','madagascar','mali','monaco','morocco','netherlands','new zealand','niger','nigeria','norway','panama','poland','puerto rico','romania','russia','senegal','singapore','somalia','south africa','south korea','spain','sudan','sweden','syria','tanzania','thailand','turkey','ukraine','united kingdom','united states','vietnam']},
   {id:'alphabet', name:'字母单词', icon:'🔤', folder:'Alphabets A - Z Flashcards',
    words:['apple','banana','cat','dog','elephant','fox','giraffe','horse','ice cream','jug','kite','lion','mango','notebook','owl','pig','queen','rabbit','strawberry','tree','umbrella','violin','watermelon','xylophone','yoyo','zebra']},
+  {id:'seasons', name:'天气季节', icon:'🌈', folder:'weather and seasons Flashcards',
+   words:['cloud','full moon','hailstone','lightning','lightning cloud','moon','rain','rain drop','rainbow','snow','star','storm cloud','sun','sun and clouds','tornado']},
+  {id:'emoji', name:'表情包', icon:'😜', folder:'Emoji Feelings Flashcards',
+   words:['adoring','cheeky','cheerful','confused','content','cool','desperate','disappointed','disdain','disgusted','ecstatic','elated','embarrassed','exhausted','funny','happy','hungry','hurt','loving','neutral','playful','relieved','sad','shocked','sick','silenced','silly','sneaky','tired','unenthused','unimpressed','worried']},
+  {id:'science', name:'科学实验', icon:'🔬', folder:'Science Equipment Flashcards',
+   words:['DNA','alcohol lamp','atom','bacteria','beaker','brain','bunsen burner','capsule','conical flask','digital thermometer','dropper','evaporating dish','face mask','funnel','gas washing bottle','globe','glove','gloves','goggles','lab coat','lamp','light bulb','magnet','magnifying glass','measuring cylinder','microscope','molecule','petri dish','pipettes','radioactive','reagent bottle','retort','round flask','scale','spatula','stethoscope','syringe','telescope','test tube holder','test tube rack','test tube stand','test tubes','thermometer','tongs','trash can','tweezers','wash bottle','watch glass']},
 ];
 
 function enSrc(sub){ const s=sub||enSub; return s==="phrases"?ENG_PHRASES:s==="alphabet"?ENG_ALPHABET:ENGLISH; }
@@ -7881,13 +7913,13 @@ function showEnCatWords(setIdx){
     var imgSrc = enImgSrc(s.folder, w);
     var display = w.split(' ').map(function(p){ return p.charAt(0).toUpperCase()+p.slice(1); }).join(' ');
     return '<button onclick="_eiSet='+setIdx+';_eiIdx='+wi+';showEnImgCard('+setIdx+','+wi+')" '
-      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px 10px;border-radius:16px;'
+      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 10px 16px;border-radius:18px;'
       +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
       +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative">'
       +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:9px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700">✓</span>':'')
-      +'<img src="'+imgSrc+'" style="width:64px;height:52px;object-fit:contain;border-radius:8px" onerror="this.style.opacity=\'0.15\'">'
-      +'<span style="font-size:12px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
-      +(zh?'<span style="font-size:10.5px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
+      +'<img src="'+imgSrc+'" style="width:90px;height:74px;object-fit:contain;border-radius:10px" onerror="this.style.opacity=\'0.15\'">'
+      +'<span style="font-size:14px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
+      +(zh?'<span style="font-size:12px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
       +'</button>';
   }).join('');
 
@@ -7899,7 +7931,7 @@ function showEnCatWords(setIdx){
     +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
     +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
     +'</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+wordGrid+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">'+wordGrid+'</div>'
     +'</div>';
 }
 
