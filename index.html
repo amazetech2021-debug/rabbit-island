@@ -5773,154 +5773,138 @@ function pgHanziWrite(units){
 
 function openHzWrite(ch){
   _hwChar = ch;
+  if(_hwWriter){ try{_hwWriter.cancelQuiz();}catch(e){} _hwWriter=null; }
   var extra = findHzExtra(ch);
-  modal('<div style="text-align:center;padding:4px 0">'
-    +'<div style="font-size:28px;font-weight:900;color:var(--brand)">'+htmlEsc(ch)+'</div>'
-    +'<div style="font-size:14px;color:var(--ink-soft);margin-bottom:12px">'+htmlEsc(extra.py||'')+' '+htmlEsc(extra.emoji||'')+'</div>'
-    +'<div style="position:relative;width:280px;height:280px;margin:0 auto 14px;border:2px solid #bbb;box-sizing:border-box;background:#fff;border-radius:4px">'
-    +'<div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#e0d0f8;pointer-events:none"></div>'
-    +'<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#e0d0f8;pointer-events:none"></div>'
-    +'<div id="hw-canvas" style="position:absolute;top:0;left:0"></div>'
+  modal(
+    '<div style="text-align:center;padding:8px 0 4px">'
+    +'<div style="font-size:32px;font-weight:900;color:#6040b0;margin-bottom:4px">'+htmlEsc(ch)+'</div>'
+    +'<div style="font-size:15px;color:#888;margin-bottom:14px">'+htmlEsc(extra.py||'')+' '+htmlEsc(extra.emoji||'')+'</div>'
+    +'<div id="hz-demo-box" style="position:relative;width:300px;height:300px;margin:0 auto;border:1px solid #ccc;background:#fff;border-radius:4px;overflow:hidden">'
+      +'<div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#e8e0f8;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#e8e0f8;pointer-events:none"></div>'
+      +'<div id="hw-canvas" style="position:absolute;top:0;left:0"></div>'
+      +'<div id="hw-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#aaa">加载中…</div>'
     +'</div>'
-    +'<div style="display:flex;gap:10px;justify-content:center;margin-bottom:10px">'
-    +'<button class="big p" onclick="hwAnimate()" style="padding:12px 22px;font-size:15px;border-radius:10px">▶ 笔顺演示</button>'
-    +'<button class="big o" onclick="hwQuiz()" style="padding:12px 22px;font-size:15px;border-radius:10px">✏️ 描写练习</button>'
+    +'<div style="border:1px solid #ddd;border-top:none;padding:12px 16px;background:#fafafa;width:300px;margin:0 auto;box-sizing:border-box;border-radius:0 0 4px 4px;display:flex;align-items:center;justify-content:space-between">'
+      +'<label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">'
+        +'<input type="checkbox" id="hz-outline-cb" checked onchange="hwToggleOutline(this.checked)" style="width:16px;height:16px"> 显示轮廓'
+      +'</label>'
+      +'<button onclick="hwAnimate()" style="background:#3b82f6;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer">▶ 笔顺演示</button>'
     +'</div>'
-    +'<div id="hw-status" style="font-size:13px;color:var(--ink-soft);min-height:20px;line-height:1.5"></div>'
-    +'<button onclick="closeModal()" style="margin-top:10px;padding:8px 24px;border-radius:20px;background:#f0eef8;border:1px solid #ddd;font-size:13px;cursor:pointer">关闭</button>'
+    +'<div style="margin-top:10px">'
+      +'<button class="big o" onclick="hwQuiz()" style="padding:10px 20px;font-size:14px;border-radius:8px">✏️ 描写练习</button>'
+    +'</div>'
+    +'<div id="hw-status" style="margin-top:8px;font-size:13px;color:#888;min-height:18px"></div>'
+    +'<button onclick="closeModal()" style="margin-top:10px;padding:8px 28px;border-radius:20px;background:#f0eef8;border:1px solid #ddd;font-size:13px;cursor:pointer;color:#555">关闭</button>'
     +'</div>'
   );
   setTimeout(function(){
     var el=document.getElementById('hw-canvas');
     if(!el) return;
     if(typeof HanziWriter==='undefined'){
-      el.innerHTML='<div style="padding:16px;color:#e5443c;font-size:13px">写字库未加载，请检查网络后刷新</div>';
+      var ld=document.getElementById('hw-loading');
+      if(ld) ld.textContent='写字库未加载，请刷新页面';
       return;
     }
     try{
       _hwWriter=HanziWriter.create('hw-canvas',ch,{
-        width:280,height:280,padding:16,
+        width:300,height:300,padding:16,
         showOutline:true,
-        strokeColor:'#6040b0',
-        outlineColor:'#c8b8f0',
-        drawingColor:'#2C2448',
+        strokeColor:'#555',
+        outlineColor:'#ddd',
+        drawingColor:'#333',
         drawingWidth:10,
         strokeAnimationSpeed:1,
         delayBetweenStrokes:400,
         charDataLoader:function(char,onLoad,onError){
-          var url='https://registry.npmmirror.com/hanzi-writer-data/2.0.0/files/'+char+'.json';
-          var xhr=new XMLHttpRequest();xhr.open('GET',url,true);
-          xhr.onload=function(){if(xhr.status===200){onLoad(JSON.parse(xhr.responseText));}else{onError();}};
-          xhr.onerror=onError;xhr.send();
+          var urls=[
+            'https://registry.npmmirror.com/hanzi-writer-data/2.0.0/files/'+encodeURIComponent(char)+'.json',
+            'https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/'+encodeURIComponent(char)+'.json'
+          ];
+          var i=0;
+          function tryNext(){
+            if(i>=urls.length){onError();return;}
+            var xhr=new XMLHttpRequest();
+            xhr.open('GET',urls[i++],true);
+            xhr.onload=function(){
+              if(xhr.status===200){
+                try{onLoad(JSON.parse(xhr.responseText));}catch(e){tryNext();}
+              } else { tryNext(); }
+            };
+            xhr.onerror=tryNext;
+            xhr.send();
+          }
+          tryNext();
         },
         onLoadCharDataSuccess:function(){
+          var ld=document.getElementById('hw-loading');
+          if(ld) ld.style.display='none';
           var st=document.getElementById('hw-status');
-          if(st) st.textContent='点"笔顺演示"看写法，或点"描写练习"来临摹 ✍️';
+          if(st) st.textContent='点"笔顺演示"看写法，或点"描写练习"来临摹';
         },
         onLoadCharDataError:function(){
-          var c=document.getElementById('hw-canvas');
-          if(c) c.innerHTML='<div style="padding:20px;color:#e5443c;font-size:13px">该汉字暂无笔顺数据</div>';
+          var ld=document.getElementById('hw-loading');
+          if(ld){ld.style.color='#e5443c';ld.textContent='暂无"'+ch+'"的笔顺数据';}
         }
       });
     }catch(e){
-      el.innerHTML='<div style="padding:16px;color:#e5443c;font-size:13px">写字功能初始化失败</div>';
+      var ld=document.getElementById('hw-loading');
+      if(ld){ld.style.color='#e5443c';ld.textContent='初始化失败：'+e.message;}
     }
   },150);
 }
 
+function hwToggleOutline(on){
+  if(!_hwWriter) return;
+  if(on){ _hwWriter.showOutline(); } else { _hwWriter.hideOutline(); }
+}
+
 function hwAnimate(){
   if(!_hwWriter) return;
+  try{_hwWriter.cancelQuiz();}catch(e){}
   var st=document.getElementById('hw-status');
   if(st) st.textContent='正在演示笔顺…';
   _hwWriter.animateCharacter({
     onComplete:function(){
       var s=document.getElementById('hw-status');
-      if(s) s.textContent='🎉 演示完毕！点"描写练习"来临摹';
+      if(s) s.textContent='演示完毕！可再次点击或试试"描写练习" ✍️';
     }
   });
 }
 
 function hwQuiz(){
   if(!_hwWriter) return;
+  try{_hwWriter.cancelQuiz();}catch(e){}
+  _hwWriter.hideOutline();
+  var cb=document.getElementById('hz-outline-cb');
+  if(cb) cb.checked=false;
   var st=document.getElementById('hw-status');
   if(st) st.textContent='✏️ 请按笔顺一笔一笔描写…';
   _hwWriter.quiz({
     leniency:1.2,
     onMistake:function(sd){
       var s=document.getElementById('hw-status');
-      if(s) s.textContent='❌ 第'+(sd.strokeNum+1)+'笔有些偏，再试试！';
+      if(s) s.textContent='再试一次这一笔，共'+sd.strokeNum+'画';
     },
     onCorrectStroke:function(sd){
-      var rem=sd.totalStrokeCount-sd.strokeNum-1;
       var s=document.getElementById('hw-status');
-      if(s) s.textContent='✅ 写对了！还剩 '+rem+' 笔';
+      var left=sd.totalStrokes-sd.strokeNum-1;
+      if(s) s.textContent=left>0?'👍 还剩'+left+'笔！':'最后一笔！';
     },
     onComplete:function(summary){
       var s=document.getElementById('hw-status');
-      if(s) s.innerHTML='🎉 完成！错误 '+summary.totalMistakes+' 次 <button class="tab" onclick="hwQuiz()" style="margin-left:6px;font-size:12px">再写一次</button>';
-      if(_hwChar){
-        for(var g2=1;g2<=6;g2++){
-          var gd2=HANZI_GRADED[g2]||{};
-          var done2=false;
-          for(var u2 in gd2){
-            var arr2=gd2[u2]||[];
-            var ch2=_hwChar;
-            if(arr2.find(function(e){return e[0]===ch2;})){
-              var k2=g2+'-'+u2+'-'+ch2;
-              if(S.learnedHz[k2]){S.learnedHz[k2].count++;save();}
-              done2=true;break;
-            }
-          }
-          if(done2) break;
-        }
+      if(s) s.textContent='🎉 完成！错误'+summary.totalMistakes+'次';
+      if(S.learnedHz&&S.learnedHz[_hwChar]){
+        S.learnedHz[_hwChar].count=(S.learnedHz[_hwChar].count||0)+1;
+        save();
       }
+      _hwWriter.showOutline();
+      var cb=document.getElementById('hz-outline-cb');
+      if(cb) cb.checked=true;
     }
   });
 }
 
-/* ══════════════════════════════════════════════════
-   汉字测试 (Hz Quiz)
-   ══════════════════════════════════════════════════ */
-var _hzQuiz = null;
-var _hzQGrade = null;
-var _hzQUnit  = null;
-var _hzQType  = 'meaning'; // 'meaning' | 'listen'
-
-function _hzQuizPool(grade, unit){
-  var g = grade || hzGrade;
-  var gd = HANZI_GRADED[g] || HANZI_GRADED[1];
-  var pool = [];
-  if(unit && gd[unit]){
-    (gd[unit]||[]).forEach(function(e){ pool.push({ch:e[0],py:e[1],em:e[2],u:unit,g:g}); });
-  } else {
-    Object.keys(gd).forEach(function(u){
-      (gd[u]||[]).forEach(function(e){ pool.push({ch:e[0],py:e[1],em:e[2],u:u,g:g}); });
-    });
-  }
-  return pool;
-}
-
-function startHzQuiz(){
-  _hzQuiz = null;
-  if(_hzQGrade === null) _hzQGrade = hzGrade;
-  hzMode = 'quiz';
-  renderHzQuizPage();
-}
-
-function _doStartHzQuiz(){
-  var pool = _hzQuizPool(_hzQGrade, _hzQUnit);
-  if(pool.length < 4){ modal('<div style="padding:20px;text-align:center;font-size:16px">汉字数量不足4个，请扩大范围！</div>'); return; }
-  var items = shuffle(pool).slice(0, Math.min(10, pool.length));
-  _hzQuiz = {items:items, idx:0, score:0, answered:false, type:_hzQType};
-  renderHzQuizPage();
-}
-
-function _hzQuizTabs(){
-  return '<div class="tabs"><button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
-    +'<button class="tab" onclick="hzMode=\'write\';render()">✏️ 写字</button>'
-    +'<button class="tab on">🧪 测试</button>'
-    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习</button></div>';
-}
 
 function renderHzQuizPage(){
   var q = _hzQuiz;
