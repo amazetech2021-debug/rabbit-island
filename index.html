@@ -7798,6 +7798,39 @@ const EN_IMG_SETS = [
 
 function enSrc(sub){ const s=sub||enSub; return s==="phrases"?ENG_PHRASES:s==="alphabet"?ENG_ALPHABET:ENGLISH; }
 
+function enListHTML(){
+  const SRC = enSrc();
+  const isPh = (enSub==="phrases");
+  const cats = Object.keys(SRC);
+  const show = (enCat && cats.indexOf(enCat)>=0) ? [enCat] : cats;
+  const kw = (enKw||"").trim().toLowerCase();
+  let total = 0;
+  const secs = show.map(c => {
+    let list = SRC[c].map((e,i)=>({e:e,i:i}));
+    if(kw) list = list.filter(o =>
+      String(o.e[0]).toLowerCase().indexOf(kw)>=0 || String(o.e[1]||"").indexOf(kw)>=0);
+    if(!list.length) return "";
+    total += list.length;
+    const cells = list.map(o => {
+      const key = c+"-"+o.e[0];
+      const mc = _masteryClass(S.learnedEn[key]);
+      const act = (enSub==="alphabet") ? "abc" : "en";
+      return `<button class="wtile ${mc}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
+        <span class="em">${o.e[2]||"🔤"}</span><span class="w">${htmlEsc(o.e[0])}</span>
+        <span class="cn">${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedEn[key])}</button>`;
+    }).join("");
+    return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(c)}</h3><em>${list.length} ${isPh?"句":"词"}</em></div>
+      <div class="wgrid ${isPh?"ph":(enSub==="alphabet")?"abc":""}">${cells}</div></div>`;
+  }).join("");
+  if(!total) return `<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">没找到「${htmlEsc(enKw)}」，换个词试试～</div>`;
+  return secs;
+}
+function enSwitch(sub){
+  if(enSub === sub) return;
+  enSub = sub; enCat = ""; enKw = ""; _enTouched = false; render();
+}
+function enPaint(){ const el = $("enList"); if(el) el.innerHTML = enListHTML(); }
+
 function enImgSrc(folder, word){
   return 'English Flashcards/单词卡截图/' + folder + '/' + word + '.png';
 }
