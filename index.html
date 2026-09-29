@@ -7796,6 +7796,8 @@ const EN_IMG_SETS = [
    words:['apple','banana','cat','dog','elephant','fox','giraffe','horse','ice cream','jug','kite','lion','mango','notebook','owl','pig','queen','rabbit','strawberry','tree','umbrella','violin','watermelon','xylophone','yoyo','zebra']},
 ];
 
+function enSrc(sub){ const s=sub||enSub; return s==="phrases"?ENG_PHRASES:s==="alphabet"?ENG_ALPHABET:ENGLISH; }
+
 function enImgSrc(folder, word){
   return 'English Flashcards/单词卡截图/' + folder + '/' + word + '.png';
 }
