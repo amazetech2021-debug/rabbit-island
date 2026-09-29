@@ -4356,7 +4356,7 @@ const dayGap = (a,b) => Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00
 const BLANK = {
   grow:0, hp:100, water:100, dead:false, level:0,
   lastCheck:"", streak:0, totalDays:0, wearing:{}, fedCount:0,
-  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{},
+  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{}, knownHz:{},
   day:"",
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
@@ -5563,8 +5563,9 @@ function hzListHTML(){
     const cells = list.map(o => {
       const key = hzGrade+"-"+u+"-"+o.e[0];
       const mc = _masteryClass(S.learnedHz[key]);
+      const isKnown = S.knownHz && S.knownHz[o.e[0]];
       return `<button class="tile ${mc}" data-act="hz" data-g="${hzGrade}" data-u="${htmlEsc(u)}" data-c="${htmlEsc(o.e[0])}">
-        <span class="emo">${o.e[2]||"📝"}</span><b>${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedHz[key])}</button>`;
+        <span class="emo">${o.e[2]||"📝"}</span><b style="${isKnown?'color:#E53935':''}">${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedHz[key])}</button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(u)}</h3><em>${list.length} 字</em></div>
       <div class="tilegrid">${cells}</div></div>`;
@@ -5678,6 +5679,8 @@ function cardHz(g, u, ch, autoSpeak){
       <div class="row" style="width:100%">
       <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('hz','${jsEsc(key)}');closeModal();hzPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的字库"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
+      </div><div class="row" style="width:100%">
+      <button class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnown('${jsEsc(row[0])}');closeModal();hzPaint()">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakHanzi(row[0], row[3]); }, 150);
 }
@@ -5865,9 +5868,10 @@ function pgHanziCards(){
   }).join('');
   var grid = chars.map(function(ch, i){
     var enc = encodeURIComponent(ch);
+    var isKnown = S.knownHz && S.knownHz[ch];
     return '<button onclick="showHzCard(\''+enc+'\','+i+')" '
       +'style="font-size:24px;min-width:56px;height:56px;border-radius:10px;border:1.5px solid var(--brand-light,#c8b0f0);'
-      +'background:var(--cream-1);cursor:pointer;font-weight:700;color:var(--ink)">'+ch+'</button>';
+      +'background:var(--cream-1);cursor:pointer;font-weight:700;color:'+(isKnown?'#E53935':'var(--ink)')+'">'+ch+'</button>';
   }).join('');
   $('page').innerHTML =
     '<div class="tabs">'+modeTabs+'</div>'
@@ -5878,6 +5882,16 @@ function pgHanziCards(){
 }
 
 var _hzCardIdx = 0;
+
+function markHzKnown(ch){
+  if(!S.knownHz) S.knownHz = {};
+  if(S.knownHz[ch]){
+    delete S.knownHz[ch];
+  } else {
+    S.knownHz[ch] = true;
+  }
+  save();
+}
 
 function showHzCard(encodedCh, idx){
   var ch = decodeURIComponent(encodedCh);
@@ -5957,7 +5971,23 @@ function showHzCard(encodedCh, idx){
   closeBtn.textContent = '✕';
   closeBtn.onclick = function(){ modal.remove(); };
 
+  var knownBtn = document.createElement('button');
+  knownBtn.style.cssText = 'font-size:18px;padding:10px 18px;border-radius:28px;border:none;cursor:pointer;font-weight:700;';
+  function _updateKnownBtn(){
+    var known = S.knownHz && S.knownHz[ch];
+    knownBtn.textContent = known ? '✅ 已认识' : '👋 认识';
+    knownBtn.style.background = known ? '#4CAF50' : '#FFD54F';
+    knownBtn.style.color = known ? '#fff' : '#333';
+  }
+  _updateKnownBtn();
+  knownBtn.onclick = function(){
+    markHzKnown(ch);
+    _updateKnownBtn();
+    if(hzMode==='cards') pgHanziCards();
+    if(hzMode==='learn') hzPaint();
+  };
   btnRow.appendChild(speakBtn);
+  btnRow.appendChild(knownBtn);
   btnRow.appendChild(closeBtn);
 
   modal.appendChild(img);
