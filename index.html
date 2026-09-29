@@ -7913,13 +7913,13 @@ function showEnCatWords(setIdx){
     var imgSrc = enImgSrc(s.folder, w);
     var display = w.split(' ').map(function(p){ return p.charAt(0).toUpperCase()+p.slice(1); }).join(' ');
     return '<button onclick="_eiSet='+setIdx+';_eiIdx='+wi+';showEnImgCard('+setIdx+','+wi+')" '
-      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 10px 16px;border-radius:18px;'
+      +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 10px;border-radius:14px;'
       +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
       +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative">'
       +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:9px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700">✓</span>':'')
-      +'<img src="'+imgSrc+'" style="width:90px;height:74px;object-fit:contain;border-radius:10px" onerror="this.style.opacity=\'0.15\'">'
-      +'<span style="font-size:14px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
-      +(zh?'<span style="font-size:12px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
+      +'<img src="'+imgSrc+'" style="width:72px;height:58px;object-fit:contain;border-radius:8px" onerror="this.style.opacity=\'0.15\'">'
+      +'<span style="font-size:12px;font-weight:800;color:'+(isKnown?'#1565C0':'#E5443C')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</span>'
+      +(zh?'<span style="font-size:10px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</span>':'')
       +'</button>';
   }).join('');
 
@@ -7931,7 +7931,7 @@ function showEnCatWords(setIdx){
     +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
     +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
     +'</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">'+wordGrid+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">'+wordGrid+'</div>'
     +'</div>';
 }
 
@@ -8027,7 +8027,7 @@ function pgEnglishStickers(){
       var dStr=parseInt(parts[1])+' 月 '+parseInt(parts[2]);
       html+='<div style="margin-top:20px">'
         +'<div style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-bottom:10px">'+dStr+' · '+byDate[date].length+' 个单词</div>'
-        +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">';
+        +'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">';
       byDate[date].forEach(function(s){
         html+='<div style="position:relative;text-align:center;background:#fff;border-radius:14px;padding:10px 8px 8px;box-shadow:0 2px 8px rgba(0,0,0,.08)">'
           +'<img src="'+s.img+'" style="width:100%;max-height:130px;object-fit:contain;border-radius:8px">'
