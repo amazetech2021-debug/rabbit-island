@@ -9700,7 +9700,7 @@ function playBookVideo(chId,plIdx,epIdx){
   var ep=pl.episodes[epIdx||0];if(!ep)return;
   var isBili=!!ep.bili;
   var _biliBase=ep.bili&&!ep.bili.startsWith('http')?'https://www.bilibili.com/video/'+ep.bili:ep.bili;
-  var openUrl=isBili?_biliBase:(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v);
+  var openUrl=isBili?_biliBase:(ep.v?'https://www.youtube.com/watch?v='+ep.v+(ep.pl?'&list='+ep.pl:''):(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:''));
   // 永久记录已看（count-based）
   try{
     if(!S.watchedVideos) S.watchedVideos={};
@@ -11012,7 +11012,7 @@ function playYtVideo(chId,plIdx,epIdx){
   var ep=pl.episodes[epIdx];if(!ep)return;
   _ytCurCh=chId;_ytCurPl=plIdx;_ytCurIdx=epIdx;
   // 永久记录已看视频（count-based，每次播放+1）
-  var ytUrl=ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'https://www.youtube.com/watch?v='+ep.v;
+  var ytUrl=ep.v?'https://www.youtube.com/watch?v='+ep.v+(ep.pl?'&list='+ep.pl:''):(ep.pl?'https://www.youtube.com/playlist?list='+ep.pl:'');
   try{
     if(!S.watchedVideos) S.watchedVideos={};
     var vidKey = ep.v || (chId+'|'+plIdx+'|'+epIdx);
