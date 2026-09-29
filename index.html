@@ -4356,7 +4356,7 @@ const dayGap = (a,b) => Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00
 const BLANK = {
   grow:0, hp:100, water:100, dead:false, level:0,
   lastCheck:"", streak:0, totalDays:0, wearing:{}, fedCount:0,
-  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{}, knownHz:{},
+  learnedHz:{}, learnedPy:{}, learnedEn:{}, learnedPoem:{}, knownHz:{}, knownEn:{},
   day:"",
   cnt:{hz:0,math:0,py:0,en:0,poem:0,think:0},
   claimed:[], mathRight:0, rabbit:null,
@@ -7579,6 +7579,16 @@ function checkChoice(el, v){
 let enCat = "", enKw = "", enMode = "learn", enIdx = 0, enSub = "words", _enTouched = false;
 /* enSub: "words" 单词 | "phrases" 短语 | "alphabet" 字母 —— 共用同一套平铺格式 */
 function enSrc(sub){ const s=sub||enSub; return s==="phrases"?ENG_PHRASES:s==="alphabet"?ENG_ALPHABET:ENGLISH; }
+function markEnKnown(word){
+  if(!S.knownEn) S.knownEn = {};
+  if(S.knownEn[word]){
+    delete S.knownEn[word];
+  } else {
+    S.knownEn[word] = true;
+  }
+  save();
+}
+
 function enListHTML(){
   const SRC = enSrc();
   const isPh = (enSub==="phrases");
@@ -7597,7 +7607,8 @@ function enListHTML(){
       const mc = _masteryClass(S.learnedEn[key]);
       const act = (enSub==="alphabet") ? "abc" : "en";
       return `<button class="wtile ${mc}" data-act="${act}" data-sub="${enSub}" data-cat="${htmlEsc(c)}" data-i="${o.i}">
-        <span class="em">${o.e[2]||"🔤"}</span><span class="w">${htmlEsc(o.e[0])}</span>
+        const enKnown = S.knownEn && S.knownEn[o.e[0]];
+        <span class="em">${o.e[2]||"🔤"}</span><span class="w" style="${enKnown?'color:#1565C0':''}">${htmlEsc(o.e[0])}</span>
         <span class="cn">${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedEn[key])}</button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(c)}</h3><em>${list.length} ${isPh?"句":"词"}</em></div>
@@ -7782,6 +7793,8 @@ function cardEn(cat, i, sub, autoSpeak){
       <div class="row" style="width:100%">
       <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('en','${jsEsc(key)}');closeModal();enPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的词库"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
+      </div><div class="row" style="width:100%">
+      <button class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#1565C0':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#0D47A1':'#FFC107'}" onclick="markEnKnown('${jsEsc(it[0])}');closeModal();enPaint()">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识这个词'}</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
 }
