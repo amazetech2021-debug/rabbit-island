@@ -5494,7 +5494,16 @@ var petFeedPending = false;
 function pgHome(){ rabbitRender(); }
 
 /* ══════════ 识字 ══════════ */
-let hzGrade = 1, hzUnit = "", hzIdx = 0, hzMode = "learn", hzKw = "";
+let hzGrade = 1, hzUnit = "", hzIdx = 0, hzMode = "learn", hzKw = "", hzCardsBook = 1;
+/* 直映认字图卡：各册字表 */
+const CARD_CHARS = [null,
+["一","七","三","上","下","东","中","九","书","二","云","五","井","亭","人","伞","你","光","入","八","六","关","出","刀","分","前","勺","包","北","十","半","南","厂","去","口","右","叶","吃","后","吐","哥","哭","喝","四","圆","土","坐","外","多","大","天","头","女","奶","妈","妹","姐","家","小","少","尖","尘","山","工","左","巾","布","帽","开","弓","弟","弯","心","我","手","方","日","月","木","来","林","果","森","毛","气","水","火","灭","灯","灰","点","爷","爸","牙","牛","瓜","田","电","男","画","皮","目","直","眉","看","石","禾","立","竹","笑","米","羊","耳","舌","花","苗","草","虫","衣","袜","裙","裤","西","豆","走","足","身","车","里","长","门","问","雨","雪","雷","面","鞋","风","飞","马","高","鱼","鸟","鼻"],
+["不","个","丽","乌","京","亮","今","他","们","件","伯","做","偶","儿","兴","兵","冬","冷","刘","刮","剪","午","双","发","叔","只","台","号","向","吴","吸","和","喊","嘴","器","回","围","国","图","圈","在","地","块","坡","太","她","好","姨","婆","子","孔","孩","宋","害","就","巴","床","底","张","很","徐","您","房","打","把","支","散","旁","早","是","晨","更","有","服","未","本","朵","机","李","条","极","枪","柿","树","桥","正","汤","汽","河","消","溪","滑","滴","炮","燕","爱","片","玉","现","球","生","用","痰","的","盆","盏","真","眼","睛","短","碧","空","窗","章","竿","箭","箱","类","糕","红","纱","线","给","绿","美","羽","肉","背","胡","脚","脸","腰","腿","色","艳","芽","苹","茶","莓","蓝","蛋","蛙","袋","要","见","视","角","许","请","读","课","赵","路","辆","边","过","还","这","进","迷","退","郑","郭","钓","铃","铺","闪","阳","阿","陈","青","颗","题","饭","骑","鲜","麦","黄","黑","齿"],
+["万","专","业","丢","两","为","主","久","么","乐","也","乡","买","了","事","于","些","亲","什","从","以","会","作","候","借","假","傍","像","兔","公","其","养","再","净","划","到","刺","力","加","动","助","化","千","升","卜","卡","卷","参","友","取","变","可","合","同","吞","听","呀","呢","咬","响","哎","哪","唇","唱","喂","喜","因","城","堆","填","声","夏","够","失","夸","奖","如","始","季","学","它","完","密","对","尺","尾","屋","岁","岭","岸","差","己","市","师","带","帮","常","干","年","广","庭","彩","得","微","快","怎","怕","惊","想","感","慌","慢","懂","戏","成","抓","拉","拖","择","拿","挂","挡","捉","捡","排","接","摘","撑","播","擦","放","故","敬","斤","新","旗","时","明","星","春","晚","晴","暖","最","朋","朗","望","期","术","束","松","枝","枯","校","样","核","桃","梦","梨","棵","椒","次","欢","歌","此","步","每","比","汗","江","没","泥","泪","泳","泼","洗","活","流","渴","游","湖","滚","漂","激","烈","熊","爪","狗","猎","猪","猫","猬","猴","玻","班","璃","瓦","瓶","病","白","盼","着","瞧","知","礼","祖","秋","种","秘","穿","童","笔","等","算","管","粗","粮","紧","级","纸","细","终","结","罐","群","老","聪","能","脑","自","舞","船","节","苦","荷","菜","萝","落","虹","虾","蝴","蝶","血","行","装","觉","讲","识","话","说","谁","谢","象","贺","赛","起","趣","跑","跳","踢","蹈","蹦","轻","辣","迎","运","送","选","遮","那","都","钩","错","间","闻","队","降","院","集","非","颜","额","食","饱","饿","魔","鸭","龄"],
+["丁","丑","且","互","休","众","伙","伴","伸","位","低","住","体","使","保","倒","元","全","具","兽","写","军","冠","冲","冻","几","凶","列","则","刚","利","办","劲","勇","匹","单","卖","卫","危","厌","厨","叠","句","叫","名","吵","告","周","呼","命","哨","商","团","困","场","坏","坚","坪","垮","塑","境","士","壮","壳","壶","处","夜","奇","妖","妙","姑","姓","娃","娘","宝","室","容","寒","寻","导","尝","居","岗","峰","崖","巧","已","帆","希","帘","并","幼","庆","店","座","建","强","影","待","忙","念","思","急","怪","息","恶","悄","悉","悬","意","愿","战","户","才","扎","扔","找","抄","护","报","披","抱","拍","招","拦","拳","拾","持","挣","挺","捏","捧","掉","推","掰","搬","搭","操","攀","收","攻","敌","救","教","敢","斑","料","斜","无","旦","易","昨","暗","曲","杀","杨","杯","架","染","柳","标","案","桌","梢","梳","棉","棋","椅","植","楚","槽","母","毒","永","污","沙","法","泡","洒","洞","浅","海","深","清","满","滩","漠","炒","炼","烟","烧","煮","熟","爬","牌","物","狐","狸","王","玩","环","珍","珠","理","登","盖","相","眨","睡","矮","确","碗","祝","离","积","站","端","答","简","粘","粟","纹","经","缺","翻","耀","而","聊","聚","胜","脱","臂","臭","舒","舰","艇","藏","虎","蚊","蜂","蜓","蜜","蜻","街","袄","观","规","讨","让","设","诉","谎","貌","贝","贴","贵","赶","超","越","趴","跌","距","跟","踩","踪","蹲","躺","较","辈","辫","近","远","连","追","道","邻","部","配","重","野","量","金","钟","钻","铅","锻","闭","阴","阵","险","难","雀","页","顶","飘","饺","饼","香","骂","鬼","鸡","鸣","鸥","鸦","鹅","鹿"],
+["丰","乘","争","交","产","介","代","令","价","任","仿","优","传","伤","余","佛","便","停","健","兄","先","党","共","准","凉","击","别","制","刻","剑","剩","割","务","劳","医","即","厅","压","原","叉","受","古","另","司","各","吧","员","味","品","哗","唐","啦","喷","坑","塘","墙","备","夕","夹","奔","宣","射","将","局","层","展","帚","席","平","序","应","康","引","弹","当","形","往","忆","忽","怀","恼","悔","惜","惰","懒","扁","托","扫","技","投","抬","拔","拥","按","挑","挖","挤","捕","捞","掌","描","握","摔","撕","敏","敲","整","文","斗","断","施","旅","晒","普","晾","暴","替","朝","杏","枣","柜","根","格","桶","梅","楼","武","汉","池","治","泉","浇","淘","渔","湿","灌","灵","烦","热","然","照","父","爽","特","状","猜","甘","甜","留","略","疑","疗","瘦","皱","盒","盘","盛","瞎","砖","破","砸","碎","票","秀","科","秒","租","称","移","稳","窝","笼","篮","精","系","累","组","绍","继","续","缸","网","罩","翅","联","肥","胖","胸","腊","膀","膏","艘","艺","英","茂","药","菇","蘑","虽","蚁","蚂","蚓","蚪","蚯","蛛","蜘","蝌","融","衡","表","被","议","论","访","词","诗","该","语","诵","谅","谜","赞","赢","躬","转","轿","输","返","逃","透","通","速","造","遇","遗","邮","酒","醉","醒","采","针","钱","铁","铜","链","锹","闷","闹","除","随","雄","雕","霞","露","鞠","项","顺","顽","顾","顿","领","餐","馆","首","驶","驾","鸽","鼓","鼠","齐"],
+["世","丝","严","临","举","习","乱","仓","仗","付","仙","估","信","修","值","偷","催","傲","充","克","免","兰","内","冒","农","冰","决","况","减","凳","创","剧","功","区","印","厕","厚","反","叭","吓","含","吹","吼","啄","善","喇","嗓","园","固","圾","坦","垃","埋","培","堂","堵","塞","增","壁","复","夫","央","夺","奏","套","娇","嫩","字","存","孤","宇","安","官","宙","定","实","客","宫","宽","寄","富","察","封","币","帝","幸","庄","库","度","延","弄","弦","必","忍","忘","忧","怒","怨","总","恐","恨","恳","情","惯","愁","愤","慕","所","扇","扑","扮","扶","批","承","抖","折","抢","拎","拒","拔","拼","指","挠","挥","换","捣","摆","摇","摸","撞","改","数","旧","映","晃","景","晶","杆","村","板","枕","柔","查","柱","栏","栽","梯","检","棍","棒","模","横","欺","款","止","死","殿","民","求","沉","油","波","洋","派","浪","浮","浴","涂","淋","淹","添","温","漆","漏","演","澡","灿","炸","烂","煌","爆","牢","独","狮","狼","献","琴","瓣","甩","由","界","番","痒","痛","百","皇","眠","睁","矿","砍","硬","碰","神","祸","禁","福","秤","秧","稻","穷","突","竖","笨","筋","筷","粉","糊","糖","紫","约","纺","练","织","绝","绳","缝","缩","羡","翁","考","耐","聋","肃","肚","肠","肩","肯","育","航","良","芝","苍","茄","莲","萄","葡","蒸","蔽","薄","蚜","蛇","蝇","补","衫","衬","袭","解","言","警","计","认","记","评","试","诚","调","谈","贡","败","货","贫","费","跨","躲","轮","软","轰","辉","迟","避","邀","郊","钢","银","锁","锅","镜","闯","闲","陪","隆","隐","隔","雁","零","雹","需","震","静","靠","鞭","音","须","预","颤","饮","骄","骗","骨","麻","龙","龟"]
+];
 /* ══════════ 通用小工具 ══════════ */
 function htmlEsc(x){ return String(x==null?"":x)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -5569,6 +5578,7 @@ function pgHanzi(){
   if(hzMode === "review"){ pgHanziReview(units); return; }
   if(hzMode === "quiz"){ renderHzQuizPage(); return; }
   if(hzMode === "write"){ pgHanziWrite(units); return; }
+  if(hzMode === "cards"){ pgHanziCards(); return; }
   if(hzUnit && units.indexOf(hzUnit) < 0) hzUnit = "";
   const gopt = [1,2,3,4,5,6].map(g=>`<option value="${g}" ${g===hzGrade?"selected":""}>${g}年级</option>`).join("");
   const uopt = `<option value="">全部单元</option>` +
@@ -5577,7 +5587,8 @@ function pgHanzi(){
    <div class="tabs"><button class="tab ${hzMode==="learn"?"on":""}" onclick="hzMode='learn';render()">📖 学习</button>
      <button class="tab ${hzMode==="write"?"on":""}" onclick="hzMode='write';render()">✏️ 写字</button>
      <button class="tab ${hzMode==="quiz"?"on":""}" onclick="startHzQuiz()">🧪 测试</button>
-     <button class="tab ${hzMode==="review"?"on":""}" onclick="hzMode='review';render()">🔄 复习${Object.keys(S.learnedHz).length?" ("+Object.keys(S.learnedHz).length+")":""}</button></div>
+     <button class="tab ${hzMode==="review"?"on":""}" onclick="hzMode='review';render()">🔄 复习${Object.keys(S.learnedHz).length?" ("+Object.keys(S.learnedHz).length+")":""}</button>
+     <button class="tab ${hzMode==="cards"?"on":""}" onclick="hzMode='cards';render()">🃏 认字卡</button></div>
    <div class="filterbar">
      <select onchange="hzGrade=+this.value;hzUnit='';render()">${gopt}</select>
      <select onchange="hzUnit=this.value;hzPaint()">${uopt}</select>
@@ -5830,6 +5841,77 @@ function pgHanziWrite(units){
     });
   }
 }
+
+/* ══════════ 认字卡片 (直映认字图卡) ══════════ */
+function pgHanziCards(){
+  var bookNames = ["","第一册","第二册","第三册","第四册","第五册","第六册"];
+  var chars = CARD_CHARS[hzCardsBook] || [];
+  var revCnt = Object.keys(S.learnedHz).length;
+  var modeTabs =
+    '<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab" onclick="hzMode=\'write\';render()">✏️ 写字</button>'
+    +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
+    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(revCnt?' ('+revCnt+')':'')+'</button>'
+    +'<button class="tab on">🃏 认字卡</button>';
+  var bookTabs = [1,2,3,4,5,6].map(function(b){
+    return '<button class="tab '+(hzCardsBook===b?'on':'')+'" onclick="hzCardsBook='+b+';pgHanziCards()">'+bookNames[b]+'</button>';
+  }).join('');
+  var grid = chars.map(function(ch){
+    var enc = encodeURIComponent(ch);
+    return '<button onclick="showHzCard(\''+enc+'\')" '
+      +'style="font-size:24px;min-width:56px;height:56px;border-radius:10px;border:1.5px solid var(--brand-light,#c8b0f0);'
+      +'background:var(--cream-1);cursor:pointer;font-weight:700;color:var(--ink)">'+ch+'</button>';
+  }).join('');
+  $('page').innerHTML =
+    '<div class="tabs">'+modeTabs+'</div>'
+    +'<div class="tabs" style="margin:8px 0 12px;flex-wrap:wrap">'+bookTabs+'</div>'
+    +'<div class="tiptext">👆 点字看象形图卡 · 图文结合认汉字 · 点图片自动发音</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0">'+grid+'</div>'
+    +'<div class="meta">'+bookNames[hzCardsBook]+' · 共 '+chars.length+' 字</div>';
+}
+
+function showHzCard(encodedCh){
+  var ch = decodeURIComponent(encodedCh);
+  var old = document.getElementById('hz-card-modal');
+  if(old) old.remove();
+  var url = 'https://amazetech2021-debug.github.io/rabbit-island/cards/'+hzCardsBook+'/'+encodedCh+'.jpg';
+  var modal = document.createElement('div');
+  modal.id = 'hz-card-modal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);z-index:9999;'
+    +'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box';
+  var img = document.createElement('img');
+  img.src = url;
+  img.style.cssText = 'max-width:min(90vw,520px);max-height:65vh;border-radius:14px;'
+    +'box-shadow:0 8px 40px #0009;object-fit:contain;cursor:pointer';
+  img.title = '点击听发音';
+  img.onclick = function(){ tts(ch); };
+  var errDiv = document.createElement('div');
+  errDiv.id = 'hzcard-err';
+  errDiv.style.cssText = 'display:none;color:#fff;font-size:18px;padding:30px;text-align:center;border-radius:12px;background:#fff2';
+  errDiv.textContent = '图片暂时无法加载，图片正在上传中请稍后再试';
+  img.onerror = function(){ this.style.display='none'; errDiv.style.display='block'; };
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:14px;margin-top:20px;align-items:center';
+  var speakBtn = document.createElement('button');
+  speakBtn.style.cssText = 'font-size:22px;padding:12px 32px;border-radius:28px;border:none;'
+    +'background:#fff;color:#333;font-weight:700;cursor:pointer';
+  speakBtn.textContent = '🔊 ' + ch;
+  speakBtn.onclick = function(){ tts(ch); };
+  var closeBtn = document.createElement('button');
+  closeBtn.style.cssText = 'font-size:22px;padding:12px 20px;border-radius:28px;border:none;'
+    +'background:rgba(255,255,255,.2);color:#fff;cursor:pointer';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = function(){ modal.remove(); };
+  btnRow.appendChild(speakBtn);
+  btnRow.appendChild(closeBtn);
+  modal.appendChild(img);
+  modal.appendChild(errDiv);
+  modal.appendChild(btnRow);
+  modal.addEventListener('click', function(e){ if(e.target===this) this.remove(); });
+  document.body.appendChild(modal);
+  tts(ch);
+}
+
 
 function hwLoadChar(ch){
   if(!ch || ch.trim()==='') return;
