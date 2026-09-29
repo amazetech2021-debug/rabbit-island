@@ -4791,7 +4791,7 @@ function showCheckinCalendar(){
 function completeGemLesson(num){
   if(!S.gemDone) S.gemDone = {};
   if(S.gemDone[num] === today()){
-    toast("今天已完成本课了 ✅");
+    toast("已完成过本课了 ✅");
     return;
   }
   S.gemDone[num] = today();
@@ -8430,10 +8430,10 @@ function pgGeminiLesson(num){
   }
 
   // 完成本课按钮
-  var gemDoneToday = S.gemDone && S.gemDone[num] === today();
+  var gemDoneToday = S.gemDone && S.gemDone[num];
   var completeBtn = '<div style="margin-top:14px;padding:0 4px">'
     + (gemDoneToday
-       ? '<div style="background:#d4edda;border-radius:14px;padding:12px;text-align:center;color:#27ae60;font-weight:700;font-size:15px">✅ 今天已完成本课！</div>'
+       ? '<div style="background:#d4edda;border-radius:14px;padding:12px;text-align:center;color:#27ae60;font-weight:700;font-size:15px">✅ 已完成本课（永久记录）</div>'
        : '<button onclick="completeGemLesson('+num+')" style="width:100%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:14px;padding:14px 0;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">✅ 完成本课（计入打卡）</button>')
     + '</div>';
 
