@@ -363,10 +363,6 @@ body{
 .rabbit-wrap .rbubble{margin-top:10px;background:var(--field,#e7f0da);border:2px solid var(--line,#cfe0bd);border-radius:12px;padding:8px 10px;font-size:14px;min-height:52px;position:relative}
 .rabbit-wrap .rbubble::before{content:"";position:absolute;top:-9px;left:24px;width:14px;height:14px;background:var(--field,#e7f0da);border-left:2px solid var(--line,#cfe0bd);border-top:2px solid var(--line,#cfe0bd);transform:rotate(45deg)}
 .rabbit-wrap .rhug{width:100%;margin-top:8px;padding:8px;border-radius:12px;cursor:pointer;border:2px dashed #f4a9c0;background:var(--paper);color:#c85c18;font-family:var(--font);font-size:14px}
-.rabbit-wrap .rshowcase{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:8px 10px;border-radius:12px;cursor:pointer;border:2px solid #f4a9c0;background:#fff5f8;font-family:var(--font);transition:all .15s}
-.rabbit-wrap .rshowcase .rsc-label{font-size:10px;color:#c85c18;background:#ffe4ec;padding:2px 8px;border-radius:8px;white-space:nowrap;font-weight:700}
-.rabbit-wrap .rshowcase img{width:40px;height:40px;border-radius:8px;object-fit:cover;flex:none}
-.rabbit-wrap .rshowcase .rsc-name{font-size:13px;font-weight:700;color:#c85c18;flex:1}
 .rabbit-wrap .rtgroup{margin-bottom:10px}
 .rabbit-wrap .rtgroup>p{margin:0 0 4px;font-size:11px;color:var(--ink-soft);letter-spacing:1px}
 .rabbit-wrap .rtask{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 10px;margin-bottom:5px;border-radius:11px;cursor:pointer;border:2px solid var(--line,#cfe0bd);background:var(--field,#e7f0da);font-family:var(--font);font-size:14px;color:var(--ink)}
@@ -5243,13 +5239,6 @@ function rabbitRender(){
       <video id="rvideo" playsinline preload="none"></video>
       <div class="rrest">${RABBIT_CFG.lines.resting}</div>
      </div>
-     ${showcaseItem ? `<button class="rshowcase" onclick="rabbitBuy(RABBIT_CFG.shop.find(x=>x.id==='${showcaseItem.id}'))">
-       <span class="rsc-label">🎀 当前展示</span>
-       <img src="${rabbitSrc(showcaseItem.file.replace('.mp4','.jpg'))}" alt="" onerror="this.style.display='none'">
-       <span class="rsc-name">${showcaseItem.name}</span>
-       <span style="font-size:12px;color:#999">▶ 再播一次</span>
-     </button>` : ''}
-
     </section>
     <section class="rpanel">
      ${_checkinProgressPanel()}
@@ -8236,168 +8225,6 @@ function learnEn(key){
 }
 
 
-/* ══════════ 英语PDF闪卡页面 ══════════ */
-function pgEnFlashCards(){
-  var cats = Object.keys(EN_FLASH_SETS);
-  if(!enFlashCat || !EN_FLASH_SETS[enFlashCat]) enFlashCat = cats[0];
-  var sets = EN_FLASH_SETS[enFlashCat];
-  var BASE = 'https://amazetech2021-debug.github.io/rabbit-island/';
-
-  var modeTabs =
-    '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
-    +'<button class="tab on">📚 英语卡</button>'
-    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
-    +'<button class="tab" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
-    +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>';
-
-  var catTabs = cats.map(function(c){
-    return '<button class="tab '+(enFlashCat===c?'on':'')+'" onclick="enFlashCat=\''+jsEsc(c)+'\';pgEnFlashCards()">'+htmlEsc(c)+'</button>';
-  }).join('');
-
-  var grid = sets.map(function(s,i){
-    var url = BASE + encodeURI(s.file);
-    return '<button onclick="showEnPdfCard(\''+jsEsc(url)+'\',\''+jsEsc(s.name)+'\')" '
-      +'style="min-width:64px;height:64px;border-radius:12px;border:2px solid var(--brand-light,#c8b0f0);'
-      +'background:var(--cream-1);cursor:pointer;font-size:16px;font-weight:700;color:var(--ink);padding:6px">'+htmlEsc(s.name)+'</button>';
-  }).join('');
-
-  $('page').innerHTML =
-    '<div class="tabs">'+modeTabs+'</div>'
-    +'<div class="tabs" style="margin:8px 0 12px;flex-wrap:wrap">'+catTabs+'</div>'
-    +'<div class="tiptext">👆 点击卡片集翻阅 · 左右箭头换页</div>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:10px;padding:4px 0">'+grid+'</div>'
-    +'<div class="meta">'+htmlEsc(enFlashCat)+' · '+sets.length+' 套卡片</div>';
-}
-
-/* PDF.js 懒加载 */
-var _pdfJsReady = false, _pdfJsLoading = false, _pdfJsQueue = [];
-function loadPdfJs(cb){
-  if(_pdfJsReady){ cb(); return; }
-  _pdfJsQueue.push(cb);
-  if(_pdfJsLoading) return;
-  _pdfJsLoading = true;
-  var s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-  s.onload = function(){
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    _pdfJsReady = true; _pdfJsLoading = false;
-    _pdfJsQueue.forEach(function(fn){ fn(); }); _pdfJsQueue = [];
-  };
-  document.head.appendChild(s);
-}
-
-/* 显示一套PDF闪卡（逐页翻） */
-function showEnPdfCard(pdfUrl, title){
-  var old = document.getElementById('en-pdf-modal');
-  if(old) old.remove();
-
-  var modal = document.createElement('div');
-  modal.id = 'en-pdf-modal';
-  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);z-index:9999;'
-    +'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;'
-    +'touch-action:none;-webkit-overflow-scrolling:touch';
-
-  /* Canvas for PDF page */
-  var canvas = document.createElement('canvas');
-  canvas.style.cssText = 'max-width:min(90vw,520px);max-height:62vh;border-radius:14px;'
-    +'box-shadow:0 8px 40px #0009;object-fit:contain;background:#fff;display:block';
-
-  /* Loading spinner text */
-  var loadingDiv = document.createElement('div');
-  loadingDiv.style.cssText = 'color:#fff;font-size:18px;padding:30px;text-align:center';
-  loadingDiv.textContent = '加载中…';
-
-  /* Page counter label */
-  var pageLabel = document.createElement('div');
-  pageLabel.style.cssText = 'color:#fff;font-size:15px;font-weight:700;margin:10px 0 4px;opacity:.85;text-align:center;min-height:22px';
-
-  /* Nav row: ‹ prev | label | next › */
-  var navRow = document.createElement('div');
-  navRow.style.cssText = 'display:flex;gap:12px;margin-top:10px;align-items:center';
-
-  function navBtn(txt){
-    var b = document.createElement('button');
-    b.style.cssText = 'font-size:32px;width:60px;height:60px;border-radius:50%;border:none;'
-      +'background:rgba(255,255,255,.18);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0';
-    b.textContent = txt; return b;
-  }
-  var prevBtn = navBtn('‹');
-  var nextBtn = navBtn('›');
-
-  /* Title + close row */
-  var titleRow = document.createElement('div');
-  titleRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:14px;width:100%;max-width:520px;justify-content:space-between';
-  var titleEl = document.createElement('div');
-  titleEl.style.cssText = 'color:#fff;font-size:18px;font-weight:700;flex:1';
-  titleEl.textContent = title;
-  var closeBtn = document.createElement('button');
-  closeBtn.style.cssText = 'font-size:15px;padding:8px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.18);color:#fff;cursor:pointer;font-weight:700;flex-shrink:0';
-  closeBtn.textContent = '✕ 关闭';
-  closeBtn.onclick = function(){ modal.remove(); };
-  titleRow.appendChild(titleEl);
-  titleRow.appendChild(closeBtn);
-
-  navRow.appendChild(prevBtn);
-  navRow.appendChild(pageLabel);
-  navRow.appendChild(nextBtn);
-
-  modal.appendChild(titleRow);
-  modal.appendChild(loadingDiv);
-  modal.appendChild(canvas);
-  modal.appendChild(navRow);
-  document.body.appendChild(modal);
-
-  /* PDF state */
-  var pdfDoc = null, curPage = 1, totalPages = 0, rendering = false;
-
-  function renderPage(n){
-    if(!pdfDoc || rendering) return;
-    rendering = true;
-    pdfDoc.getPage(n).then(function(page){
-      var vp0 = page.getViewport({scale:1});
-      /* scale to fit within canvas display max */
-      var maxW = Math.min(window.innerWidth * 0.9, 520);
-      var maxH = window.innerHeight * 0.62;
-      var scale = Math.min(maxW / vp0.width, maxH / vp0.height, 3);
-      var vp = page.getViewport({scale: scale});
-      canvas.width = vp.width; canvas.height = vp.height;
-      var ctx = canvas.getContext('2d');
-      page.render({canvasContext: ctx, viewport: vp}).promise.then(function(){
-        rendering = false;
-        pageLabel.textContent = n + ' / ' + totalPages;
-        prevBtn.style.opacity = (n > 1) ? '1' : '0.3';
-        nextBtn.style.opacity = (n < totalPages) ? '1' : '0.3';
-      });
-    });
-  }
-
-  prevBtn.onclick = function(){
-    if(curPage > 1){ curPage--; renderPage(curPage); }
-  };
-  nextBtn.onclick = function(){
-    if(curPage < totalPages){ curPage++; renderPage(curPage); }
-  };
-
-  /* Swipe support */
-  var _tx0 = 0;
-  modal.addEventListener('touchstart', function(e){ _tx0 = e.touches[0].clientX; }, {passive:true});
-  modal.addEventListener('touchend', function(e){
-    var dx = e.changedTouches[0].clientX - _tx0;
-    if(Math.abs(dx) > 50){ if(dx < 0) nextBtn.onclick(); else prevBtn.onclick(); }
-  }, {passive:true});
-
-  loadPdfJs(function(){
-    loadingDiv.style.display = 'none';
-    pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf){
-      pdfDoc = pdf; totalPages = pdf.numPages;
-      canvas.style.display = 'block';
-      renderPage(curPage);
-    }).catch(function(err){
-      loadingDiv.style.display = 'block';
-      loadingDiv.textContent = '加载失败，请检查网络 😢';
-    });
-  });
-}
 
 /* ══════════ Gemini课程 ══════════ */
 const GEMINI_INSTRUCTIONS = "You are Teacher Gem, a warm, patient and playful English teacher for a 5-year-old Chinese child who is a beginner. We are on a live video call and a parent sits nearby. Teach the lesson in this document, stage by stage. As soon as you have read it, start Stage 1 right away with a cheerful greeting. Do not summarize this document and do not read it aloud.\n[Name] is the child's name. The parent tells it to you when sending this document. If you do not know it, ask the child \"What's your name?\" at the start.\n1. Speak slowly and clearly in short sentences (3 to 7 words). Speak English. If the child looks lost or upset, say ONE short Chinese phrase to help, then go back to English.\n2. Ask only ONE question at a time, then wait patiently (up to 8 seconds). Never answer for the child.\n3. Praise every effort in a cheerful voice (\"Great job!\", \"Wow!\"). Never say \"wrong\". If the child makes a mistake, say the correct version warmly and invite the child to repeat it.\n4. Keep every turn to 1 or 2 short sentences before the child responds. No grammar explanations.\n5. Use the camera: ask the child to show objects, do actions, or hold up drawings. Say what you see and react to it.\n6. The child's pronunciation is not perfect and speech recognition may mishear. Be generous: guess the meaning from context and accept single words, then say the full sentence for the child to copy.\n7. Keep the energy high with movement, songs and games. If attention drops, switch to a movement game.\n8. Use the target words and sentences again and again in natural short sentences. Recycle the review words.\n9. Follow the stages in order. The parent says \"Next\" when it is time to move on: finish kindly and go to the next stage. If the parent says nothing, move on yourself after the child has done the activity 3 or 4 times. Other parent commands: \"Repeat\" (do the activity again), \"Slower\" (speak more slowly), \"Stop\" (say goodbye and end).\n10. In the script below, T = what you say (say it naturally, you may vary the wording, keep it short), S = how the child may answer, » = an action or camera cue. Never read the labels (T, S, ») or the stage names aloud.\n11. Safety: ask only for the child's first name and age. Never ask for an address, school, phone number or other personal information. Keep everything kind and age-appropriate.\n12. The last page (\"Parent page\", in Chinese) is for the parent only. Ignore it.";
