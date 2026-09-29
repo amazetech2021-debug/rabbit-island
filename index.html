@@ -5750,26 +5750,146 @@ var _hwChar = null;
 
 function pgHanziWrite(units){
   var learned = Object.keys(S.learnedHz || {});
-  var btns = '';
-  for(var i=0;i<learned.length;i++){
-    var k=learned[i], ch=k.includes('-')?k.split('-').pop():k;
-    var rec=S.learnedHz[k];
-    var cnt=rec&&rec.count?'<span style="font-size:9px;color:var(--ink-soft);font-weight:700">\xd7'+rec.count+'</span>':'';
-    btns+='<button data-hzch="'+ch+'" onclick="openHzWrite(this.getAttribute(\'data-hzch\'))" style="width:64px;height:64px;font-size:26px;border-radius:12px;border:2px solid var(--brand);background:var(--cream-2);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;font-family:inherit">'+ch+cnt+'</button>';
-  }
-  var charListHTML = btns
-    ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">'+btns+'</div>'
-    : '<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">还没有学习记录，先去 📖 学习几个汉字吧！</div>';
+  var learnedChars = learned.map(function(k){ return k.includes('-')?k.split('-').pop():k; });
+
+  // Learned chars quick-pick row
+  var quickBtns = learnedChars.length
+    ? learnedChars.map(function(ch){
+        return '<button data-hzch="'+ch+'" onclick="hwLoadChar(this.getAttribute(\'data-hzch\'))" '
+          +'style="width:48px;height:48px;font-size:22px;border-radius:8px;border:1.5px solid var(--brand-light,#c8b0f0);'
+          +'background:var(--cream-1);cursor:pointer;display:flex;align-items:center;justify-content:center">'+ch+'</button>';
+      }).join('')
+    : '<span style="color:var(--ink-soft);font-size:13px">先去📖学习几个字，这里会出现快捷按钮</span>';
+
   $('page').innerHTML =
-    '<div class="tabs">'
-    +'<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
-    +'<button class="tab on">✏️ 写字</button>'
-    +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
-    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedHz).length?' ('+Object.keys(S.learnedHz).length+')':'')+'</button>'
+    // Tabs
+    '<div class="tabs" style="margin-bottom:14px">'
+      +'<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+      +'<button class="tab on">✏️ 写字</button>'
+      +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
+      +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习</button>'
     +'</div>'
-    +'<div style="margin:10px 0 6px;font-size:13px;color:var(--ink-soft);font-weight:700">👆 点击汉字，观看笔顺动画 / 开始描写练习 ✍️</div>'
-    +charListHTML;
+
+    // Input row (like hanziwriter demo)
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'
+      +'<span style="font-size:14px;font-weight:700;color:var(--ink)">输入汉字：</span>'
+      +'<input id="hz-input" type="text" maxlength="1" placeholder="字" '
+        +'style="width:56px;height:48px;font-size:28px;text-align:center;border:2px solid #bbb;border-radius:8px;'
+        +'font-family:inherit;background:var(--cream-1);color:var(--ink)" '
+        +'oninput="if(this.value) hwLoadChar(this.value.trim().slice(-1))">'
+      +'<button onclick="var v=document.getElementById(\'hz-input\').value.trim();if(v)hwLoadChar(v.slice(-1))" '
+        +'style="height:48px;padding:0 20px;font-size:15px;font-weight:700;background:#3b82f6;color:#fff;'
+        +'border:none;border-radius:8px;cursor:pointer">开始练习</button>'
+    +'</div>'
+
+    // Canvas + controls (matching demo layout)
+    +'<div style="display:flex;flex-direction:column;align-items:center">'
+      +'<div id="hz-demo-box" style="position:relative;width:300px;height:300px;border:1px solid #ccc;'
+        +'background:#fff;border-radius:4px;overflow:hidden;flex-shrink:0">'
+        +'<div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#e8e0f8;pointer-events:none"></div>'
+        +'<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#e8e0f8;pointer-events:none"></div>'
+        +'<div id="hw-canvas"></div>'
+        +'<div id="hw-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;'
+          +'font-size:14px;color:#aaa;pointer-events:none">← 输入一个汉字开始</div>'
+      +'</div>'
+      +'<div style="width:300px;border:1px solid #ddd;border-top:none;padding:12px 16px;background:#fafafa;'
+        +'box-sizing:border-box;border-radius:0 0 4px 4px;display:flex;align-items:center;justify-content:space-between">'
+        +'<label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">'
+          +'<input type="checkbox" id="hz-outline-cb" checked onchange="hwToggleOutline(this.checked)" '
+            +'style="width:16px;height:16px"> 显示轮廓'
+        +'</label>'
+        +'<button onclick="hwAnimate()" style="background:#3b82f6;color:#fff;border:none;padding:10px 20px;'
+          +'border-radius:6px;font-size:15px;font-weight:700;cursor:pointer">▶ 笔顺演示</button>'
+      +'</div>'
+      +'<div style="width:300px;margin-top:8px;display:flex;gap:8px">'
+        +'<button class="big o" onclick="hwQuiz()" style="flex:1;padding:11px 0;font-size:14px;border-radius:8px">✏️ 描写练习</button>'
+        +'<button onclick="hwAnimate()" style="flex:1;padding:11px 0;font-size:14px;border-radius:8px;'
+          +'background:var(--cream-2);border:1.5px solid var(--brand-light,#c8b0f0);cursor:pointer;font-weight:600">🔁 重播</button>'
+      +'</div>'
+      +'<div id="hw-status" style="width:300px;margin-top:8px;font-size:13px;color:#888;min-height:18px;text-align:center"></div>'
+    +'</div>'
+
+    // Learned chars quick-pick
+    +(learnedChars.length
+      ? '<div style="margin-top:20px"><div style="font-size:13px;color:var(--ink-soft);margin-bottom:8px">📚 已学汉字（点击练习）</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:8px">'+quickBtns+'</div></div>'
+      : '<div style="margin-top:16px">'+quickBtns+'</div>');
 }
+
+function hwLoadChar(ch){
+  if(!ch || ch.trim()==='') return;
+  ch = ch.trim();
+  _hwChar = ch;
+  // Update input field
+  var inp = document.getElementById('hz-input');
+  if(inp) inp.value = ch;
+  // Clear old writer
+  if(_hwWriter){ try{_hwWriter.cancelQuiz();}catch(e){} _hwWriter=null; }
+  // Clear canvas
+  var canvas = document.getElementById('hw-canvas');
+  if(canvas) canvas.innerHTML='';
+  // Show loading
+  var ld = document.getElementById('hw-loading');
+  if(ld){ ld.style.display='flex'; ld.style.color='#aaa'; ld.textContent='加载"'+ch+'"的笔顺数据…'; }
+  var st = document.getElementById('hw-status');
+  if(st) st.textContent='';
+
+  if(typeof HanziWriter==='undefined'){
+    if(ld){ ld.style.color='#e5443c'; ld.textContent='写字库未加载，请刷新页面'; }
+    return;
+  }
+  try{
+    _hwWriter = HanziWriter.create('hw-canvas', ch, {
+      width:300, height:300, padding:16,
+      showOutline:true,
+      strokeColor:'#555',
+      outlineColor:'#ddd',
+      drawingColor:'#333',
+      drawingWidth:10,
+      strokeAnimationSpeed:1,
+      delayBetweenStrokes:400,
+      charDataLoader:function(char,onLoad,onError){
+        var urls=[
+          'https://registry.npmmirror.com/hanzi-writer-data/2.0.0/files/'+encodeURIComponent(char)+'.json',
+          'https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/'+encodeURIComponent(char)+'.json'
+        ];
+        var i=0;
+        function tryNext(){
+          if(i>=urls.length){onError();return;}
+          var xhr=new XMLHttpRequest();
+          xhr.open('GET',urls[i++],true);
+          xhr.onload=function(){
+            if(xhr.status===200){try{onLoad(JSON.parse(xhr.responseText));}catch(e){tryNext();}}
+            else{tryNext();}
+          };
+          xhr.onerror=tryNext;
+          xhr.send();
+        }
+        tryNext();
+      },
+      onLoadCharDataSuccess:function(){
+        var ld2=document.getElementById('hw-loading');
+        if(ld2) ld2.style.display='none';
+        var cb=document.getElementById('hz-outline-cb');
+        if(cb) cb.checked=true;
+        var st2=document.getElementById('hw-status');
+        if(st2) st2.textContent='点"笔顺演示"看写法，或"描写练习"来临摹 ✍️';
+      },
+      onLoadCharDataError:function(){
+        var ld2=document.getElementById('hw-loading');
+        if(ld2){ld2.style.display='flex';ld2.style.color='#e5443c';ld2.textContent='暂无"'+ch+'"的笔顺数据，换一个字试试';}
+      }
+    });
+  }catch(e){
+    if(ld){ld.style.display='flex';ld.style.color='#e5443c';ld.textContent='加载失败：'+e.message;}
+  }
+}
+
+function hwToggleOutline(on){
+  if(!_hwWriter) return;
+  if(on){_hwWriter.showOutline();}else{_hwWriter.hideOutline();}
+}
+
 
 function openHzWrite(ch){
   _hwChar = ch;
