@@ -5742,122 +5742,118 @@ var _hwChar = null;
 
 function pgHanziWrite(units){
   var learned = Object.keys(S.learnedHz || {});
-  var charListHTML = '';
-  if(learned.length === 0){
-    charListHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">还没有学习记录，先去 📖 学习几个汉字吧！</div>';
-  } else {
-    charListHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">'
-      + learned.map(function(k){
-          var ch = k.includes('-') ? k.split('-').pop() : k;
-          var rec = S.learnedHz[k];
-          return '<button onclick="openHzWrite(\''+jsEsc(ch)+'\')"\'
-            + ' style="width:64px;height:64px;font-size:26px;border-radius:12px;border:2px solid var(--brand);background:var(--cream-2);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;font-family:inherit">'
-            + ch
-            + (rec && rec.count ? '<span style="font-size:9px;color:var(--ink-soft);font-weight:700">×'+rec.count+'</span>' : '')
-            + '</button>';
-        }).join('')
-      + '</div>';
+  var btns = '';
+  for(var i=0;i<learned.length;i++){
+    var k=learned[i], ch=k.includes('-')?k.split('-').pop():k;
+    var rec=S.learnedHz[k];
+    var cnt=rec&&rec.count?'<span style="font-size:9px;color:var(--ink-soft);font-weight:700">\xd7'+rec.count+'</span>':'';
+    btns+='<button data-hzch="'+ch+'" onclick="openHzWrite(this.getAttribute(\'data-hzch\'))" style="width:64px;height:64px;font-size:26px;border-radius:12px;border:2px solid var(--brand);background:var(--cream-2);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;font-family:inherit">'+ch+cnt+'</button>';
   }
-  $("page").innerHTML =
+  var charListHTML = btns
+    ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">'+btns+'</div>'
+    : '<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">还没有学习记录，先去 📖 学习几个汉字吧！</div>';
+  $('page').innerHTML =
     '<div class="tabs">'
-    + '<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
-    + '<button class="tab on">✏️ 写字</button>'
-    + '<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
-    + '<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedHz).length?' ('+Object.keys(S.learnedHz).length+')':'')+'</button>'
-    + '</div>'
-    + '<div style="margin:10px 0 6px;font-size:13px;color:var(--ink-soft);font-weight:700">👆 点击汉字，观看笔顺动画 / 开始描写练习 ✍️</div>'
-    + charListHTML;
+    +'<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab on">✏️ 写字</button>'
+    +'<button class="tab" onclick="startHzQuiz()">🧪 测试</button>'
+    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedHz).length?' ('+Object.keys(S.learnedHz).length+')':'')+'</button>'
+    +'</div>'
+    +'<div style="margin:10px 0 6px;font-size:13px;color:var(--ink-soft);font-weight:700">👆 点击汉字，观看笔顺动画 / 开始描写练习 ✍️</div>'
+    +charListHTML;
 }
 
 function openHzWrite(ch){
   _hwChar = ch;
   var extra = findHzExtra(ch);
   modal('<div style="text-align:center;padding:4px 0">'
-    + '<div style="font-size:16px;font-weight:800;color:var(--brand);margin-bottom:2px">'+htmlEsc(ch)+' · '+htmlEsc(extra.py||'')+'</div>'
-    + '<div style="font-size:20px;margin-bottom:8px">'+htmlEsc(extra.emoji||'📝')+'</div>'
-    + '<div id="hw-canvas" style="margin:0 auto 10px"></div>'
-    + '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
-    + '<button class="big p" onclick="hwAnimate()" style="padding:10px 18px;font-size:14px">▶ 笔顺演示</button>'
-    + '<button class="big o" onclick="hwQuiz()" style="padding:10px 18px;font-size:14px">✏️ 描写练习</button>'
-    + '<button class="big" onclick="closeModal()" style="padding:10px 18px;font-size:14px;background:var(--cream-2)">关闭</button>'
-    + '</div>'
-    + '<div id="hw-status" style="margin-top:10px;font-size:13px;color:var(--ink-soft);min-height:22px;line-height:1.4"></div>'
-    + '</div>'
+    +'<div style="font-size:16px;font-weight:800;color:var(--brand);margin-bottom:2px">'+htmlEsc(ch)+' &middot; '+htmlEsc(extra.py||'')+'</div>'
+    +'<div style="font-size:20px;margin-bottom:8px">'+htmlEsc(extra.emoji||'📝')+'</div>'
+    +'<div id="hw-canvas" style="margin:0 auto 10px"></div>'
+    +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+    +'<button class="big p" onclick="hwAnimate()" style="padding:10px 18px;font-size:14px">▶ 笔顺演示</button>'
+    +'<button class="big o" onclick="hwQuiz()" style="padding:10px 18px;font-size:14px">✏️ 描写练习</button>'
+    +'<button class="big" onclick="closeModal()" style="padding:10px 18px;font-size:14px;background:var(--cream-2)">关闭</button>'
+    +'</div>'
+    +'<div id="hw-status" style="margin-top:10px;font-size:13px;color:var(--ink-soft);min-height:22px;line-height:1.4"></div>'
+    +'</div>'
   );
   setTimeout(function(){
-    var el = document.getElementById('hw-canvas');
+    var el=document.getElementById('hw-canvas');
     if(!el) return;
-    if(typeof HanziWriter === 'undefined'){
-      el.innerHTML = '<div style="padding:16px;color:#e5443c;font-size:13px">写字库未加载，请检查网络后刷新</div>';
+    if(typeof HanziWriter==='undefined'){
+      el.innerHTML='<div style="padding:16px;color:#e5443c;font-size:13px">写字库未加载，请检查网络后刷新</div>';
       return;
     }
     try{
-      _hwWriter = HanziWriter.create('hw-canvas', ch, {
-        width: 220, height: 220, padding: 12,
-        showOutline: true,
-        strokeColor: '#7060C0',
-        outlineColor: '#D0C8F0',
-        drawingColor: '#2C2448',
-        drawingWidth: 8,
-        strokeAnimationSpeed: 1,
-        delayBetweenStrokes: 400,
-        onLoadCharDataSuccess: function(){
-          var st = document.getElementById('hw-status');
-          if(st) st.textContent = '点"笔顺演示"看写法，或点"描写练习"来临摹 ✍️';
+      _hwWriter=HanziWriter.create('hw-canvas',ch,{
+        width:220,height:220,padding:12,
+        showOutline:true,
+        strokeColor:'#7060C0',
+        outlineColor:'#D0C8F0',
+        drawingColor:'#2C2448',
+        drawingWidth:8,
+        strokeAnimationSpeed:1,
+        delayBetweenStrokes:400,
+        onLoadCharDataSuccess:function(){
+          var st=document.getElementById('hw-status');
+          if(st) st.textContent='点"笔顺演示"看写法，或点"描写练习"来临摹 ✍️';
         },
-        onLoadCharDataError: function(){
-          var c = document.getElementById('hw-canvas');
-          if(c) c.innerHTML = '<div style="padding:16px;color:#e5443c;font-size:13px">该汉字暂无笔顺数据</div>';
+        onLoadCharDataError:function(){
+          var c=document.getElementById('hw-canvas');
+          if(c) c.innerHTML='<div style="padding:16px;color:#e5443c;font-size:13px">该汉字暂无笔顺数据</div>';
         }
       });
-    } catch(e){
-      el.innerHTML = '<div style="padding:16px;color:#e5443c;font-size:13px">写字功能初始化失败</div>';
+    }catch(e){
+      el.innerHTML='<div style="padding:16px;color:#e5443c;font-size:13px">写字功能初始化失败</div>';
     }
-  }, 150);
+  },150);
 }
 
 function hwAnimate(){
   if(!_hwWriter) return;
-  var st = document.getElementById('hw-status');
-  if(st) st.textContent = '正在演示笔顺…';
+  var st=document.getElementById('hw-status');
+  if(st) st.textContent='正在演示笔顺…';
   _hwWriter.animateCharacter({
-    onComplete: function(){
-      var s = document.getElementById('hw-status');
-      if(s) s.textContent = '🎉 演示完毕！点"描写练习"来临摹';
+    onComplete:function(){
+      var s=document.getElementById('hw-status');
+      if(s) s.textContent='🎉 演示完毕！点"描写练习"来临摹';
     }
   });
 }
 
 function hwQuiz(){
   if(!_hwWriter) return;
-  var st = document.getElementById('hw-status');
-  if(st) st.textContent = '✏️ 请按笔顺一笔一笔描写…';
+  var st=document.getElementById('hw-status');
+  if(st) st.textContent='✏️ 请按笔顺一笔一笔描写…';
   _hwWriter.quiz({
-    leniency: 1.2,
-    onMistake: function(sd){
-      var s = document.getElementById('hw-status');
-      if(s) s.textContent = '❌ 第'+(sd.strokeNum+1)+'笔有些偏，再试试！';
+    leniency:1.2,
+    onMistake:function(sd){
+      var s=document.getElementById('hw-status');
+      if(s) s.textContent='❌ 第'+(sd.strokeNum+1)+'笔有些偏，再试试！';
     },
-    onCorrectStroke: function(sd){
-      var rem = sd.totalStrokeCount - sd.strokeNum - 1;
-      var s = document.getElementById('hw-status');
-      if(s) s.textContent = '✅ 写对了！还剩 '+rem+' 笔';
+    onCorrectStroke:function(sd){
+      var rem=sd.totalStrokeCount-sd.strokeNum-1;
+      var s=document.getElementById('hw-status');
+      if(s) s.textContent='✅ 写对了！还剩 '+rem+' 笔';
     },
-    onComplete: function(summary){
-      var s = document.getElementById('hw-status');
-      if(s) s.innerHTML = '🎉 完成！错误 '+summary.totalMistakes+' 次 <button class="tab" onclick="hwQuiz()" style="margin-left:6px;font-size:12px">再写一次</button>';
+    onComplete:function(summary){
+      var s=document.getElementById('hw-status');
+      if(s) s.innerHTML='🎉 完成！错误 '+summary.totalMistakes+' 次 <button class="tab" onclick="hwQuiz()" style="margin-left:6px;font-size:12px">再写一次</button>';
       if(_hwChar){
         for(var g2=1;g2<=6;g2++){
-          var gd2 = HANZI_GRADED[g2]||{};
-          var found2 = false;
+          var gd2=HANZI_GRADED[g2]||{};
+          var done2=false;
           for(var u2 in gd2){
-            if((gd2[u2]||[]).find(function(e){ return e[0]===_hwChar; })){
-              var k2 = g2+'-'+u2+'-'+_hwChar;
-              if(S.learnedHz[k2]){ S.learnedHz[k2].count++; save(); }
-              found2 = true; break;
+            var arr2=gd2[u2]||[];
+            var ch2=_hwChar;
+            if(arr2.find(function(e){return e[0]===ch2;})){
+              var k2=g2+'-'+u2+'-'+ch2;
+              if(S.learnedHz[k2]){S.learnedHz[k2].count++;save();}
+              done2=true;break;
             }
           }
-          if(found2) break;
+          if(done2) break;
         }
       }
     }
