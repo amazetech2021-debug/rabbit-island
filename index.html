@@ -7253,6 +7253,7 @@ function findHzExtra(ch){
 function pgHanziReview(units){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${hzMode==='learn'?'on':''}" onclick="hzMode='learn';render()">📖 学习</button>
+     <button class="tab ${hzMode==='cards'?'on':''}" onclick="hzMode='cards';render()">🃏 认字卡</button>
      <button class="tab ${hzMode==='write'?'on':''}" onclick="hzMode='write';render()">✏️ 写字</button>
      <button class="tab ${hzMode==='quiz'?'on':''}" onclick="startHzQuiz()">🧪 测试</button>
      <button class="tab ${hzMode==='review'?'on':''}" onclick="hzMode='review';render()">🔄 复习${Object.keys(S.learnedHz).length?' ('+Object.keys(S.learnedHz).length+')':''}</button></div>
@@ -7366,6 +7367,16 @@ function pgHanziWrite(units){
       if(!_composing && this.value) hwLoadChar(this.value.trim().slice(-1));
     });
   }
+}
+
+function _hzQuizTabs(){
+  return '<div class="tabs">'
+    +'<button class="tab" onclick="hzMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab" onclick="hzMode=\'cards\';render()">🃏 认字卡</button>'
+    +'<button class="tab" onclick="hzMode=\'write\';render()">✏️ 写字</button>'
+    +'<button class="tab on">🧪 测试</button>'
+    +'<button class="tab" onclick="hzMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedHz).length?' ('+Object.keys(S.learnedHz).length+')':'')+'</button>'
+    +'</div>';
 }
 
 function startHzQuiz(){
