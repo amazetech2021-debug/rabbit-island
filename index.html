@@ -308,8 +308,8 @@ body{
 #modal{position:fixed;inset:0;background:rgba(30,20,12,.55);display:none;align-items:center;
   justify-content:center;z-index:100;padding:12px}
 #modal.show{display:flex}
-.mbox{position:relative;background:var(--paper);border-radius:26px;padding:16px 18px;max-width:560px;width:100%;text-align:center;
-  box-shadow:0 16px 40px rgba(0,0,0,.3);max-height:calc(100vh - 48px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.mbox{position:relative;background:var(--paper);border-radius:26px;padding:10px 16px 14px;max-width:560px;width:100%;text-align:center;
+  box-shadow:0 16px 40px rgba(0,0,0,.3);max-height:calc(100vh - 24px);overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .mbox-x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;
   background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;border:none;cursor:pointer;z-index:5;
   display:flex;align-items:center;justify-content:center}
@@ -10065,7 +10065,7 @@ function showEnImgCard(setIdx, wordIdx){
   modal(
     '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 4px;width:100%">'
     +'<div style="font-size:13px;color:#888;font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</div>'
-    +'<img src="'+imgSrc+'" style="width:100%;height:auto;object-fit:contain;border-radius:12px;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
+    +'<img src="'+imgSrc+'" style="width:100%;max-height:45vh;object-fit:contain;border-radius:12px;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
     +'<div '+enClickAttr+' style="font-size:32px;font-weight:800;color:#1565C0;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(display)+'</div>'
     +(zh?'<div '+zhClickAttr+' style="font-size:22px;color:#E5443C;font-weight:700;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(zh)+'</div>':'')
     +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
