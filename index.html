@@ -9922,7 +9922,7 @@ function enImgSrc(folder, word){
   return 'English Flashcards/单词卡截图/' + folder + '/' + word + '.png';
 }
 
-var _eiSet = 0, _eiIdx = 0;
+var _eiSet = 0, _eiIdx = 0, _eiPfx = null;
 
 function pgEnFlashCards(){
   var modeTabs =
@@ -9958,8 +9958,9 @@ function pgEnFlashCards(){
     +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'+catGrid+'</div></div>';
 }
 
-function showEnCatWords(setIdx){
+function showEnCatWords(setIdx, filterPrefix){
   _enCatScrollTop = $("page").scrollTop;
+  _eiPfx = filterPrefix || null;
   var s = EN_IMG_SETS[setIdx];
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
@@ -9970,7 +9971,48 @@ function showEnCatWords(setIdx){
 
   var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
 
-  var wordGrid = s.words.map(function(w, wi){
+  // Sub-category grouping: detect sets where words use subfolder prefixes
+  var allHavePfx = s.words.length > 0 && s.words.every(function(w){ return w.indexOf('/') >= 0; });
+  if (allHavePfx && !filterPrefix) {
+    var pfxMap = {};
+    s.words.forEach(function(w){
+      var p = w.split('/')[0];
+      if (!pfxMap[p]) pfxMap[p] = 0;
+      pfxMap[p]++;
+    });
+    var pfxList = Object.keys(pfxMap).sort();
+    if (pfxList.length > 2) {
+      var pfxGrid = pfxList.map(function(p){
+        var label = p.replace(/-flashcards\(C\)/g,'').replace(/-verbs$/,'');
+        var cnt = pfxMap[p];
+        var known = s.words.filter(function(w){ return w.split('/')[0]===p && S.knownEn && S.knownEn[w]; }).length;
+        return '<button onclick="showEnCatWords('+setIdx+',\''+p+'\')" '
+          +'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:16px;'
+          +'border:2px solid var(--border);background:var(--cream-1);cursor:pointer;font-weight:800">'
+          +'<span style="font-size:26px;font-weight:900;color:#5C6BC0">'+label+'</span>'
+          +'<span style="font-size:11px;color:var(--ink-soft)">'+known+'/'+cnt+'</span>'
+          +'</button>';
+      }).join('');
+      $('page').innerHTML =
+        '<div class="tabs">'+modeTabs+'</div>'
+        +'<div style="padding:12px 0;max-width:960px;margin:0 auto">'
+        +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+        +'<button onclick="enMode=\'cards\';pgEnFlashCards();setTimeout(function(){$(\'page\').scrollTop=_enCatScrollTop},20)" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>'
+        +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
+        +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
+        +'</div>'
+        +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+pfxGrid+'</div>'
+        +'</div>';
+      return;
+    }
+  }
+  // Filter words by prefix if specified; keep original index for card nav
+  var wordsToShow = filterPrefix
+    ? s.words.map(function(w,i){ return {w:w,i:i}; }).filter(function(x){ return x.w.split('/')[0]===filterPrefix; })
+    : s.words.map(function(w,i){ return {w:w,i:i}; });
+  var wordGrid = wordsToShow.map(function(item){
+    var w = item.w; var wi = item.i;
+
     var isKnown = !!(S.knownEn && S.knownEn[w]);
     var baseName = w.split('/').pop();
     var zh = EN_IMG_ZH[w] || EN_IMG_ZH[baseName] || '';
@@ -9993,7 +10035,9 @@ function showEnCatWords(setIdx){
     '<div class="tabs">'+modeTabs+'</div>'
     +'<div style="padding:12px 0;max-width:960px;margin:0 auto">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
-    +'<button onclick="enMode=\'cards\';pgEnFlashCards();setTimeout(function(){$(\'page\').scrollTop=_enCatScrollTop},20)" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>'
+    +(filterPrefix
+      ? '<button onclick="showEnCatWords('+setIdx+')" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 返回</button>'
+      : '<button onclick="enMode=\'cards\';pgEnFlashCards();setTimeout(function(){$(\'page\').scrollTop=_enCatScrollTop},20)" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>')
     +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
     +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
     +'</div>'
@@ -10031,7 +10075,7 @@ function showEnImgCard(setIdx, wordIdx){
     +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'+1)%'+total+')" style="flex:1;padding:11px 6px;border-radius:22px;border:2px solid #e0d9f2;background:#f5f2ff;color:#333;cursor:pointer;font-size:14px;font-weight:700">下一个</button>'
     +'</div>'
     +'<div style="display:flex;gap:8px;width:100%">'
-    +'<button onclick="closeModal();showEnCatWords(_eiSet)" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px;font-weight:700">← 词列表</button>'
+    +'<button onclick="closeModal();showEnCatWords(_eiSet,_eiPfx)" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px;font-weight:700">← 词列表</button>'
     +'<button onclick="closeModal()" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px">✕ 关闭</button>'
     +'</div>'
     +'</div>'
