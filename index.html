@@ -10160,7 +10160,6 @@ function pgEnglishStickers(){
 function pgEnglish(){
   if(enMode === "review"){ pgEnglishReview(); return; }
   if(enMode === "quiz"){ renderEnQuizPage(); return; }
-  if(enMode === "stickers"){ pgEnglishStickers(); return; }
   if(enMode === "cards"){ pgEnFlashCards(); return; }
   if(enMode === "gemini"){ pgGemini(); return; }
   const isPh = (enSub==="phrases"), isAbc = (enSub==="alphabet");
@@ -10176,7 +10175,6 @@ function pgEnglish(){
      <button class="tab ${enMode==="cards"?"on":""}" onclick="enMode='cards';render()">📚 英语卡</button>
      <button class="tab ${enMode==="gemini"?"on":""}" onclick="enMode='gemini';_gemLesson=null;render()">🎙 口语课</button>
      <button class="tab ${enMode==="quiz"?"on":""}" onclick="startEnQuiz()">🧪 测试</button>
-     <button class="tab ${enMode==="stickers"?"on":""}" onclick="enMode='stickers';render()">📷 贴纸</button>
      <button class="tab ${enMode==="review"?"on":""}" onclick="enMode='review';render()">🔄 复习${Object.keys(S.learnedEn).length?" ("+Object.keys(S.learnedEn).length+")":""}</button></div>
    <div class="tabs"><button class="tab ${!isPh&&!isAbc?"on":""}" onclick="enSwitch('words')">🔤 单词</button>
      <button class="tab ${isPh?"on":""}" onclick="enSwitch('phrases')">💬 短语</button>
