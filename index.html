@@ -9936,8 +9936,8 @@ function pgEnFlashCards(){
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
-    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn).length?' ('+Object.keys(S.learnedEn).length+')':'')+'</button>';
 
   var catGrid = EN_IMG_SETS.map(function(s,i){
@@ -9973,8 +9973,8 @@ function showEnCatWords(setIdx, filterPrefix){
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
-    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>';
 
   var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
@@ -14019,7 +14019,7 @@ var TEXTBOOK_DATA = {
             {type:'mc', q:'我们的国家叫什么名字？', opts:['中国','日本','美国','英国'], ans:0},
             {type:'mc', q:'"我是中国人"中的"中"字，共有多少笔画？', opts:['3画','4画','5画','6画'], ans:1},
             {type:'fill', q:'我是___国人。', ans:'中'},
-            {type:'match', q:'连一连', pairs:[['中','guó'],['国','zhōng'],['人','rén']]},
+            {type:'match', q:'连一连', pairs:[['中','zhōng'],['国','guó'],['人','rén']]},
           ]
          },
          {id:'yw-l02',pdfPage:8, name:'我爱我们的祖国', content:'认识五星红旗是中国国旗，北京是首都，天安门广场升旗非常壮观。',
@@ -14936,7 +14936,7 @@ function _tbUnitView(){
     html += '</div></div>';
     // Arrow / completion badge
     var _lDone = S.tbDone && S.tbDone[lesson.id];
-    html += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-right:14px;gap:4px">';
+    html += '<div style="display:flex;flex-direction:row;align-items:center;justify-content:center;padding-right:14px;gap:6px">';
     if(_lDone) html += '<span style="background:#4caf50;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700">✅ 完成</span>';
     html += '<span style="color:#bbb;font-size:22px;font-weight:300">›</span></div>';
     html += '</div></button>';
@@ -15090,21 +15090,46 @@ function _tbRenderExercise(ex, idx, lessonId){
 function _tbRenderMatch(ex, key){
   var pairs = ex.pairs;
   if(!pairs || !pairs.length) return '';
-  var sel = _tbExAnswers[key+'_matchSel'] || null; // selected left item
+  // Stable shuffle for right column (generated once per exercise key)
+  var rightOrder = _tbExAnswers[key+'_rightOrder'];
+  if(!rightOrder){
+    rightOrder = pairs.map(function(_,i){return i;});
+    var seed = 0;
+    for(var ci=0;ci<key.length;ci++) seed = (seed*31 + key.charCodeAt(ci)) & 0xfffffff;
+    for(var si=rightOrder.length-1;si>0;si--){
+      seed = ((seed * 1664525 + 1013904223) & 0x7fffffff);
+      var sj = Math.abs(seed) % (si+1);
+      var stmp = rightOrder[si]; rightOrder[si]=rightOrder[sj]; rightOrder[sj]=stmp;
+    }
+    _tbExAnswers[key+'_rightOrder'] = rightOrder;
+  }
+  var sel = _tbExAnswers[key+'_matchSel'];
   var matched = _tbExAnswers[key+'_matched'] || {};
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-  // Left column
+  var COLORS = ['#e53935','#1e88e5','#43a047','#f57c00','#7b1fa2','#00897b'];
+  var LIGHT  = ['#ffebee','#e3f2fd','#e8f5e9','#fff3e0','#f3e5f5','#e0f2f1'];
+  function leftIdxForRight(origIdx){
+    var found = null;
+    Object.keys(matched).forEach(function(k){ if(matched[k]===origIdx) found=parseInt(k); });
+    return found;
+  }
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   html += '<div>';
   pairs.forEach(function(p,i){
-    var isMatch = Object.keys(matched).indexOf(String(i))>=0;
-    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchLeft(\''+key+'\','+i+')" data-t="'+p[0].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(sel==i?'#c8e6ff':(isMatch?'#e8f5e9':'var(--bg)'))+';border:1.5px solid '+(sel==i?'var(--brand)':'var(--border)')+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[0]+'</button>';
+    var isMatched = matched[i] !== undefined;
+    var isSelected = (sel === i);
+    var bg = isSelected ? '#c8e6ff' : (isMatched ? LIGHT[i%LIGHT.length] : 'var(--bg)');
+    var border = isSelected ? '2px solid var(--brand)' : (isMatched ? '2px solid '+COLORS[i%COLORS.length] : '1.5px solid var(--border)');
+    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchLeft(\''+key+'\','+i+')" data-t="'+p[0].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+bg+';border:'+border+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[0]+'</button>';
   });
   html += '</div>';
-  // Right column
   html += '<div>';
-  pairs.forEach(function(p,i){
-    var isMatched = Object.values(matched).indexOf(i)>=0;
-    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchRight(\''+key+'\','+i+')" data-t="'+p[1].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+(isMatched?'#e8f5e9':'var(--bg)')+';border:1.5px solid var(--border);border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+p[1]+'</button>';
+  rightOrder.forEach(function(origIdx){
+    var rp = pairs[origIdx];
+    var li = leftIdxForRight(origIdx);
+    var isMatched = li !== null;
+    var bg = isMatched ? LIGHT[li%LIGHT.length] : 'var(--bg)';
+    var border = isMatched ? '2px solid '+COLORS[li%COLORS.length] : '1.5px solid var(--border)';
+    html += '<button onclick="speak(this.dataset.t,\'zh-CN\');_tbMatchRight(\''+key+'\','+origIdx+')" data-t="'+rp[1].replace(/"/g,'&quot;')+'" style="display:block;width:100%;background:'+bg+';border:'+border+';border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:15px;color:var(--tx);font-weight:600">'+rp[1]+'</button>';
   });
   html += '</div>';
   html += '</div>';
