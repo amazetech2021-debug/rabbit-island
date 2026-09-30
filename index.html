@@ -306,9 +306,9 @@ body{
   font-weight:800;pointer-events:none;transition:.28s;z-index:99;max-width:80%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #modal{position:fixed;inset:0;background:rgba(30,20,12,.55);display:none;align-items:center;
-  justify-content:center;z-index:100;padding:24px}
+  justify-content:center;z-index:100;padding:12px}
 #modal.show{display:flex}
-.mbox{position:relative;background:var(--paper);border-radius:26px;padding:26px 22px;max-width:340px;width:100%;text-align:center;
+.mbox{position:relative;background:var(--paper);border-radius:26px;padding:16px 18px;max-width:560px;width:100%;text-align:center;
   box-shadow:0 16px 40px rgba(0,0,0,.3);max-height:calc(100vh - 48px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .mbox-x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;
   background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;border:none;cursor:pointer;z-index:5;
@@ -7464,8 +7464,8 @@ function showHzCard(encodedCh, idx){
     +'display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box';
 
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#fff;border-radius:24px;padding:22px 18px 18px;max-width:600px;width:100%;'
-    +'display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 12px 48px rgba(0,0,0,.32);max-height:92vh;overflow-y:auto';
+  panel.style.cssText = 'background:#fff;border-radius:24px;padding:14px 18px 14px;max-width:600px;width:100%;'
+    +'display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 12px 48px rgba(0,0,0,.32);max-height:96vh;overflow-y:auto';
 
   // Header: book name + counter
   var header = document.createElement('div');
@@ -7478,7 +7478,7 @@ function showHzCard(encodedCh, idx){
   imgWrap.style.cssText = 'width:100%;display:flex;justify-content:center';
   var img = document.createElement('img');
   img.src = url;
-  img.style.cssText = 'width:100%;height:auto;object-fit:contain;border-radius:12px;'
+  img.style.cssText = 'width:100%;max-height:45vh;object-fit:contain;border-radius:12px;'
     +'background:#f8f8f8;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1);cursor:pointer';
   img.title = '点击听发音';
   img.onclick = function(){ speak(ch, 'zh-CN'); };
@@ -10063,7 +10063,7 @@ function showEnImgCard(setIdx, wordIdx){
   var enClickAttr = 'onclick="speak(\''+jsEsc(wordBase)+'\',\'en-US\')" onmouseenter="this.style.background=\'#E3F2FD\'" onmouseleave="this.style.background=\'transparent\'"';
   var zhClickAttr = zh ? ('onclick="speak(\''+jsEsc(zh)+'\',\'zh-CN\')" onmouseenter="this.style.background=\'#FFF3E0\'" onmouseleave="this.style.background=\'transparent\'"') : '';
   modal(
-    '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 16px;max-width:600px;margin:0 auto;width:100%">'
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 4px;width:100%">'
     +'<div style="font-size:13px;color:#888;font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</div>'
     +'<img src="'+imgSrc+'" style="width:100%;height:auto;object-fit:contain;border-radius:12px;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
     +'<div '+enClickAttr+' style="font-size:32px;font-weight:800;color:#1565C0;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(display)+'</div>'
