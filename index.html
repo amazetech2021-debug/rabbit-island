@@ -7478,7 +7478,7 @@ function showHzCard(encodedCh, idx){
   imgWrap.style.cssText = 'width:100%;display:flex;justify-content:center';
   var img = document.createElement('img');
   img.src = url;
-  img.style.cssText = 'width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:12px;'
+  img.style.cssText = 'width:100%;height:auto;object-fit:contain;border-radius:12px;'
     +'background:#f8f8f8;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1);cursor:pointer';
   img.title = '点击听发音';
   img.onclick = function(){ speak(ch, 'zh-CN'); };
@@ -9981,7 +9981,7 @@ function showEnCatWords(setIdx){
       +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
       +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative;display:flex;flex-direction:column;width:100%">'
       +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:10px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700;z-index:1">✓</span>':'')
-      +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:4/3;object-fit:contain;background:#f8f8f8;display:block" onerror="this.style.aspectRatio=\'unset\';this.style.height=\'60px\';this.style.opacity=\'0.2\'">'
+      +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" onerror="this.style.aspectRatio=\'unset\';this.style.height=\'60px\';this.style.opacity=\'0.2\'">'
       +'<div style="padding:5px 4px 7px;text-align:center">'
       +'<div style="font-size:13px;font-weight:800;color:'+(isKnown?'#1565C0':'#1A237E')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</div>'
       +(zh?'<div style="font-size:11px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</div>':'')
@@ -10021,7 +10021,7 @@ function showEnImgCard(setIdx, wordIdx){
   modal(
     '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 16px;max-width:600px;margin:0 auto;width:100%">'
     +'<div style="font-size:13px;color:#888;font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</div>'
-    +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:12px;background:#f8f8f8;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
+    +'<img src="'+imgSrc+'" style="width:100%;height:auto;object-fit:contain;border-radius:12px;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
     +'<div '+enClickAttr+' style="font-size:32px;font-weight:800;color:#1565C0;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(display)+'</div>'
     +(zh?'<div '+zhClickAttr+' style="font-size:22px;color:#E5443C;font-weight:700;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(zh)+'</div>':'')
     +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
