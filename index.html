@@ -11191,7 +11191,7 @@ const GEMINI_LESSONS = [
 ];
 
 
-var _gemPhase = 0, _gemLesson = null, _gemTab = 0;
+var _gemPhase = 0, _gemLesson = null, _gemTab = 0, _gemLastLesson = null;
 var _gemFlowCache = [];
 function spkFlow(i){ if(_gemFlowCache[i]) speak(_gemFlowCache[i],'en-US'); }
 function spkG(num,type,idx){
@@ -11215,7 +11215,8 @@ function pgGemini(){
     var phaseLessons = GEMINI_LESSONS.filter(function(l){return l.phase===ph.n;});
     html += '<div style="margin-bottom:16px">';
     html += '<div onclick="var d=this.nextElementSibling;d.style.display=d.style.display===' + "'none'" + '?' + "'block'" + ':' + "'none'" + '" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px">'+ph.label+'</div><div style="font-size:11px;opacity:0.85">'+ph.sub+'</div></div><div style="font-size:18px">&#9660;</div></div>';
-    html += '<div style="display:none">';
+    var isActivePh = _gemLastLesson && phaseLessons.some(function(ll){return ll.num===_gemLastLesson;});
+    html += '<div style="display:'+(isActivePh?'block':'none')+'">';
     phaseLessons.forEach(function(l){
       var ww = l.words.map(function(w,wi){
         return '<button onclick="spkG('+l.num+',\'w\','+wi+')" style="background:#e8f4fd;border:1px solid #b3d9f7;border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer;margin:2px">'+w+'</button>';
@@ -11225,18 +11226,19 @@ function pgGemini(){
       }).join('');
       var isDone = S.gemDone && S.gemDone[l.num];
       var doneBadge = isDone ? '<span style="margin-left:auto;background:#27ae60;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;flex-shrink:0">✅ 已完成</span>' : '';
-      html += '<div style="background:'+( isDone ? '#f0fdf4' : '#fff')+';border:1px solid '+(isDone?'#4caf50':'#e8e0ff')+';border-radius:10px;padding:10px 12px;margin:6px 0">';
-      html += '<div onclick="_gemLesson='+l.num+';_gemTab=0;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px"><span style="font-size:22px">'+l.emoji+'</span><div style="flex:1"><div style="font-weight:600;font-size:13px;color:#333">第'+l.num+'课 '+l.title_en+'</div><div style="font-size:11px;color:#666">'+l.title_zh+'</div></div>'+doneBadge+'</div>';
+      html += '<div id="gem-lesson-'+l.num+'" style="background:'+( isDone ? '#f0fdf4' : '#fff')+';border:1px solid '+(isDone?'#4caf50':'#e8e0ff')+';border-radius:10px;padding:10px 12px;margin:6px 0">';
+      html += '<div onclick="_gemLastLesson='+l.num+';_gemLesson='+l.num+';_gemTab=0;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px"><span style="font-size:22px">'+l.emoji+'</span><div style="flex:1"><div style="font-weight:600;font-size:13px;color:#333">第'+l.num+'课 '+l.title_en+'</div><div style="font-size:11px;color:#666">'+l.title_zh+'</div></div>'+doneBadge+'</div>';
       if(l.goal) html += '<div style="font-size:11px;color:#888;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:6px">🎯 '+l.goal+'</div>';
       if(ww) html += '<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:600;color:#4a90e2;margin-bottom:3px">📝 新单词</div>'+ww+'</div>';
       if(ss) html += '<div><div style="font-size:11px;font-weight:600;color:#4caf50;margin-bottom:2px">💬 关键句</div>'+ss+'</div>';
-      if(l.ppt) html += '<div style="margin-top:6px"><span style="font-size:11px;background:#e8d5ff;color:#6c5ce7;padding:2px 8px;border-radius:6px;cursor:pointer" onclick="_gemLesson='+l.num+';_gemTab=1;render()">📊 点击查看PPT</span></div>';
+      if(l.ppt) html += '<div style="margin-top:6px"><span style="font-size:11px;background:#e8d5ff;color:#6c5ce7;padding:2px 8px;border-radius:6px;cursor:pointer" onclick="_gemLastLesson='+l.num+';_gemLesson='+l.num+';_gemTab=1;render()">📊 点击查看PPT</span></div>';
       html += '</div>';
     });
     html += '</div></div>';
   });
   html += '</div>';
   $("page").innerHTML = html;
+  if(_gemLastLesson){ var _el=document.getElementById("gem-lesson-"+_gemLastLesson); if(_el) setTimeout(function(){_el.scrollIntoView({block:"center"});},0); }
 }
 function pgGeminiLesson(num){
   var l = GEMINI_LESSONS.find(function(x){return x.num===num;});
