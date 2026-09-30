@@ -11210,7 +11210,14 @@ function pgGemini(){
     {n:4, label:'第四阶段：探索世界', sub:'天气·季节·太空·玩具·字母S-X'},
     {n:5, label:'第五阶段：英语达人', sub:'字母YZ·反义词·疑问词·歌曲·毕业秀'},
   ];
-  var html = '<div style="padding:12px 10px 0"><h2 style="font-size:18px;font-weight:700;color:var(--brand);margin:0 0 4px;display:flex;align-items:center;gap:8px">'+GICO+' 口语课</h2><p style="font-size:12px;color:#888;margin:0 0 14px">Gemini英语口语 &middot; 50节课 &middot; 5个阶段 &middot; 点单词/句子发音</p>';
+  var _enTabBar = '<div class="tabs">'
+    + '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
+    + '<button class="tab" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
+    + '<button class="tab on" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    + '<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
+    + '<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn||{}).length?' ('+Object.keys(S.learnedEn||{}).length+')':'')+'</button>'
+    + '</div>';
+  var html = _enTabBar + '<div style="padding:12px 10px 0"><h2 style="font-size:18px;font-weight:700;color:var(--brand);margin:0 0 4px;display:flex;align-items:center;gap:8px">'+GICO+' 口语课</h2><p style="font-size:12px;color:#888;margin:0 0 14px">Gemini英语口语 &middot; 50节课 &middot; 5个阶段 &middot; 点单词/句子发音</p>';
   phases.forEach(function(ph){
     var phaseLessons = GEMINI_LESSONS.filter(function(l){return l.phase===ph.n;});
     html += '<div style="margin-bottom:16px">';
