@@ -7464,7 +7464,7 @@ function showHzCard(encodedCh, idx){
     +'display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box';
 
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#fff;border-radius:24px;padding:22px 18px 18px;max-width:420px;width:100%;'
+  panel.style.cssText = 'background:#fff;border-radius:24px;padding:22px 18px 18px;max-width:600px;width:100%;'
     +'display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 12px 48px rgba(0,0,0,.32);max-height:92vh;overflow-y:auto';
 
   // Header: book name + counter
@@ -7478,8 +7478,8 @@ function showHzCard(encodedCh, idx){
   imgWrap.style.cssText = 'width:100%;display:flex;justify-content:center';
   var img = document.createElement('img');
   img.src = url;
-  img.style.cssText = 'width:100%;max-width:300px;height:200px;object-fit:contain;border-radius:16px;'
-    +'background:#fafafa;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.12);cursor:pointer';
+  img.style.cssText = 'width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:12px;'
+    +'background:#f8f8f8;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1);cursor:pointer';
   img.title = '点击听发音';
   img.onclick = function(){ speak(ch, 'zh-CN'); };
   var errDiv = document.createElement('div');
@@ -7533,7 +7533,7 @@ function showHzCard(encodedCh, idx){
   navRow.style.cssText = 'display:flex;gap:8px;width:100%';
   var prevBtn = document.createElement('button');
   prevBtn.style.cssText = 'flex:1;padding:11px 6px;border-radius:22px;border:2px solid #e0d9f2;background:#f5f2ff;color:#333;cursor:pointer;font-size:14px;font-weight:700';
-  prevBtn.textContent = '← 上一个';
+  prevBtn.textContent = '上一个';
   prevBtn.onclick = function(){
     var cs = CARD_CHARS[hzCardsBook] || [];
     var ni = (_hzCardIdx - 1 + cs.length) % cs.length;
@@ -7541,7 +7541,7 @@ function showHzCard(encodedCh, idx){
   };
   var nextBtn = document.createElement('button');
   nextBtn.style.cssText = 'flex:1;padding:11px 6px;border-radius:22px;border:2px solid #e0d9f2;background:#f5f2ff;color:#333;cursor:pointer;font-size:14px;font-weight:700';
-  nextBtn.textContent = '下一个 →';
+  nextBtn.textContent = '下一个';
   nextBtn.onclick = function(){
     var cs = CARD_CHARS[hzCardsBook] || [];
     var ni = (_hzCardIdx + 1) % cs.length;
@@ -9953,12 +9953,13 @@ function pgEnFlashCards(){
 
   $('page').innerHTML =
     '<div class="tabs">'+modeTabs+'</div>'
-    +'<div style="padding:12px 0">'
+    +'<div style="padding:12px 0;max-width:960px;margin:0 auto">'
     +'<div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:12px">选择分类 · 点击进入</div>'
     +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'+catGrid+'</div></div>';
 }
 
 function showEnCatWords(setIdx){
+  _enCatScrollTop = $("page").scrollTop;
   var s = EN_IMG_SETS[setIdx];
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
@@ -9980,7 +9981,7 @@ function showEnCatWords(setIdx){
       +'border:2.5px solid '+(isKnown?'#1565C0':'var(--border)')+';'
       +'background:'+(isKnown?'#E3F2FD':'var(--cream-1)')+';cursor:pointer;position:relative;display:flex;flex-direction:column;width:100%">'
       +(isKnown?'<span style="position:absolute;top:5px;right:6px;font-size:10px;background:#1565C0;color:#fff;border-radius:99px;padding:1px 5px;font-weight:700;z-index:1">✓</span>':'')
-      +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:4/3;object-fit:contain;background:#f8f8f8;display:block" onerror="this.style.opacity=\'0.15\'">'
+      +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:4/3;object-fit:contain;background:#f8f8f8;display:block" onerror="this.style.aspectRatio=\'unset\';this.style.height=\'60px\';this.style.opacity=\'0.2\'">'
       +'<div style="padding:5px 4px 7px;text-align:center">'
       +'<div style="font-size:13px;font-weight:800;color:'+(isKnown?'#1565C0':'#1A237E')+';line-height:1.2;text-align:center">'+htmlEsc(display)+'</div>'
       +(zh?'<div style="font-size:11px;color:'+(isKnown?'#1E88E5':'var(--ink-soft)')+';font-weight:600">'+htmlEsc(zh)+'</div>':'')
@@ -9990,9 +9991,9 @@ function showEnCatWords(setIdx){
 
   $('page').innerHTML =
     '<div class="tabs">'+modeTabs+'</div>'
-    +'<div style="padding:12px 0">'
+    +'<div style="padding:12px 0;max-width:960px;margin:0 auto">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
-    +'<button onclick="enMode=\'cards\';pgEnFlashCards()" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>'
+    +'<button onclick="enMode=\'cards\';pgEnFlashCards();setTimeout(function(){$(\'page\').scrollTop=_enCatScrollTop},20)" style="padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);font-size:13px;cursor:pointer;font-weight:700">← 分类</button>'
     +'<span style="font-size:16px;font-weight:800">'+s.icon+' '+s.name+'</span>'
     +'<span style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-left:auto">'+knownCnt+'/'+s.words.length+' 已掌握</span>'
     +'</div>'
@@ -10018,16 +10019,16 @@ function showEnImgCard(setIdx, wordIdx){
   var enClickAttr = 'onclick="speak(\''+jsEsc(wordBase)+'\',\'en-US\')" onmouseenter="this.style.background=\'#E3F2FD\'" onmouseleave="this.style.background=\'transparent\'"';
   var zhClickAttr = zh ? ('onclick="speak(\''+jsEsc(zh)+'\',\'zh-CN\')" onmouseenter="this.style.background=\'#FFF3E0\'" onmouseleave="this.style.background=\'transparent\'"') : '';
   modal(
-    '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px;max-width:440px;margin:0 auto;width:100%">'
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 16px;max-width:600px;margin:0 auto;width:100%">'
     +'<div style="font-size:13px;color:#888;font-weight:700;text-align:center">'+set.icon+' '+set.name+' '+(wordIdx+1)+'/'+total+'</div>'
-    +'<img src="'+imgSrc+'" style="width:100%;object-fit:contain;border-radius:12px;background:#fff;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
+    +'<img src="'+imgSrc+'" style="width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:12px;background:#f8f8f8;display:block;box-shadow:0 2px 12px rgba(0,0,0,.1)" onerror="this.style.opacity=\'0.2\'">'
     +'<div '+enClickAttr+' style="font-size:32px;font-weight:800;color:#1565C0;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(display)+'</div>'
     +(zh?'<div '+zhClickAttr+' style="font-size:22px;color:#E5443C;font-weight:700;text-align:center;cursor:pointer;padding:4px 14px;border-radius:10px">'+htmlEsc(zh)+'</div>':'')
     +'<button id="en-img-known-btn" onclick="markEnKnownInCard(\''+jsEsc(word)+'\',\'en-img-known-btn\');showEnImgCard('+setIdx+','+wordIdx+')" '
     +'style="width:100%;padding:14px;font-size:17px;font-weight:700;border-radius:14px;border:2px solid '+kBd+';background:'+kBg+';color:'+kColor+';cursor:pointer">'+kLabel+'</button>'
     +'<div style="display:flex;gap:8px;width:100%">'
-    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'-1+'+total+')%'+total+')" style="flex:1;padding:11px 6px;border-radius:22px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink);cursor:pointer;font-size:14px;font-weight:700">← 上一个</button>'
-    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'+1)%'+total+')" style="flex:1;padding:11px 6px;border-radius:22px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink);cursor:pointer;font-size:14px;font-weight:700">下一个 →</button>'
+    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'-1+'+total+')%'+total+')" style="flex:1;padding:11px 6px;border-radius:22px;border:2px solid #e0d9f2;background:#f5f2ff;color:#333;cursor:pointer;font-size:14px;font-weight:700">上一个</button>'
+    +'<button onclick="showEnImgCard('+setIdx+',('+wordIdx+'+1)%'+total+')" style="flex:1;padding:11px 6px;border-radius:22px;border:2px solid #e0d9f2;background:#f5f2ff;color:#333;cursor:pointer;font-size:14px;font-weight:700">下一个</button>'
     +'</div>'
     +'<div style="display:flex;gap:8px;width:100%">'
     +'<button onclick="closeModal();showEnCatWords(_eiSet)" style="flex:1;padding:9px;border-radius:20px;border:2px solid var(--border);background:var(--cream-1);color:var(--ink-soft);cursor:pointer;font-size:13px;font-weight:700">← 词列表</button>'
