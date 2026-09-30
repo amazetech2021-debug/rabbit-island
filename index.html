@@ -7985,8 +7985,10 @@ function _doStartEnQuiz(){
 
 function _enQuizTabs(){
   return '<div class="tabs"><button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
-    +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>'
-    +'<button class="tab on">🧪 测试</button></div>'
+    +'<button class="tab" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab on">🧪 测试</button>'
+    +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn||{}).length?' ('+Object.keys(S.learnedEn||{}).length+')':'')+'</button></div>'
     +'<div class="tabs">'
     +'<button class="tab '+(enSub==='words'?'on':'')+'" onclick="enSwitch(\'words\')">🔤 单词</button>'
     +'<button class="tab '+(enSub==='phrases'?'on':'')+'" onclick="enSwitch(\'phrases\')">💬 短语</button>'
@@ -9935,7 +9937,7 @@ function pgEnFlashCards(){
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
     +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
-    +'<button class="tab" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn).length?' ('+Object.keys(S.learnedEn).length+')':'')+'</button>';
 
   var catGrid = EN_IMG_SETS.map(function(s,i){
@@ -9972,7 +9974,7 @@ function showEnCatWords(setIdx, filterPrefix){
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
     +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
-    +'<button class="tab" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>';
 
   var knownCnt = s.words.filter(function(w){ return S.knownEn && S.knownEn[w]; }).length;
@@ -10377,7 +10379,7 @@ function pgEnglishReview(){
    +'<button class="tab '+(enMode==='learn'?'on':'')+'" onclick="enMode=\'learn\';render()">📖 学习</button>'
    +'<button class="tab '+(enMode==='cards'?'on':'')+'" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
    +'<button class="tab '+(enMode==='quiz'?'on':'')+'" onclick="startEnQuiz()">🧪 测试</button>'
-   +'<button class="tab '+(enMode==='stickers'?'on':'')+'" onclick="enMode=\'stickers\';render()">📷 贴纸</button>'
+   +'<button class="tab '+(enMode==='gemini'?'on':'')+'" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
    +'<button class="tab '+(enMode==='review'?'on':'')+'" onclick="enMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedEn).length?' ('+Object.keys(S.learnedEn).length+')':'')+' </button>'
    +'</div>'
    +'<div class="tabs" style="margin-top:6px">'+subTabs+'</div>'
@@ -14932,8 +14934,11 @@ function _tbUnitView(){
     html += '<span style="background:#f0ebff;color:#7c5cbf;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+ex_count+'道练习</span>';
     if(lesson.chars && lesson.chars.length) html += '<span style="background:#e8f5e9;color:#388e3c;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600">'+lesson.chars.length+'个生字</span>';
     html += '</div></div>';
-    // Arrow
-    html += '<div style="display:flex;align-items:center;padding-right:14px"><span style="color:#bbb;font-size:22px;font-weight:300">›</span></div>';
+    // Arrow / completion badge
+    var _lDone = S.tbDone && S.tbDone[lesson.id];
+    html += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-right:14px;gap:4px">';
+    if(_lDone) html += '<span style="background:#4caf50;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700">✅ 完成</span>';
+    html += '<span style="color:#bbb;font-size:22px;font-weight:300">›</span></div>';
     html += '</div></button>';
   });
   return html;
@@ -15038,6 +15043,9 @@ function _tbLessonView(){
       html += _tbRenderExercise(ex, exIdx, lesson.id);
     });
     html += '<button onclick="_tbCheckAll(\''+lesson.id+'\')" style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px">✅ 检查全部答案</button>';
+  } else {
+    var _isLDone = S.tbDone && S.tbDone[lesson.id];
+    html += '<button onclick="if(!S.tbDone)S.tbDone={};S.tbDone[\''+lesson.id+'\']= today();save();pgTextbook()" style="width:100%;background:'+(_isLDone?'#4caf50':'var(--brand)')+';color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px">'+(_isLDone?'✅ 已完成':'✅ 标记完成')+'</button>';
   }
   
   // Navigation
@@ -15160,6 +15168,7 @@ function _tbCheckAll(lessonId){
       if(allRight) correct++;
     }
   });
+  if(!S.tbDone)S.tbDone={};S.tbDone[lessonId]=today();save();
   pgTextbook();
   var pct = Math.round(correct/total*100);
   var emoji = pct>=80?'🎉':pct>=60?'👍':'💪';
