@@ -7087,7 +7087,7 @@ function hzListHTML(){
       const mc = _masteryClass(S.learnedHz[key]);
       const isKnown = S.knownHz && S.knownHz[o.e[0]];
       return `<button class="tile ${mc}" data-act="hz" data-g="${hzGrade}" data-u="${htmlEsc(u)}" data-c="${htmlEsc(o.e[0])}" style="${isKnown?'background:#fde8ec;border-color:#e53935':''}">
-        <span class="emo">${o.e[2]||"📝"}</span><b style="${isKnown?'color:#E53935':''}">${o.e[0]}</b><span>${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedHz[key])}</button>`;
+        <span class="emo">${o.e[2]||"📝"}</span><b style="${isKnown?'color:#E53935':''}">${o.e[0]}</b><span style="${isKnown?'color:#E53935':''}">${htmlEsc(o.e[1]||"")}</span>${_learnBadge(S.learnedHz[key])}</button>`;
     }).join("");
     return `<div class="card sect"><div class="secthead"><h3>${htmlEsc(u)}</h3><em>${list.length} 字</em></div>
       <div class="tilegrid">${cells}</div></div>`;
