@@ -670,6 +670,15 @@ body{
 .sptile:active{transform:scale(.94)}
 .sptile.on{background:#FFF3D6;border-color:#F5A623;color:#B36B00}
 .spmsg{font-size:14px;font-weight:800;min-height:22px;margin-top:2px}
+.spwrap{max-width:460px;margin:0 auto}
+.spwrap .spgrid{max-width:none}
+.spwrap .sprow{justify-content:center}
+.spbtns{display:flex;gap:10px;margin-top:14px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.spbtn{flex:1 1 0;min-width:0;height:48px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink-soft);
+  font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px}
+.spbtn:active{transform:scale(.96)}
+.spbtn.hint{background:#FFF3D6;border-color:#F5C76B;color:#B36B00}
+.spbtn.next{flex:1.4 1 0;background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
 
 .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
 .wtile{position:relative;border:2px solid var(--line);background:#fff;border-radius:16px;padding:11px 5px 9px;
@@ -8411,7 +8420,7 @@ function spPaint(){
           : st==="show" ? '<div class="spmsg" style="color:var(--ink-soft)">正确答案是 '+htmlEsc(q.py)+'，记住它再做下一题</div>'
           : '<div class="spmsg" style="color:var(--ink-soft)">先选字母，再选声调</div>';
   $("page").innerHTML = tabs+gtabs
-    +'<div class="card sect" id="spBox" style="text-align:center">'
+    +'<div class="card sect" id="spBox" style="text-align:center"><div class="spwrap">'
     +'<div class="secthead"><h3>第 '+_sp.n+' 题</h3><em>拼对 '+_sp.ok+' 个</em></div>'
     +'<div class="spgrid'+(st==="ok"?' ok':st==="bad"?' bad':'')+'" onclick="spClear()">'+htmlEsc(built)+'</div>'
     +'<div class="spchar" onclick="spSay()">'+htmlEsc(q.ch)+'</div>'
@@ -8419,11 +8428,11 @@ function spPaint(){
     +'<div class="splabel">请选择字母</div><div class="sprow">'+tiles+'</div>'
     +'<div class="splabel">请选择声调</div><div class="sprow">'+tones+'</div>'
     +msg
-    +'<div class="row" style="gap:8px;margin-top:10px">'
-    +'<button class="big" style="flex:1;padding:12px 6px;font-size:15px;background:#eee;color:#555" onclick="spClear()">⌫ 重选</button>'
-    +'<button class="big o" style="flex:1;padding:12px 6px;font-size:15px" onclick="spReveal()">💡 看答案</button>'
-    +'<button class="big p" style="flex:1;padding:12px 6px;font-size:15px" onclick="spNext()">下一题 →</button>'
-    +'</div></div>'
+    +'<div class="spbtns">'
+    +'<button class="spbtn" onclick="spClear()">⌫ 重选</button>'
+    +'<button class="spbtn hint" onclick="spReveal()">💡 看答案</button>'
+    +'<button class="spbtn next" onclick="spNext()">下一题 →</button>'
+    +'</div></div></div>'
     +'<div class="meta">今日已练 '+S.cnt.py+' 次</div>';
 }
 
