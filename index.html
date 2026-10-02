@@ -657,6 +657,19 @@ body{
 .pytile.r1{background:#F2FAF3;border-color:#B7DEBB}
 .pytile.r2{background:#E0F2E1;border-color:#81C784}
 .pytile.r3{background:#C8E6C9;border-color:#4CAF50}
+.spgrid{height:100px;max-width:420px;margin:4px auto 6px;border-radius:10px;border:2px solid #9DBB92;display:flex;align-items:center;justify-content:center;
+  font-size:54px;font-weight:700;color:#222;letter-spacing:1px;line-height:1;cursor:pointer;
+  background:linear-gradient(to bottom,transparent calc(33.33% - 1px),#8AA880 calc(33.33% - 1px),#8AA880 33.33%,transparent 33.33%,transparent calc(66.66% - 1px),#8AA880 calc(66.66% - 1px),#8AA880 66.66%,transparent 66.66%),#D3E6C8}
+.spgrid.ok{color:#2E7D32;border-color:var(--green)}
+.spgrid.bad{color:var(--red);border-color:var(--red)}
+.spchar{font-size:96px;font-weight:900;line-height:1.2;color:var(--ink);cursor:pointer}
+.splabel{text-align:left;font-size:13px;font-weight:700;color:var(--ink-soft);margin:6px 2px 8px}
+.sprow{display:flex;gap:10px;margin-bottom:10px}
+.sptile{flex:1 1 0;min-width:0;max-width:100px;height:60px;padding:0 4px;border:2px solid var(--line);border-radius:12px;background:#fff;font-size:26px;font-weight:800;color:var(--ink);
+  cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center}
+.sptile:active{transform:scale(.94)}
+.sptile.on{background:#FFF3D6;border-color:#F5A623;color:#B36B00}
+.spmsg{font-size:14px;font-weight:800;min-height:22px;margin-top:2px}
 
 .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
 .wtile{position:relative;border:2px solid var(--line);background:#fff;border-radius:16px;padding:11px 5px 9px;
@@ -8184,9 +8197,11 @@ function pyPaint(){ const el = $("pyList"); if(el) el.innerHTML = pyListHTML(); 
 function pgPinyin(){
   if(pyMode === "review"){ pgPinyinReview(); return; }
   if(pyMode === "table"){ pgPinyinTable(); return; }
+  if(pyMode === "spell"){ pgPinyinSpell(); return; }
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==="learn"?"on":""}" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab ${pyMode==="table"?"on":""}" onclick="pyMode='table';render()">🔊 拼音表</button>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
      <button class="tab ${pyMode==="review"?"on":""}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?" ("+Object.keys(S.learnedPy).length+")":""}</button></div>
    <div class="tiptext">👆 点一下听发音（多练边框越深代表越熟练）　·　👉 长按看口诀、例字和四声</div>
    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 2px 10px;font-size:12px;color:var(--ink-soft);font-weight:700;align-items:center">
@@ -8254,6 +8269,162 @@ function learnPy(key){
   if(S.learnedPy[key]) return;
   S.learnedPy[key] = {count:1, lastReview:today(), collected:false};
   S.cnt.py++; earn(1,"py"); save(); render();
+}
+
+/* ══════════ 拼音·拼一拼（看字选声母、韵母、声调） ══════════ */
+var _SP_INIT = ["zh","ch","sh","b","p","m","f","d","t","n","l","g","k","h","j","q","x","r","z","c","s","y","w"];
+var _SP_WHOLE = {zhi:1,chi:1,shi:1,ri:1,zi:1,ci:1,si:1,yi:1,wu:1,yu:1,ye:1,yue:1,yuan:1,yin:1,yun:1,ying:1};
+var _SP_CONF_I = {z:["zh","c"],zh:["z","ch"],c:["ch","z"],ch:["c","zh"],s:["sh","c"],sh:["s","ch"],n:["l","m"],l:["n","r"],b:["p","d"],p:["b","q"],d:["t","b"],t:["d","f"],g:["k","h"],k:["g","h"],h:["f","k"],f:["h","t"],j:["q","x"],q:["j","p"],x:["j","s"],r:["l","n"],m:["n","w"],y:["w","j"],w:["y","m"]};
+var _SP_CONF_F = {an:["ang","en"],ang:["an","eng"],en:["eng","an"],eng:["en","ong"],"in":["ing","un"],ing:["in","eng"],ui:["iu","ei"],iu:["ui","ou"],ie:["ei","ue"],ei:["ie","ui"],ou:["uo","iu"],uo:["ou","u"],ong:["eng","ang"],un:["ong","in"],ai:["ei","an"],ao:["ou","iao"],a:["o","e"],o:["e","u"],e:["o","a"],i:["v","u"],u:["v","o"],v:["u","i"],ia:["ie","a"],ua:["a","uo"],iao:["ao","iu"],ian:["an","iang"],iang:["ian","ang"],uan:["an","uang"],uang:["uan","ang"],uai:["ai","ui"],iong:["ong","ing"],ue:["ie","ui"],er:["e","en"],ve:["ie","ue"]};
+var _SP_YW = ["yi","wu","yu","ye","yue","yin","yun","ying","yuan"];
+var _sp = {grade:0, q:null, tiles:[], sel:[], tone:0, n:0, ok:0, state:"", qid:0, recent:[]};
+
+function _spSplit(syl){
+  if(_SP_WHOLE[syl]) return [syl];
+  for(var i=0;i<_SP_INIT.length;i++){
+    var ini=_SP_INIT[i];
+    if(syl.indexOf(ini)===0 && syl.length>ini.length) return [ini, syl.slice(ini.length)];
+  }
+  return [syl];
+}
+/* 给不带调的音节标上声调（v 显示成 ü） */
+function _spMark(s, tone){
+  var disp = String(s).replace(/v/g,"ü");
+  if(!tone) return disp;
+  var T = {a:"āáǎà",o:"ōóǒò",e:"ēéěè",i:"īíǐì",u:"ūúǔù","ü":"ǖǘǚǜ"};
+  var idx = -1;
+  if(disp.indexOf("a")>=0) idx = disp.indexOf("a");
+  else if(disp.indexOf("e")>=0) idx = disp.indexOf("e");
+  else if(disp.indexOf("ou")>=0) idx = disp.indexOf("o");
+  else { for(var i=disp.length-1;i>=0;i--){ if(T[disp.charAt(i)]){ idx=i; break; } } }
+  if(idx<0) return disp;
+  return disp.slice(0,idx) + T[disp.charAt(idx)].charAt(tone-1) + disp.slice(idx+1);
+}
+function _spPool(g){
+  var out=[], G=HANZI_GRADED[g]||{};
+  Object.keys(G).forEach(function(u){ (G[u]||[]).forEach(function(e){
+    var py=String(e[1]||"").trim();
+    if(!/[āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜ]/.test(py)) return;      /* 轻声或没有拼音的跳过 */
+    if(/[\s,，\/]/.test(py)) return;                           /* 多音写法跳过 */
+    var n=pyToNum(py); if(!n.syl) return;
+    out.push({ch:e[0], py:py, emo:e[2]||"", words:e[3]||"", syl:n.syl, tone:n.tone});
+  }); });
+  return out;
+}
+function _spShuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function _spTiles(syl){
+  var parts=_spSplit(syl), tiles=parts.slice(), extra=[];
+  if(parts.length===2){
+    extra = (_SP_CONF_I[parts[0]]||["b"]).slice(0,1).concat((_SP_CONF_F[parts[1]]||["a","o"]).slice(0,1));
+  } else if(/^(zh|ch|sh|r|z|c|s)i$/.test(syl)){
+    extra = (_SP_CONF_I[syl.slice(0,-1)]||["z","c"]).map(function(x){ return x+"i"; });
+  } else if(_SP_WHOLE[syl]){
+    extra = _spShuffle(_SP_YW.filter(function(x){ return x!==syl; })).slice(0,2);
+  } else {
+    extra = (_SP_CONF_F[syl]||["a","o"]).slice(0,2);
+  }
+  extra.forEach(function(x){ if(tiles.indexOf(x)<0) tiles.push(x); });
+  return {parts:parts, tiles:_spShuffle(tiles)};
+}
+function spSay(){
+  var q=_sp.q; if(!q) return;
+  speakHanzi(q.ch, q.words);
+}
+function spNew(){
+  if(!_sp.grade) _sp.grade = (typeof hzGrade!=="undefined" && HANZI_GRADED[hzGrade]) ? hzGrade : +Object.keys(HANZI_GRADED)[0];
+  var pool=_spPool(_sp.grade);
+  if(!pool.length){ _sp.q=null; return; }
+  var q, guard=0;
+  do { q = pool[Math.floor(Math.random()*pool.length)]; guard++; } while(_sp.recent.indexOf(q.ch)>=0 && guard<30);
+  _sp.recent.push(q.ch); if(_sp.recent.length>Math.min(20,pool.length-1)) _sp.recent.shift();
+  var t=_spTiles(q.syl);
+  q.parts=t.parts; _sp.q=q; _sp.tiles=t.tiles; _sp.sel=[]; _sp.tone=0; _sp.state=""; _sp.n++; _sp.qid++;
+  spSay();
+}
+function spNext(){ spNew(); spPaint(); }
+function spGrade(g){ _sp.grade=+g; _sp.recent=[]; _sp.n=0; _sp.ok=0; spNew(); spPaint(); }
+function spClear(){ if(_sp.state==="ok") return; _sp.sel=[]; _sp.tone=0; _sp.state=""; spPaint(); }
+function spTap(i){
+  if(!_sp.q || _sp.state) return;
+  var at=_sp.sel.indexOf(i);
+  if(at>=0) _sp.sel.splice(at,1);
+  else if(_sp.sel.length<_sp.q.parts.length) _sp.sel.push(i);
+  spCheck();
+}
+function spTone(t){
+  if(!_sp.q || _sp.state) return;
+  _sp.tone = (_sp.tone===t) ? 0 : t;
+  spCheck();
+}
+function spCheck(){
+  var q=_sp.q;
+  if(_sp.sel.length<q.parts.length || !_sp.tone){ spPaint(); return; }
+  var built=_sp.sel.map(function(i){ return _sp.tiles[i]; }).join("");
+  var id=_sp.qid;
+  if(built===q.syl && _sp.tone===q.tone){
+    _sp.state="ok"; _sp.ok++;
+    S.cnt.py++; earn(1,"py"); save();
+    spPaint();
+    speakSyllable(q.syl, q.tone, q.ch);
+    setTimeout(function(){ if(pyMode==="spell" && _sp.qid===id && $("spBox")) spNext(); }, 1600);
+  } else {
+    _sp.state="bad"; spPaint();
+    setTimeout(function(){
+      if(_sp.qid!==id || _sp.state!=="bad") return;
+      _sp.sel=[]; _sp.tone=0; _sp.state="";
+      if(pyMode==="spell" && $("spBox")) spPaint();
+    }, 1000);
+  }
+}
+function spReveal(){
+  var q=_sp.q; if(!q || _sp.state==="ok") return;
+  _sp.state="show"; spPaint(); speakSyllable(q.syl, q.tone, q.ch);
+}
+function pgPinyinSpell(){
+  if(!_sp.q) spNew();
+  spPaint();
+}
+function spPaint(){
+  var q=_sp.q, st=_sp.state;
+  var tabs='<div class="tabs"><button class="tab" onclick="pyMode=\'learn\';render()">📖 学习</button>'
+    +'<button class="tab" onclick="pyMode=\'table\';render()">🔊 拼音表</button>'
+    +'<button class="tab on">🧩 拼一拼</button>'
+    +'<button class="tab" onclick="pyMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':'')+'</button></div>';
+  var CN=["一","二","三","四","五","六"];
+  var grades=Object.keys(HANZI_GRADED).filter(function(g){ return _spPool(g).length; });
+  var gtabs = grades.length>1 ? '<div class="tabs">'+grades.map(function(g){
+    return '<button class="tab '+(+g===_sp.grade?'on':'')+'" onclick="spGrade('+(+g)+')">'+(CN[g-1]||g)+'年级</button>'; }).join('')+'</div>' : '';
+  if(!q){ $("page").innerHTML = tabs+gtabs+'<div class="card" style="text-align:center;padding:30px;color:var(--ink-soft);font-weight:700">这个年级还没有可以拼的字～</div>'; return; }
+  var built = (st==="show") ? q.py : _spMark(_sp.sel.map(function(i){ return _sp.tiles[i]; }).join(""), _sp.tone);
+  var tiles=_sp.tiles.map(function(t,i){
+    var on = (st==="show") ? q.parts.indexOf(t)>=0 : _sp.sel.indexOf(i)>=0;
+    return '<button class="sptile'+(on?' on':'')+'" onclick="spTap('+i+')">'+htmlEsc(t.replace(/v/g,"ü"))+'</button>';
+  }).join('');
+  var TP=["M6 16H26","M8 24L24 8","M6 10L16 22L26 10","M8 8L24 24"];
+  var tones=TP.map(function(p,i){
+    var on = (st==="show") ? q.tone===i+1 : _sp.tone===i+1;
+    return '<button class="sptile sptone'+(on?' on':'')+'" onclick="spTone('+(i+1)+')" aria-label="第'+(i+1)+'声">'
+      +'<svg width="32" height="32" viewBox="0 0 32 32"><path d="'+p+'" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  }).join('');
+  var msg = st==="ok" ? '<div class="spmsg" style="color:var(--green-d)">✅ 拼对啦！</div>'
+          : st==="bad" ? '<div class="spmsg" style="color:var(--red)">再想一想，重新拼一次～</div>'
+          : st==="show" ? '<div class="spmsg" style="color:var(--ink-soft)">正确答案是 '+htmlEsc(q.py)+'，记住它再做下一题</div>'
+          : '<div class="spmsg" style="color:var(--ink-soft)">先选字母，再选声调</div>';
+  $("page").innerHTML = tabs+gtabs
+    +'<div class="card sect" id="spBox" style="text-align:center">'
+    +'<div class="secthead"><h3>第 '+_sp.n+' 题</h3><em>拼对 '+_sp.ok+' 个</em></div>'
+    +'<div class="spgrid'+(st==="ok"?' ok':st==="bad"?' bad':'')+'" onclick="spClear()">'+htmlEsc(built)+'</div>'
+    +'<div class="spchar" onclick="spSay()">'+htmlEsc(q.ch)+'</div>'
+    +'<div style="font-size:12.5px;color:var(--ink-soft);font-weight:700;margin-bottom:12px">'+(q.emo?q.emo+' ':'')+'🔊 点一下大字听读音</div>'
+    +'<div class="splabel">请选择字母</div><div class="sprow">'+tiles+'</div>'
+    +'<div class="splabel">请选择声调</div><div class="sprow">'+tones+'</div>'
+    +msg
+    +'<div class="row" style="gap:8px;margin-top:10px">'
+    +'<button class="big" style="flex:1;padding:12px 6px;font-size:15px;background:#eee;color:#555" onclick="spClear()">⌫ 重选</button>'
+    +'<button class="big o" style="flex:1;padding:12px 6px;font-size:15px" onclick="spReveal()">💡 看答案</button>'
+    +'<button class="big p" style="flex:1;padding:12px 6px;font-size:15px" onclick="spNext()">下一题 →</button>'
+    +'</div></div>'
+    +'<div class="meta">今日已练 '+S.cnt.py+' 次</div>';
 }
 
 /* ══════════ 拼音总表子页面 ══════════ */
@@ -8347,6 +8518,7 @@ function pgPinyinTable(){
   $("page").innerHTML=`
    <div class="tabs"><button class="tab" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab on">🔊 拼音表</button>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
      <button class="tab" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
    <div class="tiptext">🎵 点数字按钮听对应声调的发音 · 共 ${_PY_ALL.length} 个音节（真人录音）</div>
    <div>${html}</div>`;
@@ -8358,6 +8530,7 @@ function pgPinyinReview(){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==='learn'?'on':''}" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab ${pyMode==='table'?'on':''}" onclick="pyMode='table';render()">🔊 拼音表</button>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
      <button class="tab ${pyMode==='review'?'on':''}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
    <div class="tabs">${cats.map(c=>`<button class="tab ${c===pyCat?"on":""}" onclick="pyCat='${c}';pyIdx=0;render()">${c}</button>`).join("")}</div>
    ${reviewListHTML("py", false)}`;
