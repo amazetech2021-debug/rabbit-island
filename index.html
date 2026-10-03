@@ -204,6 +204,7 @@ body{
 .trio{display:flex;flex-direction:column;align-items:center;gap:11px;margin-top:18px}
 .trio .row{display:flex;gap:11px;justify-content:center;width:100%}
 .trio .big{flex:1;padding:16px 8px;font-size:17px;flex-direction:row}
+.trio .row .big{flex:1 1 0 !important;min-width:0;justify-content:center}
 .meta{text-align:center;font-size:14.5px;color:var(--ink-soft);font-weight:700;margin-top:12px}
 
 /* ── 数学 ── */
@@ -1547,7 +1548,7 @@ const ENGLISH = {
   ['sugar','糖','🍬',['a sugar','一个糖']],
   ['salt','盐','🧂',['a salt','一个盐']],
   ['pepper','胡椒','🌶️',['a pepper','一个胡椒']],
-  ['oil','油','🫒',['a oil','一个油']],
+  ['oil','油','🛢️',['some oil','一些油']],
   ['juice','果汁','🧃',['a juice','一个果汁']],
   ['tea','茶','🍵',['a tea','一个茶']],
   ['coffee','咖啡','☕',['a coffee','一个咖啡']],
@@ -1598,7 +1599,7 @@ const ENGLISH = {
   ['arm','手臂','💪',['a arm','一个手臂']],
   ['leg','腿','🦵',['a leg','一个腿']],
   ['hair','头发','💇',['a hair','一个头发']],
-  ['back','背部','💆',['a back','一个背部']],
+  ['back','背部','🧍',['a back','一个背部']],
   ['shoulder','肩膀','🤷',['a shoulder','一个肩膀']],
   ['elbow','肘','💪',['a elbow','一个肘']],
   ['wrist','手腕','⌚',['a wrist','一个手腕']],
@@ -1611,17 +1612,17 @@ const ENGLISH = {
   ['tongue','舌头','👅',['a tongue','一个舌头']],
   ['lip','嘴唇','💋',['a lip','一个嘴唇']],
   ['forehead','额头','🤦',['a forehead','一个额头']],
-  ['neck','脖子','🦒',['a neck','一个脖子']],
+  ['neck','脖子','🧣',['a neck','一个脖子']],
   ['chest','胸部','🫁',['a chest','一个胸部']],
   ['belly','肚子','🫃',['a belly','一个肚子']],
-  ['hip','臀部','💃',['a hip','一个臀部']],
+  ['hip','臀部','🍑',['a hip','一个臀部']],
   ['toe','脚趾','👣',['a toe','一个脚趾']],
   ['heel','脚后跟','👣',['a heel','一个脚后跟']],
   ['bone','骨头','🦴',['a bone','一个骨头']],
-  ['skin','皮肤','👐',['a skin','一个皮肤']],
+  ['skin','皮肤','🖐🏻',['a skin','一个皮肤']],
   ['muscle','肌肉','💪',['a muscle','一个肌肉']],
   ['brain','大脑','🧠',['a brain','一个大脑']],
-  ['palm','棕榈树','🖐️',['a palm','一个棕榈树']]
+  ['palm','手掌','🖐️',['a palm','一个手掌']]
  ],
  "Clothes 服装":[
   ['wear','穿','👕',['a wear','一个穿']],
@@ -1668,19 +1669,19 @@ const ENGLISH = {
   ['eight','八','8️⃣',['number eight','数字八']],
   ['nine','九','9️⃣',['number nine','数字九']],
   ['ten','十','🔟',['number ten','数字十']],
-  ['eleven','十一','🔢',['number eleven','数字十一']],
-  ['twelve','十二','🔢',['number twelve','数字十二']],
-  ['thirteen','十三','🔢',['number thirteen','数字十三']],
-  ['fourteen','十四','🔢',['number fourteen','数字十四']],
-  ['fifteen','十五','🔢',['number fifteen','数字十五']],
-  ['sixteen','十六','🔢',['number sixteen','数字十六']],
-  ['seventeen','十七','🔢',['number seventeen','数字十七']],
-  ['eighteen','十八','🔢',['number eighteen','数字十八']],
-  ['nineteen','十九','🔢',['number nineteen','数字十九']],
-  ['twenty','二十','🔢',['number twenty','数字二十']],
-  ['thirty','三十','🔢',['number thirty','数字三十']],
-  ['forty','四十','🔢',['number forty','数字四十']],
-  ['fifty','五十','🔢',['number fifty','数字五十']],
+  ['eleven','十一','1️⃣1️⃣',['number eleven','数字十一']],
+  ['twelve','十二','1️⃣2️⃣',['number twelve','数字十二']],
+  ['thirteen','十三','1️⃣3️⃣',['number thirteen','数字十三']],
+  ['fourteen','十四','1️⃣4️⃣',['number fourteen','数字十四']],
+  ['fifteen','十五','1️⃣5️⃣',['number fifteen','数字十五']],
+  ['sixteen','十六','1️⃣6️⃣',['number sixteen','数字十六']],
+  ['seventeen','十七','1️⃣7️⃣',['number seventeen','数字十七']],
+  ['eighteen','十八','1️⃣8️⃣',['number eighteen','数字十八']],
+  ['nineteen','十九','1️⃣9️⃣',['number nineteen','数字十九']],
+  ['twenty','二十','2️⃣0️⃣',['number twenty','数字二十']],
+  ['thirty','三十','3️⃣0️⃣',['number thirty','数字三十']],
+  ['forty','四十','4️⃣0️⃣',['number forty','数字四十']],
+  ['fifty','五十','5️⃣0️⃣',['number fifty','数字五十']],
   ['sixty','六十','6️⃣0️⃣',['number sixty','数字六十']],
   ['seventy','七十','7️⃣0️⃣',['number seventy','数字七十']],
   ['eighty','八十','8️⃣0️⃣',['number eighty','数字八十']],
@@ -1696,7 +1697,7 @@ const ENGLISH = {
   ['pair','一对','👯',['number pair','数字一对']]
  ],
  "Colors & Shapes 颜色与形状":[
-  ['heart','心脏','❤️',['a heart one','一个心脏的']],
+  ['heart','心形','❤️',['a heart','一个心形']],
   ['orange','橙色','🟠',['a orange one','一个橙子的']],
   ['red','红色','🔴',['a red one','一个红色的']],
   ['blue','蓝色','🔵',['a blue one','一个蓝色的']],
@@ -1747,7 +1748,7 @@ const ENGLISH = {
  "Feelings 感受":[
   ['love','爱','❤️',['a love','一个爱']],
   ['hope','希望','🙏',['a hope','一个希望']],
-  ['mean','意思是','😤',['a mean','一个意思是']],
+  ['mean','小气的','🤏',['a mean person','一个小气的人']],
   ['surprise','使惊讶','😲',['a surprise','一个使惊讶']],
   ['happy','快乐的','😊',['a happy','一个快乐的']],
   ['sad','伤心的','😢',['a sad','一个伤心的']],
@@ -1770,7 +1771,7 @@ const ENGLISH = {
   ['tired','累的','😩',['a tired','一个累的']],
   ['hungry','饿的','🤤',['a hungry','一个饿的']],
   ['thirsty','渴的','💧',['a thirsty','一个渴的']],
-  ['thankful','感激的','💭',['a thankful','一个感激的']],
+  ['thankful','感激的','🙏',['a thankful','一个感激的']],
   ['grateful','感激的','🙏',['a grateful','一个感激的']]
  ],
  "Nature 自然":[
@@ -7301,7 +7302,7 @@ function cardHz(g, u, ch, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button id="hz-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnownInCard('${jsEsc(row[0])}')">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
+      <button id="hz-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnownInCard('${jsEsc(row[0])}')">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakHanzi(row[0], row[3]); }, 150);
@@ -10678,7 +10679,7 @@ function cardEn(cat, i, sub, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button id="en-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','en-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
+      <button id="en-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','en-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
@@ -10736,7 +10737,7 @@ function cardAbc(cat, i, sub, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button id="abc-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','abc-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
+      <button id="abc-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','abc-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
