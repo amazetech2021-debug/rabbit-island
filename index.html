@@ -5076,7 +5076,8 @@ const RABBIT_CFG = {
     {id:"pandabag",name:"熊猫书包", kind:"装扮",days:14,file:"14_小白兔背着熊猫小书包.mp4", line:"熊猫书包背上，我要去上学啦！"},
     {id:"cake",   name:"草莓蛋糕", kind:"喂养",days:15,file:"15_小白兔吃草莓蛋糕.mp4",     line:"草莓蛋糕甜甜的，我好幸福呀！"},
     {id:"hanfu1", name:"汉服撑伞", kind:"装扮",days:16,file:"16_小白兔汉服撑伞.mp4",       line:"穿上汉服撑把伞，我是古风小公主。"},
-    {id:"hanfu2", name:"汉服提灯", kind:"装扮",days:17,file:"17_小白兔汉服提灯.mp4",       line:"提着小灯笼，夜里的路也亮堂堂。"}
+    {id:"hanfu2", name:"汉服提灯", kind:"装扮",days:17,file:"17_小白兔汉服提灯.mp4",       line:"提着小灯笼，夜里的路也亮堂堂。"},
+    {id:"new18", name:"汉服品茶", kind:"装扮",days:18,file:"18_小白兔汉服品茶.mp4", line:"竹林里喝杯热茶，慢慢来，不着急。"}
   ],
   lines:{
     hello:["你回来啦，我在窝里等你呢。","今天想先做哪一样？我陪你。","早上好，我把耳朵竖起来听你念书。"],
@@ -7583,23 +7584,64 @@ function _rvIsActive(mode, key){
   var known = (mode==='hz') ? S.knownHz : S.knownEn;
   return !!(known && known[key]) && !_rvDoneMap(mode)[key];
 }
+var _rvNav = {mode:'', items:[], pos:0};
+function _enRvSeq(){
+  var SRC = enSrc(), cats = Object.keys(SRC), out = [];
+  var show = (enCat && cats.indexOf(enCat)>=0) ? [enCat] : cats;
+  var kw = (enKw||"").trim().toLowerCase();
+  show.forEach(function(c){
+    SRC[c].forEach(function(e,i){
+      if(kw && String(e[0]).toLowerCase().indexOf(kw)<0 && String(e[1]||"").indexOf(kw)<0) return;
+      if(_rvIsActive('en', e[0])) out.push({c:c,i:i,k:e[0]});
+    });
+  });
+  return out;
+}
+function _rvOpenAt(){
+  var n = _rvNav, it = n.items[n.pos]; if(!it){ closeModal(); return; }
+  S.cnt[n.mode] = (S.cnt[n.mode]||0) + 1; earn(1, n.mode); save();   /* 复习也计入打卡 */
+  var tag = (n.pos+1)+' / '+n.items.length;
+  if(n.mode==='hz'){
+    var ex = findHzExtra(it.k);
+    _rvModal('hz', it.k, ex.emoji||'', it.k, ex.py||'', ex.words||'', "speakHanzi('"+jsEsc(it.k)+"','"+jsEsc(ex.words||'')+"')", tag);
+    speakHanzi(it.k, ex.words||'');
+  } else {
+    var w = (enSrc()[it.c]||[])[it.i]; if(!w){ closeModal(); return; }
+    _rvModal('en', w[0], w[2]||'', w[0], w[1]||'', '', "speak('"+jsEsc(w[0])+"','en-US')", tag);
+    speak(w[0], 'en-US');
+  }
+}
+function rvGo(d){
+  var n = _rvNav, p = n.pos + d;
+  if(p<0 || p>=n.items.length) return;
+  n.pos = p; _rvOpenAt();
+}
 function rvFamiliar(mode, key){
   _rvDoneMap(mode)[key] = true; save();
   toast('🎉 熟悉啦，已从复习里移除');
-  closeModal(); render();
+  var n = _rvNav;
+  n.items.splice(n.pos,1);
+  if(n.pos>=n.items.length) n.pos = n.items.length-1;
+  render();
+  if(n.items.length>0) _rvOpenAt(); else closeModal();
 }
 function rvUnfamiliar(){
-  toast('没关系，多看几遍就记住啦～');
-  closeModal();
+  var n = _rvNav;
+  if(n.pos < n.items.length-1){ toast('没关系，多看几遍就记住啦～'); n.pos++; _rvOpenAt(); }
+  else { toast('没关系，多看几遍就记住啦～'); closeModal(); }
 }
-function _rvModal(mode, key, emoji, big, sub, extra, speakFn){
-  var k = jsEsc(key);
+function _rvModal(mode, key, emoji, big, sub, extra, speakFn, tag){
+  var k = jsEsc(key), n = _rvNav;
+  var gs = 'flex:1;padding:10px 8px;font-size:15px;background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7';
   modal('<div style="text-align:center;padding:6px 4px">'
     +(emoji?'<div style="font-size:44px;line-height:1.1">'+htmlEsc(emoji)+'</div>':'')
     +'<div onclick="'+speakFn+'" style="cursor:pointer;font-size:'+(mode==='hz'?'96':'44')+'px;font-weight:900;line-height:1.2;margin:6px 0;color:var(--ink);word-break:break-word">'+htmlEsc(big)+'</div>'
     +(sub?'<div style="font-size:20px;font-weight:800;color:var(--ink-soft);margin-bottom:6px">'+htmlEsc(sub)+'</div>':'')
     +(extra?'<div style="font-size:15px;color:var(--ink-soft);margin-bottom:10px">'+htmlEsc(extra)+'</div>':'')
-    +'<div style="font-size:12.5px;color:var(--ink-soft);margin:6px 0 14px">🔊 点大字再听一遍 · 这个还熟不熟？</div>'
+    +'<div style="font-size:12.5px;color:var(--ink-soft);margin:6px 0 12px">🔊 点大字再听一遍 · 这个还熟不熟？'+(tag?' · '+tag:'')+'</div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:10px">'
+    +'<button class="big" style="'+gs+'"'+(n.pos>0?'':' disabled')+' onclick="rvGo(-1)">← 上一个</button>'
+    +'<button class="big" style="'+gs+'"'+(n.pos<n.items.length-1?'':' disabled')+' onclick="rvGo(1)">下一个 →</button></div>'
     +'<div style="display:flex;gap:10px">'
     +'<button class="big" style="flex:1;padding:14px 6px;font-size:17px;background:#4CAF50" onclick="rvFamiliar(\''+mode+'\',\''+k+'\')">😊 熟悉</button>'
     +'<button class="big o" style="flex:1;padding:14px 6px;font-size:17px" onclick="rvUnfamiliar()">🤔 不熟</button>'
@@ -7608,16 +7650,15 @@ function _rvModal(mode, key, emoji, big, sub, extra, speakFn){
     +'</div>');
 }
 function openHzKnownReview(ch){
-  var ex = findHzExtra(ch);
-  var sp = "speakHanzi('"+jsEsc(ch)+"','"+jsEsc(ex.words||'')+"')";
-  _rvModal('hz', ch, ex.emoji||'', ch, ex.py||'', ex.words||'', sp);
-  speakHanzi(ch, ex.words||'');
+  var ks = _hzRvChars();
+  _rvNav = {mode:'hz', items:ks.map(function(k){return {k:k};}), pos:Math.max(0,ks.indexOf(ch))};
+  _rvOpenAt();
 }
 function openEnKnownReview(cat, i){
-  var it = (enSrc()[cat]||[])[i]; if(!it) return;
-  var sp = "speak('"+jsEsc(it[0])+"','en-US')";
-  _rvModal('en', it[0], it[2]||'', it[0], it[1]||'', '', sp);
-  speak(it[0], 'en-US');
+  var seq = _enRvSeq(), p = 0;
+  seq.forEach(function(o,j){ if(o.c===cat && o.i===i) p=j; });
+  _rvNav = {mode:'en', items:seq, pos:p};
+  _rvOpenAt();
 }
 
 function markHzKnown(ch){
@@ -8395,8 +8436,7 @@ function pgPinyin(){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==="learn"?"on":""}" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab ${pyMode==="table"?"on":""}" onclick="pyMode='table';render()">🔊 拼音表</button>
-     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
-     <button class="tab ${pyMode==="review"?"on":""}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?" ("+Object.keys(S.learnedPy).length+")":""}</button></div>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button></div>
    <div class="tiptext">👆 点一下听发音（多练边框越深代表越熟练）　·　👉 长按看口诀、例字和四声</div>
    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 2px 10px;font-size:12px;color:var(--ink-soft);font-weight:700;align-items:center">
      <span style="border:2px solid #B7DEBB;background:#F2FAF3;border-radius:8px;padding:2px 8px">浅绿 = 练过1-2次</span>
@@ -8454,7 +8494,6 @@ function cardPy(cat, i, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i-1}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i+1}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('py','${jsEsc(key)}');closeModal();pyPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 收藏"}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakPinyinItem(pron); }, 150);
@@ -8583,7 +8622,7 @@ function spPaint(){
   var tabs='<div class="tabs"><button class="tab" onclick="pyMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab" onclick="pyMode=\'table\';render()">🔊 拼音表</button>'
     +'<button class="tab on">🧩 拼一拼</button>'
-    +'<button class="tab" onclick="pyMode=\'review\';render()">🔄 复习'+(Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':'')+'</button></div>';
+    +'</div>';
   var CN=["一","二","三","四","五","六"];
   var grades=Object.keys(HANZI_GRADED).filter(function(g){ return _spPool(g).length; });
   var gtabs = grades.length>1 ? '<div class="tabs">'+grades.map(function(g){
@@ -8712,8 +8751,7 @@ function pgPinyinTable(){
   $("page").innerHTML=`
    <div class="tabs"><button class="tab" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab on">🔊 拼音表</button>
-     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
-     <button class="tab" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button></div>
    <div class="tiptext">🎵 点数字按钮听对应声调的发音 · 共 ${_PY_ALL.length} 个音节（真人录音）</div>
    <div>${html}</div>`;
 }
@@ -8724,8 +8762,7 @@ function pgPinyinReview(){
   $("page").innerHTML = `
    <div class="tabs"><button class="tab ${pyMode==='learn'?'on':''}" onclick="pyMode='learn';render()">📖 学习</button>
      <button class="tab ${pyMode==='table'?'on':''}" onclick="pyMode='table';render()">🔊 拼音表</button>
-     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button>
-     <button class="tab ${pyMode==='review'?'on':''}" onclick="pyMode='review';render()">🔄 复习${Object.keys(S.learnedPy).length?' ('+Object.keys(S.learnedPy).length+')':''}</button></div>
+     <button class="tab" onclick="pyMode='spell';render()">🧩 拼一拼</button></div>
    <div class="tabs">${cats.map(c=>`<button class="tab ${c===pyCat?"on":""}" onclick="pyCat='${c}';pyIdx=0;render()">${c}</button>`).join("")}</div>
    ${reviewListHTML("py", false)}`;
 }
