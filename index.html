@@ -7301,10 +7301,8 @@ function cardHz(g, u, ch, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('hz','${jsEsc(key)}');closeModal();hzPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的字库"}</button>
+      <button id="hz-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnownInCard('${jsEsc(row[0])}')">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-      </div><div class="row" style="width:100%">
-      <button id="hz-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnownInCard('${jsEsc(row[0])}')">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakHanzi(row[0], row[3]); }, 150);
 }
@@ -10680,10 +10678,8 @@ function cardEn(cat, i, sub, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('en','${jsEsc(key)}');closeModal();enPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的词库"}</button>
+      <button id="en-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','en-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-      </div><div class="row" style="width:100%">
-      <button id="en-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','en-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
 }
@@ -10740,10 +10736,8 @@ function cardAbc(cat, i, sub, autoSpeak){
       <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
       <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
-      <button class="big o" style="flex:1;padding:14px 8px;font-size:16px" onclick="toggleCollect('en','${jsEsc(key)}');closeModal();enPaint()">${rec&&rec.collected?"★ 取消收藏":"☆ 加入我的词库"}</button>
+      <button id="abc-card-known-btn" class="big" style="flex:1.4;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','abc-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-      </div><div class="row" style="width:100%">
-      <button id="abc-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','abc-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
     </div></div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
 }
@@ -11832,7 +11826,7 @@ function pgPoemDetail(list){
      <div class="story mean" onclick="speak('${esMean}','zh-CN')" style="cursor:pointer"><span>📖</span><div><b>诗的意思：</b>${htmlEsc(mean)}</div></div>
      <div style="display:flex;flex-direction:row;gap:8px;margin-top:16px;width:100%">
        <button class="big p" onclick="poemIdx=(poemIdx-1+${list.length})%${list.length};render()" style="flex:1;padding:14px 4px;font-size:16px">← 上一首</button>
-       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" ${done?"disabled":""} style="flex:1.4;padding:14px 4px;font-size:16px">${done?"✓ 已背会":"✓ 我会背了"}</button>
+       <button class="big r" onclick="learnPoem('${jsEsc(t)}')" style="flex:1.4;padding:14px 4px;font-size:16px${done?';background:#9aa5b1;border-color:#7d8894':''}">${done?"✓ 已背会":"✓ 我会背了"}</button>
        <button class="big o" onclick="poemIdx=(poemIdx+1)%${list.length};render()" style="flex:1;padding:14px 4px;font-size:16px">下一首 →</button>
      </div>
      <div class="meta">${poemGrade}年级 · 第 ${poemIdx+1}/${list.length} 首 ｜ 点击每行可以单独听 · 已读 ${(S.poemRead&&S.poemRead[t])?S.poemRead[t].count:0} 次</div>
@@ -11844,8 +11838,8 @@ function pgPoemDetail(list){
 }
 var _poemNoAuto = false;
 function learnPoem(t){
-  if(S.learnedPoem[t]) return;
   _poemNoAuto = true;
+  if(S.learnedPoem[t]){ delete S.learnedPoem[t]; save(); render(); return; }   /* 再点一次 → 取消「已背会」 */
   S.learnedPoem[t] = {count:1, lastReview:today(), collected:false};
   S.cnt.poem++; earn(10,"poem"); save(); render();
 }
