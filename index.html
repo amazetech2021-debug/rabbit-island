@@ -4834,7 +4834,7 @@ var CHECKIN_GOALS = {
   en:  {need:10, label:'英语', emoji:'🗣️'},
   poem:{need:1,  label:'古诗', emoji:'📜'},
   think:{need:5, label:'思维', emoji:'🎯'},
-  gem: {need:1,  label:'Gemini课', emoji:'✨'}
+  gem: {need:1,  label:'口语课', emoji:'✨'}
 };
 
 function _checkinReady(){
@@ -4919,7 +4919,7 @@ function completeGemLesson(num){
   S.cnt.gem = (S.cnt.gem||0) + 1;
   earn(5,"gem");
   save();
-  toast("🎉 Gemini课程完成！打卡进度更新");
+  toast("🎉 口语课完成！打卡进度更新");
   render();
 }
 
