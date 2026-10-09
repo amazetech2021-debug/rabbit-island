@@ -4911,8 +4911,13 @@ function showCheckinCalendar(){
 
 function completeGemLesson(num){
   if(!S.gemDone) S.gemDone = {};
-  if(S.gemDone[num] === today()){
-    toast("已完成过本课了 ✅");
+  if(S.gemDone[num]){
+    /* 再点一次 → 取消完成，方便反复复习；当天完成的打卡次数一并撤回 */
+    if(S.gemDone[num] === today() && (S.cnt.gem||0) > 0) S.cnt.gem--;
+    delete S.gemDone[num];
+    save();
+    toast("已恢复为「未完成」，可以再学一遍～");
+    render();
     return;
   }
   S.gemDone[num] = today();
@@ -11772,7 +11777,7 @@ function pgGeminiLesson(num){
   var gemDoneToday = S.gemDone && S.gemDone[num];
   var completeBtn = '<div style="margin-top:14px;padding:0 4px">'
     + (gemDoneToday
-       ? '<div style="background:#d4edda;border-radius:14px;padding:12px;text-align:center;color:#27ae60;font-weight:700;font-size:15px">✅ 已完成本课（永久记录）</div>'
+       ? '<button onclick="completeGemLesson('+num+')" style="width:100%;background:#d4edda;border:none;border-radius:14px;padding:12px;text-align:center;color:#27ae60;font-weight:700;font-size:15px;cursor:pointer">✅ 已完成本课<span style="display:block;font-size:11px;font-weight:600;opacity:.75;margin-top:2px">再点一次可恢复为未完成</span></button>'
        : '<button onclick="completeGemLesson('+num+')" style="width:100%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:14px;padding:14px 0;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">✅ 完成本课（计入打卡）</button>')
     + '</div>';
 
