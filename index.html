@@ -7304,12 +7304,13 @@ function cardHz(g, u, ch, autoSpeak){
       <span>💡</span><div><b>字理小故事：</b>${htmlEsc(row[4]||"")}</div></div>
     <div class="meta">${g}年级 · ${htmlEsc(u)} · ${idx+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button id="hz-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownHz&&S.knownHz[row[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownHz&&S.knownHz[row[0]])?'#fff':'#333'};border-color:${(S.knownHz&&S.knownHz[row[0]])?'#388E3C':'#FFC107'}" onclick="markHzKnownInCard('${jsEsc(row[0])}')">${(S.knownHz&&S.knownHz[row[0]])?'✅ 已认识':'👋 认识这个字'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-    </div></div>`);
+    </div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(prevCh)}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardHz('${g}','${htmlEsc(u)}','${jsEsc(nextCh)}',true)})">下一个 →</button></div>
+    </div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakHanzi(row[0], row[3]); }, 150);
 }
 
@@ -7643,14 +7644,14 @@ function _rvModal(mode, key, emoji, big, sub, extra, speakFn, tag){
     +(sub?'<div style="font-size:20px;font-weight:800;color:var(--ink-soft);margin-bottom:6px">'+htmlEsc(sub)+'</div>':'')
     +(extra?'<div style="font-size:15px;color:var(--ink-soft);margin-bottom:10px">'+htmlEsc(extra)+'</div>':'')
     +'<div style="font-size:12.5px;color:var(--ink-soft);margin:6px 0 12px">🔊 点大字再听一遍 · 这个还熟不熟？'+(tag?' · '+tag:'')+'</div>'
-    +'<div style="display:flex;gap:10px;margin-bottom:10px">'
-    +'<button class="big" style="'+gs+'"'+(n.pos>0?'':' disabled')+' onclick="rvGo(-1)">← 上一个</button>'
-    +'<button class="big" style="'+gs+'"'+(n.pos<n.items.length-1?'':' disabled')+' onclick="rvGo(1)">下一个 →</button></div>'
     +'<div style="display:flex;gap:10px">'
     +'<button class="big" style="flex:1;padding:14px 6px;font-size:17px;background:#4CAF50" onclick="rvFamiliar(\''+mode+'\',\''+k+'\')">😊 熟悉</button>'
     +'<button class="big o" style="flex:1;padding:14px 6px;font-size:17px" onclick="rvUnfamiliar()">🤔 不熟</button>'
     +'</div>'
     +'<div style="margin-top:12px"><button onclick="closeModal()" style="padding:8px 26px;border-radius:20px;background:#f0eef8;border:1px solid #ddd;font-size:13px;cursor:pointer">关闭</button></div>'
+    +'<div style="display:flex;gap:10px;margin-top:14px">'
+    +'<button class="big" style="'+gs+'"'+(n.pos>0?'':' disabled')+' onclick="rvGo(-1)">← 上一个</button>'
+    +'<button class="big" style="'+gs+'"'+(n.pos<n.items.length-1?'':' disabled')+' onclick="rvGo(1)">下一个 →</button></div>'
     +'</div>');
 }
 function openHzKnownReview(ch){
@@ -8495,11 +8496,12 @@ function cardPy(cat, i, autoSpeak){
     ${tonesHtml}${warn}
     <div class="meta">${htmlEsc(cat)} · ${i+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i-1}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i+1}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-    </div></div>`);
+    </div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i-1}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardPy('${htmlEsc(cat)}','${i+1}',true)})">下一个 →</button></div>
+    </div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speakPinyinItem(pron); }, 150);
 }
 function learnPy(key){
@@ -10691,12 +10693,13 @@ function cardEn(cat, i, sub, autoSpeak){
     <div class="words" style="font-size:19px;cursor:pointer" onclick="speak('${jsEsc(it[1]||"")}','zh-CN')">${htmlEsc(it[1]||"")}</div>
     <div class="meta">${htmlEsc(cat)} · ${i+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button id="en-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','en-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-    </div></div>`);
+    </div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardEn('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
+    </div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
 }
 
@@ -10749,12 +10752,13 @@ function cardAbc(cat, i, sub, autoSpeak){
     <div class="words" style="font-size:19px;cursor:pointer" onclick="speak('${jsEsc(cn)}','zh-CN')">${htmlEsc(cn)}</div>
     <div class="meta">${htmlEsc(cat)} · ${i+1}/${arr.length}${rec?" ｜ 已读 "+rec.count+" 次":""}</div>
     <div class="trio">
-      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
-      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
       <div class="row" style="width:100%">
       <button id="abc-card-known-btn" class="big" style="flex:1;padding:14px 8px;font-size:16px;background:${(S.knownEn&&S.knownEn[it[0]])?'#4CAF50':'#FFD54F'};color:${(S.knownEn&&S.knownEn[it[0]])?'#fff':'#333'};border-color:${(S.knownEn&&S.knownEn[it[0]])?'#388E3C':'#FFC107'}" onclick="markEnKnownInCard('${jsEsc(it[0])}','abc-card-known-btn')">${(S.knownEn&&S.knownEn[it[0]])?'✅ 已认识':'👋 认识'}</button>
       <button class="big p" style="flex:1;padding:14px 8px;font-size:16px" onclick="closeModal()">关闭</button>
-    </div></div>`);
+    </div>
+      <div class="row" style="width:100%"><button class="big" style="${gs}" ${hasPrev?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i-1}','${htmlEsc(s)}',true)})">← 上一个</button>
+      <button class="big" style="${gs}" ${hasNext?"":"disabled"} onclick="event.stopPropagation();setTimeout(function(){cardAbc('${htmlEsc(cat)}','${i+1}','${htmlEsc(s)}',true)})">下一个 →</button></div>
+    </div>`);
   clearTimeout(_cardSpeakTimer); if(autoSpeak) _cardSpeakTimer = setTimeout(function(){ speak(it[0], 'en-US'); }, 150);
 }
 
