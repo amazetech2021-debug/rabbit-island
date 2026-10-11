@@ -10503,6 +10503,14 @@ function showEnImgCard(setIdx, wordIdx){
   var total = set.words.length;
   var display = wordBase.split(' ').map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
   _eiSet = setIdx; _eiIdx = wordIdx;
+  /* 英语卡学习计入打卡：每个词每天计一次 */
+  try{
+    if(!S.enCardSeen||S.enCardSeen.d!==today()) S.enCardSeen={d:today(),w:{}};
+    if(!S.enCardSeen.w[word]){
+      S.enCardSeen.w[word]=1;
+      S.cnt.en=(S.cnt.en||0)+1; earn(1,"en"); save();
+    }
+  }catch(e){}
   var kBg = isKnown?'#4CAF50':'#FFD54F';
   var kColor = isKnown?'#fff':'#333';
   var kBd = isKnown?'#388E3C':'#FFC107';
