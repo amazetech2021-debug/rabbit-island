@@ -988,6 +988,10 @@ html.vp-max .vp-bar{position:absolute;top:8px;right:8px;z-index:2;opacity:.35;tr
 html.vp-max .vp-bar:hover{opacity:1}
 html.vp-max .vp-t,html.vp-max .vp-tip{display:none}
 html.vp-max .vp-frame{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}
+
+#vpWrap.vp-web .vp-box{width:min(98vw,1400px)}
+#vpWrap.vp-web .vp-frame{aspect-ratio:auto;height:calc(100vh - 130px);background:#fff}
+html.vp-max #vpWrap.vp-web .vp-frame{height:100vh}
 </style>
 <body>
 <div class="app">
@@ -5542,9 +5546,9 @@ function vpParse(url){
 }
 function vpOpen(url, title, nav){
   var v = vpParse(url);
-  if(!v){ window.open(url, '_blank'); return; }
+  if(!v){ if(!/^https?:/i.test(url||'')){ window.open(url, '_blank'); return; } v = {kind:'web', src:url, url:url}; }
   vpClose();
-  var w = document.createElement('div'); w.id = 'vpWrap';
+  var w = document.createElement('div'); w.id = 'vpWrap'; if(v.kind==='web') w.className = 'vp-web';
   var navHtml = '';
   if(nav && nav.label) title = nav.label + ' · ' + (title||'');
   if(nav){
@@ -5556,10 +5560,12 @@ function vpOpen(url, title, nav){
     + navHtml
     + '<button onclick="_grtTab=null;grtPanel()">👓 视力训练</button>'
     + '<button onclick="vpMax()">⛶ 全屏</button>'
-    + '<button onclick="window.open(\''+v.url.replace(/'/g,"%27")+'\',\'_blank\')">↗ '+(v.kind==='bili'?'去B站':'去YouTube')+'</button>'
+    + '<button onclick="window.open(\''+v.url.replace(/'/g,"%27")+'\',\'_blank\')">↗ '+(v.kind==='bili'?'去B站':v.kind==='yt'?'去YouTube':'新窗口打开')+'</button>'
     + '<button class="vp-x" onclick="vpClose()">✕ 关闭</button></div>'
-    + '<div class="vp-frame"><iframe src="'+v.src+'" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" frameborder="0"></iframe></div>'
-    + '<div class="vp-tip">如果视频播放不了（部分视频禁止外站播放），点「'+(v.kind==='bili'?'去B站':'去YouTube')+'」。请用这里的「全屏」按钮，视力训练效果才会保留。</div>'
+    + '<div class="vp-frame"><iframe src="'+v.src+'" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" referrerpolicy="strict-origin-when-cross-origin" frameborder="0"></iframe></div>'
+    + '<div class="vp-tip">'+(v.kind==='web'
+        ? '如果画面一直是空白或显示「拒绝连接」，说明这个网站不允许在别的网页里打开，请点「新窗口打开」。'
+        : '如果视频播放不了（部分视频禁止外站播放），点「'+(v.kind==='bili'?'去B站':'去YouTube')+'」。')+'请用这里的「全屏」按钮，视力训练效果才会保留。</div>'
     + '</div>';
   (document.querySelector('.app') || document.body).appendChild(w);
 }
@@ -12636,7 +12642,7 @@ function pgLinks(){
   var html='';
   catOrder.forEach(function(cat){
     var cards=cats[cat].map(function(b){
-      return '<div style="background:var(--paper);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .15s" onclick="window.open(\''+b.url+'\',\'_blank\')" onmousedown="this.style.transform=\'scale(.97)\'" onmouseup="this.style.transform=\'\'">'+
+      return '<div style="background:var(--paper);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .15s" onclick="vpOpen(\''+b.url.replace(/'/g,'%27')+'\',\''+String(b.n).replace(/'/g,'’')+'\')" onmousedown="this.style.transform=\'scale(.97)\'" onmouseup="this.style.transform=\'\'">'+
         '<div style="width:56px;height:36px;border-radius:10px;border:1.5px solid #e8e8e8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">'+b.logo+'</div>'+
         '<div style="flex:1;min-width:0">'+
           '<div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.n+'</div>'+
@@ -12649,7 +12655,7 @@ function pgLinks(){
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+cards+'</div>'+
     '</div>';
   });
-  $("page").innerHTML='<div class="card sect"><div class="secthead"><h3>🔖 书签收藏</h3><em>点击直接跳转</em></div>'+html+'</div>';
+  $("page").innerHTML='<div class="card sect"><div class="secthead"><h3>🔖 书签收藏</h3><em>点击在开心兔里打开，可配合视力训练</em></div>'+html+'</div>';
 }
 
 /* ══════════ 奖励中心 ══════════ */
