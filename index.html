@@ -977,6 +977,8 @@ html.grt-on #vpWrap{background:transparent}
 .vp-t{flex:1;min-width:120px;color:#fff;font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .vp-bar button{border:none;border-radius:16px;padding:8px 13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;background:#fff;color:#4b3aa8}
 .vp-bar .vp-x{background:#ff6b6b;color:#fff}
+.vp-bar .vp-nav{background:#ffd54f;color:#5a3c00}
+.vp-bar button:disabled{opacity:.4;cursor:default}
 .vp-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4)}
 .vp-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vp-tip{color:rgba(255,255,255,.8);font-size:12.5px;text-align:center}
@@ -5512,6 +5514,18 @@ function stereoPick(shape){
 }
 
 /* ══════════ 站内视频播放器（B站 / YouTube 不再跳出网站，可叠加视力训练） ══════════ */
+function vpNav(fn, chId, pls, plIdx, epIdx){
+  function at(p, e){ return fn+"('"+chId+"',"+p+","+e+")"; }
+  var nav = {};
+  if(epIdx > 0) nav.prev = at(plIdx, epIdx-1);
+  else { for(var p=plIdx-1; p>=0; p--){ if(pls[p] && pls[p].episodes && pls[p].episodes.length){ nav.prev = at(p, pls[p].episodes.length-1); break; } } }
+  if(pls[plIdx] && epIdx < pls[plIdx].episodes.length-1) nav.next = at(plIdx, epIdx+1);
+  else { for(var q=plIdx+1; q<pls.length; q++){ if(pls[q] && pls[q].episodes && pls[q].episodes.length){ nav.next = at(q, 0); break; } } }
+  var before = 0, total = 0;
+  for(var i=0; i<pls.length; i++){ var n = (pls[i] && pls[i].episodes) ? pls[i].episodes.length : 0; if(i < plIdx) before += n; total += n; }
+  nav.label = '第 '+(before+epIdx+1)+' / '+total+' 集';
+  return nav;
+}
 function vpParse(url){
   if(!url || typeof url !== 'string') return null;
   var m = url.match(/bilibili\.com\/video\/(BV[0-9A-Za-z]+)/);
@@ -5532,8 +5546,11 @@ function vpOpen(url, title, nav){
   vpClose();
   var w = document.createElement('div'); w.id = 'vpWrap';
   var navHtml = '';
-  if(nav && nav.prev) navHtml += '<button onclick="'+nav.prev+'">⏮ 上一集</button>';
-  if(nav && nav.next) navHtml += '<button onclick="'+nav.next+'">下一集 ⏭</button>';
+  if(nav && nav.label) title = nav.label + ' · ' + (title||'');
+  if(nav){
+    navHtml += nav.prev ? '<button class="vp-nav" onclick="'+nav.prev+'">⏮ 上一集</button>' : '<button class="vp-nav" disabled>⏮ 上一集</button>';
+    navHtml += nav.next ? '<button class="vp-nav" onclick="'+nav.next+'">下一集 ⏭</button>' : '<button class="vp-nav" disabled>下一集 ⏭</button>';
+  }
   w.innerHTML = '<div class="vp-box">'
     + '<div class="vp-bar"><b class="vp-t">'+htmlEsc(title||'')+'</b>'
     + navHtml
@@ -13654,7 +13671,7 @@ function playBookVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
-  vpOpen(openUrl, ep.t||pl.name);return;
+  vpOpen(openUrl, ep.t||pl.name, vpNav('playBookVideo', chId, ch.playlists, plIdx, epIdx||0));return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbHtml=isBili
@@ -15020,10 +15037,7 @@ function playYtVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
-  var _nav = {};
-  if(epIdx>0) _nav.prev = "playYtVideo('"+chId+"',"+plIdx+","+(epIdx-1)+")";
-  if(epIdx<pl.episodes.length-1) _nav.next = "playYtVideo('"+chId+"',"+plIdx+","+(epIdx+1)+")";
-  vpOpen(ytUrl, ep.t, _nav);return;
+  vpOpen(ytUrl, ep.t, vpNav('playYtVideo', chId, ch.playlists, plIdx, epIdx));return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbUrl='https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg';
