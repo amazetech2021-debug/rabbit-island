@@ -960,7 +960,8 @@ html.grt-on .app [style*="background:var(--paper)"],html.grt-on .app [style*="ba
 html.grt-on .app [style*="background:var(--cream"],html.grt-on .app [style*="background:var(--card)"],html.grt-on .app [style*="background:#fafafa"],
 html.grt-on .app [style*="background:#FFFCF3"],html.grt-on .app [style*="background:linear-gradient(135deg,#f5f0ff"],
 html.grt-on #mbox:not(:has(#grtPanelBox)):not(:has(#stereoBox)){background-color:rgba(255,255,255,var(--grt-bg,.45))!important;background-image:none!important}
-html.grt-on .vp-frame{opacity:var(--grt-bg,.45)}
+html.grt-on .vp-frame{opacity:max(var(--grt-bg,.45),.6)}
+html.grt-on .app:has(#vpWrap) > :not(#vpWrap){visibility:hidden}
 html.grt-on #mbox:has(#grtPanelBox){opacity:1}
 .grt-sw{display:inline-block;width:22px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.25)}
 
