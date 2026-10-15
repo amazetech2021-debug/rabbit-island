@@ -5230,7 +5230,7 @@ function grtCfg(){
   if(!c.v4){ c.v4 = 1; c.op = 55; if(!c.lv) c.lv = 'm1'; c.size = ({low:150,m1:75,m2:36,hi:18})[c.lv] || 75; }
   if(!c.v3){ c.v3 = 1; c.mode = c.mode || 'grating'; c.amb = c.amb || 'L'; c.redEye = c.redEye || 'L'; c.glass = c.glass || 'rb'; c.fc = c.fc || 40; if(c.auto==null) c.auto = true; }
   if(c.on==null) c.on = false;
-  if(!GRT_PAL[c.pal]) c.pal = 'ry';
+  if(c.pal!=='mix' && !GRT_PAL[c.pal]) c.pal = 'ry';
   if(c.hz>3) c.hz = 3;            // 闪烁不超过每秒 3 次（光敏安全上限）
   if(!c.min) c.min = 20;
   if(!c.size) c.size = 48;
@@ -5296,9 +5296,10 @@ function grtPanel(refresh){
       +'<p class="grt-note">光栅铺满整个网页底层，卡片和格子变成半透明，文字和图标保持清晰（传统 CAM 类刺激，研究证据较弱，建议作为辅助）。有癫痫或光敏感史的孩子不要使用闪烁。</p>'
       +'<button class="big p grt-go" onclick="grtStart(\'grating\')">'+(c.on&&c.mode==='grating'?'🔄 重新开始计时':'▶ 开始光栅刺激')+'</button>'
       +'<div class="grt-lb">光栅类型</div>'
-      +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
+      +row('type', [['mix','🔀 轮流随机']].concat(GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; })))
+      +(c.type==='mix'?'<div class="grt-note" style="margin:4px 0">每 20 秒自动换一种：条纹、方格、旋转、三角、圆形（不含全屏红光闪烁和三色刺激）</div>':'')
       +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
-      +row('pal', Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; }))
+      +row('pal', [['mix','🔀 轮流随机']].concat(Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; })))
       +'<div class="grt-lb">视力分级（按弱视眼矫正视力选，视力越低条纹越粗）</div>'
       +'<div class="grt-row">'+[['low','低视力 0.0–0.1',150],['m1','中低视力 0.2–0.4',75],['m2','中高视力 0.5–0.6',36],['hi','高视力 0.7–0.9',18]].map(function(o){
           return '<button class="'+(c.lv===o[0]?'on':'')+'" onclick="grtLv(\''+o[0]+'\','+o[2]+')">'+o[1]+'</button>'; }).join('')+'</div>'
@@ -5412,24 +5413,37 @@ function grtLoop(now){
   var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
   if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; _grt.last = ''; }
   var t = (now - _grt.t0)/1000;
+  var ty = c.type, pk = c.pal;
+  if(ty === 'mix' || pk === 'mix'){
+    var slot = Math.floor(t / 20);
+    if(_grt.mixSlot !== slot){
+      _grt.mixSlot = slot;
+      var TL = ['stripe','check','rotate','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
+      do { a = TL[Math.floor(Math.random()*TL.length)]; } while(a === _grt.mixT && TL.length > 1);
+      do { b = PL[Math.floor(Math.random()*PL.length)]; } while(b === _grt.mixP && PL.length > 1);
+      _grt.mixT = a; _grt.mixP = b;
+    }
+    if(ty === 'mix') ty = _grt.mixT;
+    if(pk === 'mix') pk = _grt.mixP;
+  }
   var phase = c.hz ? Math.floor(t * c.hz * 2) % 2 : 0;   // 每秒反转 hz 次
   var key;
-  if(c.type === 'rotate') key = 'a' + Math.floor(t * 20);
-  else if(c.type === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
+  if(ty === 'rotate') key = 'a' + Math.floor(t * 20);
+  else if(ty === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
   else key = 'p' + phase;
-  key += '|' + c.type + '|' + c.size + '|' + c.pal + '|' + W + 'x' + H;
+  key += '|' + ty + '|' + c.size + '|' + pk + '|' + W + 'x' + H;
   if(key === _grt.last) return;
   _grt.last = key;
-  var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[c.pal];
+  var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[pk];
   var A = phase ? P[1] : P[0], B = phase ? P[0] : P[1];
   g.fillStyle = B; g.fillRect(0,0,W,H);
-  if(c.type === 'stripe'){
+  if(ty === 'stripe'){
     g.fillStyle = A;
     for(var x0=0; x0<W; x0+=s*2) g.fillRect(x0,0,s,H);
-  } else if(c.type === 'check'){
+  } else if(ty === 'check'){
     g.fillStyle = A;
     for(var y=0, r=0; y<H; y+=s, r++) for(var x=(r%2)*s; x<W; x+=s*2) g.fillRect(x,y,s,s);
-  } else if(c.type === 'tri'){
+  } else if(ty === 'tri'){
     var h = s*0.866;
     g.fillStyle = A;
     for(var row=0, y2=0; y2<H+h; y2+=h, row++){
@@ -5438,19 +5452,19 @@ function grtLoop(now){
         g.beginPath(); g.moveTo(x2, y2+h); g.lineTo(x2+s/2, y2); g.lineTo(x2+s, y2+h); g.closePath(); g.fill();
       }
     }
-  } else if(c.type === 'ring'){
+  } else if(ty === 'ring'){
     var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s, n = Math.ceil(R/s);
     for(var i=n; i>0; i--){ g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill(); }
-  } else if(c.type === 'rotate'){
+  } else if(ty === 'rotate'){
     var ang = t * (c.hz||1) * 0.35, D = Math.hypot(W,H);
     g.save(); g.translate(W/2,H/2); g.rotate(ang);
     g.fillStyle = P[1]; g.fillRect(-D/2,-D/2,D,D);
     g.fillStyle = P[0];
     for(var xx=-D/2; xx<D/2; xx+=s*2) g.fillRect(xx,-D/2,s,D);
     g.restore();
-  } else if(c.type === 'red'){
+  } else if(ty === 'red'){
     g.fillStyle = phase ? '#ff0000' : '#000000'; g.fillRect(0,0,W,H);
-  } else if(c.type === 'rgb'){
+  } else if(ty === 'rgb'){
     g.fillStyle = ['#ff0000','#00c000','#0044ff'][c.hz ? Math.floor(t * c.hz) % 3 : 0]; g.fillRect(0,0,W,H);
   }
 }
