@@ -949,6 +949,13 @@ body{
 .grt-row button{border:2px solid #e0d8ff;background:#fff;border-radius:14px;padding:9px 13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--ink)}
 .grt-row button.on{background:#6c5ce7;border-color:#6c5ce7;color:#fff}
 .grt-lb{font-size:14px;font-weight:800;color:var(--ink-soft);margin-top:4px}
+
+/* 光栅开启：光栅画在最底层，整个页面半透明叠在上面 */
+html.grt-on .app{position:relative;z-index:1;opacity:var(--grt-a,.55)}
+html.grt-on #modal{background:transparent}
+html.grt-on #mbox{opacity:var(--grt-a,.55)}
+html.grt-on #mbox:has(#grtPanelBox){opacity:1}
+.grt-sw{display:inline-block;width:22px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.25)}
 </style>
 <body>
 <div class="app">
@@ -5153,21 +5160,28 @@ function checkNewDay(){
   }
 }
 
-/* ══════════ 光栅阅读（弱视辅助）：整站叠加光栅层 ══════════ */
+/* ══════════ 光栅阅读（弱视辅助）：光栅在底层，页面半透明叠在上面 ══════════ */
 var GRT_TYPES = [
+  {k:'stripe',n:'条纹光栅', e:'▥'},
   {k:'check', n:'方格光栅', e:'🔲'},
-  {k:'stripe',n:'旋转条纹', e:'🌀'},
+  {k:'rotate',n:'旋转条纹', e:'🌀'},
   {k:'tri',   n:'三角光栅', e:'🔺'},
   {k:'ring',  n:'圆形光栅', e:'⭕'},
   {k:'red',   n:'红光闪烁', e:'🔴'},
   {k:'rgb',   n:'三色刺激', e:'🎨'}
 ];
+var GRT_PAL = {ry:['#ff0000','#ffff00','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff0000','#0044ff','红蓝'], rg:['#ff0000','#00b400','红绿'], by:['#0044ff','#ffff00','蓝黄']};
 var _grt = {cv:null, raf:0, t0:0, last:'', start:0};
 function grtCfg(){
-  if(!S.grt || typeof S.grt!=='object') S.grt = {on:false, type:'check', op:25, hz:2, size:24, min:20};
+  if(!S.grt || typeof S.grt!=='object') S.grt = {};
   var c = S.grt;
+  if(!c.v2){ c.v2 = 1; c.type = 'stripe'; c.op = 45; c.pal = 'ry'; c.size = 48; if(c.hz==null) c.hz = 2; }
+  if(c.on==null) c.on = false;
+  if(!GRT_PAL[c.pal]) c.pal = 'ry';
   if(c.hz>3) c.hz = 3;            // 闪烁不超过每秒 3 次（光敏安全上限）
   if(!c.min) c.min = 20;
+  if(!c.size) c.size = 48;
+  if(!c.op) c.op = 45;
   return c;
 }
 function grtSet(k, v){
@@ -5187,16 +5201,18 @@ function grtPanel(refresh){
   modal('<div id="grtPanelBox" style="padding:10px 6px 4px;text-align:center">'
     +'<div style="font-size:40px;line-height:1.1">👓</div>'
     +'<h3 style="margin:6px 0 4px">光栅阅读</h3>'
-    +'<p style="font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 12px;line-height:1.6">开启后，整个网页上会叠加一层光栅，孩子正常认字、读书、做题时同时接受光栅刺激。<br>请按医生建议的时长使用；有癫痫或光敏感史的孩子不要使用闪烁类光栅。</p>'
+    +'<p style="font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 12px;line-height:1.6">开启后，光栅铺在整个网页底下，页面半透明地叠在上面，孩子认字、读书、看视频、做题时都同时接受光栅刺激。<br>请按医生建议的时长使用；有癫痫或光敏感史的孩子不要使用闪烁。</p>'
     +'<button class="big '+(c.on?'':'p')+'" style="width:100%;padding:14px;font-size:18px;margin-bottom:10px'+(c.on?';background:#eee;color:#555':'')+'" onclick="grtSet(\'on\','+(!c.on)+')">'+(c.on?'⏸ 关闭光栅':'▶ 开启光栅')+'</button>'
     +'<div class="grt-lb">光栅类型</div>'
     +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
-    +'<div class="grt-lb">浓度（越高越明显，字越难看清）</div>'
-    +row('op', [[15,'淡 15%'],[25,'中 25%'],[35,'浓 35%'],[50,'很浓 50%']])
-    +'<div class="grt-lb">闪烁 / 旋转速度</div>'
-    +row('hz', [[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
+    +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
+    +row('pal', Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; }))
+    +'<div class="grt-lb">光栅强度（越高光栅越明显，页面越淡）</div>'
+    +row('op', [[30,'30%'],[45,'45%'],[60,'60%'],[75,'75%']])
+    +'<div class="grt-lb">闪烁速度</div>'
+    +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
     +'<div class="grt-lb">光栅粗细</div>'
-    +row('size', [[12,'细'],[24,'中'],[48,'粗']])
+    +row('size', [[24,'细'],[48,'中'],[90,'粗']])
     +'<div class="grt-lb">每次使用时长（到时自动关闭）</div>'
     +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']])
     +'<button class="big" style="width:100%;padding:12px;margin-top:4px" onclick="closeModal()">完成</button>'
@@ -5215,20 +5231,22 @@ function grtChip(){
     +'<button style="background:#ff6b6b;color:#fff" onclick="grtSet(\'on\',false)">关闭</button>';
 }
 function grtApply(){
-  var c = grtCfg();
+  var c = grtCfg(), root = document.documentElement;
   if(c.on && !_grt.start) _grt.start = Date.now();
   if(!c.on){
+    root.classList.remove('grt-on');
     if(_grt.cv){ cancelAnimationFrame(_grt.raf); _grt.cv.remove(); _grt.cv = null; }
     grtChip(); return;
   }
+  root.classList.add('grt-on');
+  root.style.setProperty('--grt-a', String(1 - c.op/100));
   if(!_grt.cv){
     var cv = document.createElement('canvas'); cv.id = 'grtCanvas';
-    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9990';
-    document.body.appendChild(cv);
-    _grt.cv = cv; _grt.t0 = performance.now(); _grt.last = '';
+    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:0';
+    document.body.insertBefore(cv, document.body.firstChild);
+    _grt.cv = cv; _grt.t0 = performance.now();
     _grt.raf = requestAnimationFrame(grtLoop);
   }
-  _grt.cv.style.opacity = (c.op/100);
   _grt.last = '';
   grtChip();
 }
@@ -5242,53 +5260,49 @@ function grtLoop(now){
   var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
   if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; _grt.last = ''; }
   var t = (now - _grt.t0)/1000;
-  var phase = Math.floor(t * c.hz * 2) % 2;          // 每秒反转 hz 次（亮暗各一次）
+  var phase = c.hz ? Math.floor(t * c.hz * 2) % 2 : 0;   // 每秒反转 hz 次
   var key;
-  if(c.type === 'stripe'){
-    key = 'a' + Math.floor(t * 20);                    // 旋转：每秒约 20 帧
-  } else if(c.type === 'rgb'){
-    key = 'c' + Math.floor(t * c.hz) % 3;
-  } else {
-    key = 'p' + phase;
-  }
-  key += '|' + c.type + '|' + c.size + '|' + W + 'x' + H;
+  if(c.type === 'rotate') key = 'a' + Math.floor(t * 20);
+  else if(c.type === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
+  else key = 'p' + phase;
+  key += '|' + c.type + '|' + c.size + '|' + c.pal + '|' + W + 'x' + H;
   if(key === _grt.last) return;
   _grt.last = key;
   if(Math.floor(t) % 30 === 0) grtChip();
-  var g = cv.getContext('2d'), s = c.size;
-  var A = phase ? '#000' : '#fff', B = phase ? '#fff' : '#000';
-  g.clearRect(0,0,W,H);
-  if(c.type === 'check'){
-    for(var y=0, r=0; y<H; y+=s, r++) for(var x=0, q=0; x<W; x+=s, q++){
-      g.fillStyle = ((r+q)%2) ? A : B; g.fillRect(x,y,s,s);
-    }
+  var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[c.pal];
+  var A = phase ? P[1] : P[0], B = phase ? P[0] : P[1];
+  g.fillStyle = B; g.fillRect(0,0,W,H);
+  if(c.type === 'stripe'){
+    g.fillStyle = A;
+    for(var x0=0; x0<W; x0+=s*2) g.fillRect(x0,0,s,H);
+  } else if(c.type === 'check'){
+    g.fillStyle = A;
+    for(var y=0, r=0; y<H; y+=s, r++) for(var x=(r%2)*s; x<W; x+=s*2) g.fillRect(x,y,s,s);
   } else if(c.type === 'tri'){
     var h = s*0.866;
+    g.fillStyle = A;
     for(var row=0, y2=0; y2<H+h; y2+=h, row++){
-      for(var col=-1, x2=-s; x2<W+s; x2+=s/2, col++){
-        var up = (col + row) % 2 === 0;
-        g.beginPath();
-        if(up){ g.moveTo(x2, y2+h); g.lineTo(x2+s/2, y2); g.lineTo(x2+s, y2+h); }
-        else  { g.moveTo(x2, y2); g.lineTo(x2+s, y2); g.lineTo(x2+s/2, y2+h); }
-        g.closePath(); g.fillStyle = up ? A : B; g.fill();
+      for(var col=0, x2=-s; x2<W+s; x2+=s/2, col++){
+        if((col + row) % 2) continue;
+        g.beginPath(); g.moveTo(x2, y2+h); g.lineTo(x2+s/2, y2); g.lineTo(x2+s, y2+h); g.closePath(); g.fill();
       }
     }
   } else if(c.type === 'ring'){
-    var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s;
-    for(var rr = Math.ceil(R/s)*s, i=Math.ceil(R/s); rr>0; rr-=s, i--){
-      g.beginPath(); g.arc(cx,cy,rr,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill();
+    var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s, n = Math.ceil(R/s);
+    for(var i=n; i>0; i--){
+      g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill();
     }
-  } else if(c.type === 'stripe'){
-    var ang = t * c.hz * 0.35, D = Math.hypot(W,H);
+  } else if(c.type === 'rotate'){
+    var ang = t * (c.hz||1) * 0.35, D = Math.hypot(W,H);
     g.save(); g.translate(W/2,H/2); g.rotate(ang);
-    g.fillStyle = '#fff'; g.fillRect(-D/2,-D/2,D,D);
-    g.fillStyle = '#000';
+    g.fillStyle = P[1]; g.fillRect(-D/2,-D/2,D,D);
+    g.fillStyle = P[0];
     for(var xx=-D/2; xx<D/2; xx+=s*2) g.fillRect(xx,-D/2,s,D);
     g.restore();
   } else if(c.type === 'red'){
-    g.fillStyle = phase ? '#ff1a1a' : '#000'; g.fillRect(0,0,W,H);
+    g.fillStyle = phase ? '#ff0000' : '#000000'; g.fillRect(0,0,W,H);
   } else if(c.type === 'rgb'){
-    g.fillStyle = ['#ff2020','#20c040','#2060ff'][Math.floor(t * c.hz) % 3]; g.fillRect(0,0,W,H);
+    g.fillStyle = ['#ff0000','#00c000','#0044ff'][c.hz ? Math.floor(t * c.hz) % 3 : 0]; g.fillRect(0,0,W,H);
   }
 }
 
