@@ -914,11 +914,41 @@ body{
   /* 首页兔兔展示框 */
   .rabbit-wrap .rmain{grid-template-columns:340px 1fr}
   .rabbit-wrap .rscreen .rrest{font-size:13px}
-  .ck-grid{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px!important}
 }
 @media(min-width:1500px){
   :root{--pz:1.3}
 }
+
+/* ══════════ 首页打卡：一行两个，与兔兔框等高 ══════════ */
+.rabbit-wrap .rmain{align-items:stretch}
+.rabbit-wrap .rmain > .rpanel:last-child{display:flex;flex-direction:column}
+.ck-box{flex:1;display:flex;flex-direction:column}
+.ck-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
+.ck-cell{border-radius:14px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:76px}
+.ck-e{font-size:24px;line-height:1.1}
+.ck-l{font-size:14px;margin-top:2px}
+.ck-n{font-size:15px}
+.ck-grt{background:#fff;border:2px dashed #b9a7f5;cursor:pointer;color:#6c5ce7}
+.ck-grt.on{background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:2px solid #6c5ce7;color:#fff}
+.ck-grt.on .ck-l,.ck-grt.on .ck-n{color:#fff!important}
+@media(min-width:1100px){
+  .ck-cell{min-height:0;padding:4px 6px}
+  .ck-e{font-size:26px}
+  .ck-l{font-size:17px;line-height:1.25}
+  .ck-n{font-size:18px;line-height:1.25}
+  .ck-box{padding:12px 14px!important}
+  .rabbit-wrap .rmain > .rpanel:first-child{display:flex;flex-direction:column}
+  .rabbit-wrap .rmain .rscreen{flex:1;aspect-ratio:auto;min-height:420px}
+}
+/* ══════════ 光栅阅读 ══════════ */
+#grtChip{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9995;display:flex;align-items:center;gap:8px;
+  background:rgba(60,40,140,.92);color:#fff;border-radius:22px;padding:8px 10px 8px 14px;font-size:14px;font-weight:800;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);font-family:inherit}
+#grtChip button{border:none;border-radius:16px;padding:5px 11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.grt-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 12px}
+.grt-row button{border:2px solid #e0d8ff;background:#fff;border-radius:14px;padding:9px 13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--ink)}
+.grt-row button.on{background:#6c5ce7;border-color:#6c5ce7;color:#fff}
+.grt-lb{font-size:14px;font-weight:800;color:var(--ink-soft);margin-top:4px}
 </style>
 <body>
 <div class="app">
@@ -4941,7 +4971,7 @@ function _checkinReady(){
 
 function _checkinProgressPanel(){
   var c = S.cnt || {};
-  var html = '<div style="background:linear-gradient(135deg,#f5f0ff,#e8e0ff);border-radius:16px;padding:14px;margin-bottom:12px">';
+  var html = '<div class="ck-box" style="background:linear-gradient(135deg,#f5f0ff,#e8e0ff);border-radius:16px;padding:14px">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
   html += '<div style="font-weight:700;font-size:14px;color:#6c5ce7">📋 今日打卡进度</div>';
   var ready = _checkinReady();
@@ -4954,19 +4984,23 @@ function _checkinProgressPanel(){
     html += '<div style="font-size:11px;color:#999">完成后解锁</div>';
   }
   html += '</div>';
-  html += '<div class="ck-grid" style="display:flex;flex-wrap:wrap;gap:6px">';
+  html += '<div class="ck-grid">';
   Object.keys(CHECKIN_GOALS).forEach(function(k){
     var g = CHECKIN_GOALS[k];
     var cur = c[k]||0;
     var done = cur >= g.need;
-    html += '<div style="flex:1;min-width:80px;background:'+(done?'#d4edda':'#fff')+';border:2px solid '+(done?'#4caf50':'#e0d8ff')+';border-radius:12px;padding:7px 8px;text-align:center">';
-    html += '<div style="font-size:18px">'+g.emoji+'</div>';
-    html += '<div style="font-size:11px;font-weight:700;color:'+(done?'#27ae60':'#6c5ce7')+'">'+g.label+'</div>';
-    html += '<div style="font-size:12px;color:#555;margin-top:2px">';
+    html += '<div class="ck-cell" style="background:'+(done?'#d4edda':'#fff')+';border:2px solid '+(done?'#4caf50':'#e0d8ff')+';border-radius:12px;padding:7px 8px;text-align:center">';
+    html += '<div class="ck-e">'+g.emoji+'</div>';
+    html += '<div class="ck-l" style="font-weight:700;color:'+(done?'#27ae60':'#6c5ce7')+'">'+g.label+'</div>';
+    html += '<div class="ck-n" style="color:#555;margin-top:2px">';
     if(done){ html += '<span style="color:#27ae60;font-weight:800">✓</span>'; }
     else { html += '<b>'+cur+'</b>/<span style="color:#999">'+g.need+'</span>'; }
     html += '</div></div>';
   });
+  var _gc = grtCfg();
+  html += '<div class="ck-cell ck-grt'+(_gc.on?' on':'')+'" onclick="grtPanel()">'
+    + '<div class="ck-e">👓</div><div class="ck-l" style="font-weight:700">光栅阅读</div>'
+    + '<div class="ck-n" style="font-weight:800">'+(_gc.on?'已开启':'点击开启')+'</div></div>';
   html += '</div>';
   // 打卡日历按钮
   html += '<div style="text-align:right;margin-top:8px"><button onclick="showCheckinCalendar()" style="background:none;border:none;color:#6c5ce7;font-size:12px;cursor:pointer;font-family:inherit">📅 打卡日历 ›</button></div>';
@@ -5118,6 +5152,146 @@ function checkNewDay(){
     save();
   }
 }
+
+/* ══════════ 光栅阅读（弱视辅助）：整站叠加光栅层 ══════════ */
+var GRT_TYPES = [
+  {k:'check', n:'方格光栅', e:'🔲'},
+  {k:'stripe',n:'旋转条纹', e:'🌀'},
+  {k:'tri',   n:'三角光栅', e:'🔺'},
+  {k:'ring',  n:'圆形光栅', e:'⭕'},
+  {k:'red',   n:'红光闪烁', e:'🔴'},
+  {k:'rgb',   n:'三色刺激', e:'🎨'}
+];
+var _grt = {cv:null, raf:0, t0:0, last:'', start:0};
+function grtCfg(){
+  if(!S.grt || typeof S.grt!=='object') S.grt = {on:false, type:'check', op:25, hz:2, size:24, min:20};
+  var c = S.grt;
+  if(c.hz>3) c.hz = 3;            // 闪烁不超过每秒 3 次（光敏安全上限）
+  if(!c.min) c.min = 20;
+  return c;
+}
+function grtSet(k, v){
+  var c = grtCfg(); c[k] = v;
+  if(k==='on'){ _grt.start = v ? Date.now() : 0; if(v) toast('👓 光栅阅读已开启，'+c.min+' 分钟后自动关闭'); }
+  save(); grtApply(); grtPanel(true);
+  if(cur==='home') render();
+}
+function grtPanel(refresh){
+  var c = grtCfg();
+  if(refresh && !document.getElementById('grtPanelBox')) return;
+  function row(key, list){
+    return '<div class="grt-row">'+list.map(function(o){
+      return '<button class="'+(c[key]===o[0]?'on':'')+'" onclick="grtSet(\''+key+'\','+JSON.stringify(o[0]).replace(/"/g,"&quot;")+')">'+o[1]+'</button>';
+    }).join('')+'</div>';
+  }
+  modal('<div id="grtPanelBox" style="padding:10px 6px 4px;text-align:center">'
+    +'<div style="font-size:40px;line-height:1.1">👓</div>'
+    +'<h3 style="margin:6px 0 4px">光栅阅读</h3>'
+    +'<p style="font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 12px;line-height:1.6">开启后，整个网页上会叠加一层光栅，孩子正常认字、读书、做题时同时接受光栅刺激。<br>请按医生建议的时长使用；有癫痫或光敏感史的孩子不要使用闪烁类光栅。</p>'
+    +'<button class="big '+(c.on?'':'p')+'" style="width:100%;padding:14px;font-size:18px;margin-bottom:10px'+(c.on?';background:#eee;color:#555':'')+'" onclick="grtSet(\'on\','+(!c.on)+')">'+(c.on?'⏸ 关闭光栅':'▶ 开启光栅')+'</button>'
+    +'<div class="grt-lb">光栅类型</div>'
+    +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
+    +'<div class="grt-lb">浓度（越高越明显，字越难看清）</div>'
+    +row('op', [[15,'淡 15%'],[25,'中 25%'],[35,'浓 35%'],[50,'很浓 50%']])
+    +'<div class="grt-lb">闪烁 / 旋转速度</div>'
+    +row('hz', [[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
+    +'<div class="grt-lb">光栅粗细</div>'
+    +row('size', [[12,'细'],[24,'中'],[48,'粗']])
+    +'<div class="grt-lb">每次使用时长（到时自动关闭）</div>'
+    +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']])
+    +'<button class="big" style="width:100%;padding:12px;margin-top:4px" onclick="closeModal()">完成</button>'
+    +'</div>');
+}
+function grtChip(){
+  var c = grtCfg(), el = document.getElementById('grtChip');
+  if(!c.on){ if(el) el.remove(); return; }
+  if(!el){
+    el = document.createElement('div'); el.id = 'grtChip';
+    document.body.appendChild(el);
+  }
+  var left = _grt.start ? Math.max(0, Math.ceil((_grt.start + c.min*60000 - Date.now())/60000)) : c.min;
+  el.innerHTML = '👓 光栅中 · 剩 '+left+' 分'
+    +'<button style="background:#fff;color:#4b3aa8" onclick="grtPanel()">设置</button>'
+    +'<button style="background:#ff6b6b;color:#fff" onclick="grtSet(\'on\',false)">关闭</button>';
+}
+function grtApply(){
+  var c = grtCfg();
+  if(c.on && !_grt.start) _grt.start = Date.now();
+  if(!c.on){
+    if(_grt.cv){ cancelAnimationFrame(_grt.raf); _grt.cv.remove(); _grt.cv = null; }
+    grtChip(); return;
+  }
+  if(!_grt.cv){
+    var cv = document.createElement('canvas'); cv.id = 'grtCanvas';
+    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9990';
+    document.body.appendChild(cv);
+    _grt.cv = cv; _grt.t0 = performance.now(); _grt.last = '';
+    _grt.raf = requestAnimationFrame(grtLoop);
+  }
+  _grt.cv.style.opacity = (c.op/100);
+  _grt.last = '';
+  grtChip();
+}
+function grtLoop(now){
+  if(!_grt.cv) return;
+  _grt.raf = requestAnimationFrame(grtLoop);
+  var c = grtCfg();
+  if(_grt.start && Date.now() - _grt.start > c.min*60000){
+    c.on = false; _grt.start = 0; save(); grtApply(); toast('⏰ 光栅时间到啦，休息一下眼睛'); if(cur==='home') render(); return;
+  }
+  var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
+  if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; _grt.last = ''; }
+  var t = (now - _grt.t0)/1000;
+  var phase = Math.floor(t * c.hz * 2) % 2;          // 每秒反转 hz 次（亮暗各一次）
+  var key;
+  if(c.type === 'stripe'){
+    key = 'a' + Math.floor(t * 20);                    // 旋转：每秒约 20 帧
+  } else if(c.type === 'rgb'){
+    key = 'c' + Math.floor(t * c.hz) % 3;
+  } else {
+    key = 'p' + phase;
+  }
+  key += '|' + c.type + '|' + c.size + '|' + W + 'x' + H;
+  if(key === _grt.last) return;
+  _grt.last = key;
+  if(Math.floor(t) % 30 === 0) grtChip();
+  var g = cv.getContext('2d'), s = c.size;
+  var A = phase ? '#000' : '#fff', B = phase ? '#fff' : '#000';
+  g.clearRect(0,0,W,H);
+  if(c.type === 'check'){
+    for(var y=0, r=0; y<H; y+=s, r++) for(var x=0, q=0; x<W; x+=s, q++){
+      g.fillStyle = ((r+q)%2) ? A : B; g.fillRect(x,y,s,s);
+    }
+  } else if(c.type === 'tri'){
+    var h = s*0.866;
+    for(var row=0, y2=0; y2<H+h; y2+=h, row++){
+      for(var col=-1, x2=-s; x2<W+s; x2+=s/2, col++){
+        var up = (col + row) % 2 === 0;
+        g.beginPath();
+        if(up){ g.moveTo(x2, y2+h); g.lineTo(x2+s/2, y2); g.lineTo(x2+s, y2+h); }
+        else  { g.moveTo(x2, y2); g.lineTo(x2+s, y2); g.lineTo(x2+s/2, y2+h); }
+        g.closePath(); g.fillStyle = up ? A : B; g.fill();
+      }
+    }
+  } else if(c.type === 'ring'){
+    var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s;
+    for(var rr = Math.ceil(R/s)*s, i=Math.ceil(R/s); rr>0; rr-=s, i--){
+      g.beginPath(); g.arc(cx,cy,rr,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill();
+    }
+  } else if(c.type === 'stripe'){
+    var ang = t * c.hz * 0.35, D = Math.hypot(W,H);
+    g.save(); g.translate(W/2,H/2); g.rotate(ang);
+    g.fillStyle = '#fff'; g.fillRect(-D/2,-D/2,D,D);
+    g.fillStyle = '#000';
+    for(var xx=-D/2; xx<D/2; xx+=s*2) g.fillRect(xx,-D/2,s,D);
+    g.restore();
+  } else if(c.type === 'red'){
+    g.fillStyle = phase ? '#ff1a1a' : '#000'; g.fillRect(0,0,W,H);
+  } else if(c.type === 'rgb'){
+    g.fillStyle = ['#ff2020','#20c040','#2060ff'][Math.floor(t * c.hz) % 3]; g.fillRect(0,0,W,H);
+  }
+}
+
 function render(){
   checkNewDay();
   // If cur is an unknown page (e.g. "gemini" after it was moved), redirect to English
@@ -5134,6 +5308,7 @@ function render(){
   ({home:pgHome, hz:pgHanzi, py:pgPinyin, math:pgMath, en:pgEnglish, poem:pgPoem,
     think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook, links:pgLinks, gemini:pgGemini})[cur]();
   scrollTabsIntoView();
+  try{ grtApply(); }catch(e){}
 }
 
 /* ══════════ 小白兔养成岛配置与逻辑 ══════════ */
