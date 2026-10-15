@@ -5569,6 +5569,7 @@ function vpParse(url){
 function vpOpen(url, title, nav){
   var v = vpParse(url);
   if(!v){ if(!/^https?:/i.test(url||'')){ window.open(url, '_blank'); return; } v = {kind:'web', src:url, url:url}; }
+  if(v.kind==='web' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1))){ window.open(v.url,'_blank'); return; }
   vpClose();
   var w = document.createElement('div'); w.id = 'vpWrap'; if(v.kind==='web') w.className = 'vp-web';
   var navHtml = '';
