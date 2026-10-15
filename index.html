@@ -951,9 +951,16 @@ body{
 .grt-lb{font-size:14px;font-weight:800;color:var(--ink-soft);margin-top:4px}
 
 /* 光栅开启：光栅画在最底层，整个页面半透明叠在上面 */
-html.grt-on .app{position:relative;z-index:1;opacity:var(--grt-a,.55)}
+html.grt-on .app{position:relative;z-index:1}
 html.grt-on #modal{background:transparent}
-html.grt-on #mbox{opacity:var(--grt-a,.55)}
+html.grt-on .app,html.grt-on #mbox{text-shadow:0 0 2px rgba(255,255,255,.95),0 0 5px rgba(255,255,255,.85)}
+html.grt-on .side,html.grt-on .nav .ico{background:rgba(255,255,255,var(--grt-bg,.45))!important;backdrop-filter:none!important}
+html.grt-on .app :is(.card,.filterbar,.secthead em,.tile,.wtile,.pytile,.pmcard,.cell,.choice,.tab:not(.on),.coll-card,.coll-info,.coll-meta,.ck-cell:not(.ck-grt.on),.ck-box,.rpanel,.rtop,.ep-item,.ep-header,.pill,.big:not(.p):not(.o),select,input,textarea,.hw-right,.mq-grid>button),
+html.grt-on .app [style*="background:var(--paper)"],html.grt-on .app [style*="background:#fff"],html.grt-on .app [style*="background: #fff"],
+html.grt-on .app [style*="background:var(--cream"],html.grt-on .app [style*="background:var(--card)"],html.grt-on .app [style*="background:#fafafa"],
+html.grt-on .app [style*="background:#FFFCF3"],html.grt-on .app [style*="background:linear-gradient(135deg,#f5f0ff"],
+html.grt-on #mbox:not(:has(#grtPanelBox)):not(:has(#stereoBox)){background-color:rgba(255,255,255,var(--grt-bg,.45))!important;background-image:none!important}
+html.grt-on .vp-frame{opacity:var(--grt-bg,.45)}
 html.grt-on #mbox:has(#grtPanelBox){opacity:1}
 .grt-sw{display:inline-block;width:22px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.25)}
 
@@ -966,7 +973,6 @@ html.grt-on #mbox:has(#grtPanelBox){opacity:1}
 .grt-go{width:100%;padding:14px;font-size:18px;margin-bottom:10px}
 .dch{position:fixed;inset:0;pointer-events:none}
 body:has(#modal.show #grtPanelBox) .dch,body:has(#modal.show #stereoBox) .dch,body:has(#modal.show #stereoBox) #grtCanvas{display:none}
-html.grt-on:has(#modal.show #stereoBox) .app{opacity:1}
 html.grt-on #mbox:has(#stereoBox){opacity:1}
 .mbox:has(#stereoBox){zoom:1!important;max-height:calc(100vh - 24px)!important}
 /* —— 站内视频播放器 —— */
@@ -5217,6 +5223,7 @@ function grtCfg(){
   if(!S.grt || typeof S.grt!=='object') S.grt = {};
   var c = S.grt;
   if(!c.v2){ c.v2 = 1; c.type = 'stripe'; c.op = 45; c.pal = 'ry'; c.size = 48; if(c.hz==null) c.hz = 2; }
+  if(!c.v4){ c.v4 = 1; c.op = 55; if(!c.lv) c.lv = 'm1'; c.size = ({low:150,m1:75,m2:36,hi:18})[c.lv] || 75; }
   if(!c.v3){ c.v3 = 1; c.mode = c.mode || 'grating'; c.amb = c.amb || 'L'; c.redEye = c.redEye || 'L'; c.glass = c.glass || 'rb'; c.fc = c.fc || 40; if(c.auto==null) c.auto = true; }
   if(c.on==null) c.on = false;
   if(!GRT_PAL[c.pal]) c.pal = 'ry';
@@ -5235,6 +5242,13 @@ function grtSet(k, v){
   if(cur==='home') render();
 }
 function grtStart(mode){ var c = grtCfg(); c.mode = mode; grtSet('on', true); }
+function grtLv(lv, size){ var c = grtCfg(); c.lv = lv; c.size = size; save(); grtApply(); grtPanel(true); }
+function grtOp(v, redraw){
+  var c = grtCfg(); c.op = +v; save();
+  document.documentElement.style.setProperty('--grt-bg', String(Math.max(0, Math.min(1, 1 - c.op/100))));
+  var e = document.getElementById('grtOpV'); if(e) e.textContent = c.op + '%';
+  if(redraw) grtPanel(true);
+}
 function grtPanel(refresh){
   var c = grtCfg();
   if(refresh && !document.getElementById('grtPanelBox')) return;
@@ -5275,22 +5289,26 @@ function grtPanel(refresh){
       +'<div class="grt-lb">另一片镜片颜色</div>'+row('glass', [['rb','蓝色'],['rc','青色（蓝绿）']]);
   } else {
     h += running
-      +'<p class="grt-note">光栅铺在整个网页底下，页面半透明叠在上面（传统 CAM 类刺激，研究证据较弱，建议作为辅助）。有癫痫或光敏感史的孩子不要使用闪烁。</p>'
+      +'<p class="grt-note">光栅铺满整个网页底层，卡片和格子变成半透明，文字和图标保持清晰（传统 CAM 类刺激，研究证据较弱，建议作为辅助）。有癫痫或光敏感史的孩子不要使用闪烁。</p>'
       +'<button class="big p grt-go" onclick="grtStart(\'grating\')">'+(c.on&&c.mode==='grating'?'🔄 重新开始计时':'▶ 开始光栅刺激')+'</button>'
       +'<div class="grt-lb">光栅类型</div>'
       +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
       +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
       +row('pal', Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; }))
-      +'<div class="grt-lb">光栅强度（越高光栅越明显，页面越淡）</div>'
-      +row('op', [[30,'30%'],[45,'45%'],[60,'60%'],[75,'75%']])
+      +'<div class="grt-lb">视力分级（按弱视眼矫正视力选，视力越低条纹越粗）</div>'
+      +'<div class="grt-row">'+[['low','低视力 0.0–0.1',150],['m1','中低视力 0.2–0.4',75],['m2','中高视力 0.5–0.6',36],['hi','高视力 0.7–0.9',18]].map(function(o){
+          return '<button class="'+(c.lv===o[0]?'on':'')+'" onclick="grtLv(\''+o[0]+'\','+o[2]+')">'+o[1]+'</button>'; }).join('')+'</div>'
+      +'<div class="grt-lb">页面透明度：<b id="grtOpV">'+c.op+'%</b>（越高越透，光栅越明显；文字和图标始终清晰）</div>'
+      +'<div style="display:flex;align-items:center;gap:10px;margin:4px 6px 12px"><span style="font-size:13px">0%</span>'
+      +'<input type="range" min="0" max="100" step="5" value="'+c.op+'" style="flex:1;accent-color:#6c5ce7" oninput="grtOp(this.value)">'
+      +'<span style="font-size:13px">100%</span><button class="big" style="padding:6px 12px;font-size:13px;color:var(--ink)" onclick="grtOp(55,true)">重置</button></div>'
       +'<div class="grt-lb">闪烁速度</div>'
       +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
-      +'<div class="grt-lb">光栅粗细</div>'
-      +row('size', [[24,'细'],[48,'中'],[90,'粗']])
+
       +'<div class="grt-lb">每次时长（到时自动结束）</div>'
       +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']]);
   }
-  h += '<button class="big" style="width:100%;padding:12px;margin-top:6px" onclick="closeModal()">完成</button></div>';
+  h += '<button class="big" style="width:100%;padding:12px;margin-top:6px;color:var(--ink)" onclick="closeModal()">完成</button></div>';
   modal(h);
 }
 function grtChip(){
@@ -5362,7 +5380,7 @@ function grtApply(){
     grtChip(); return;
   }
   root.classList.add('grt-on');
-  root.style.setProperty('--grt-a', String(1 - c.op/100));
+  root.style.setProperty('--grt-bg', String(Math.max(0, Math.min(1, 1 - c.op/100))));
   if(!_grt.cv){
     var cv = document.createElement('canvas'); cv.id = 'grtCanvas';
     cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:0';
