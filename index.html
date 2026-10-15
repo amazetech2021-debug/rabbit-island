@@ -956,6 +956,36 @@ html.grt-on #modal{background:transparent}
 html.grt-on #mbox{opacity:var(--grt-a,.55)}
 html.grt-on #mbox:has(#grtPanelBox){opacity:1}
 .grt-sw{display:inline-block;width:22px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.25)}
+
+/* —— 视力训练面板 —— */
+.grt-tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:0 0 10px}
+.grt-tabs button{border:none;border-radius:16px;padding:9px 14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;background:#f0ecff;color:#4b3aa8}
+.grt-tabs button.on{background:#6c5ce7;color:#fff}
+.grt-note{font-size:13.5px;font-weight:600;color:var(--ink-soft);margin:0 0 10px;line-height:1.65;text-align:left}
+.grt-run{font-size:14px;font-weight:800;color:#2e7d32;background:#e8f5e9;border-radius:12px;padding:7px 10px;margin:0 0 10px}
+.grt-go{width:100%;padding:14px;font-size:18px;margin-bottom:10px}
+.dch{position:fixed;inset:0;pointer-events:none}
+body:has(#modal.show #grtPanelBox) .dch,body:has(#modal.show #stereoBox) .dch,body:has(#modal.show #stereoBox) #grtCanvas{display:none}
+html.grt-on:has(#modal.show #stereoBox) .app{opacity:1}
+html.grt-on #mbox:has(#stereoBox){opacity:1}
+.mbox:has(#stereoBox){zoom:1!important;max-height:calc(100vh - 24px)!important}
+/* —— 站内视频播放器 —— */
+#vpWrap{position:fixed;inset:0;z-index:60;background:rgba(15,10,30,.88);display:flex;align-items:center;justify-content:center;padding:12px}
+html.grt-on #vpWrap{background:transparent}
+.vp-box{width:min(96vw, calc((100vh - 150px) * 16 / 9));display:flex;flex-direction:column;gap:8px}
+.vp-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vp-t{flex:1;min-width:120px;color:#fff;font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.vp-bar button{border:none;border-radius:16px;padding:8px 13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;background:#fff;color:#4b3aa8}
+.vp-bar .vp-x{background:#ff6b6b;color:#fff}
+.vp-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.vp-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vp-tip{color:rgba(255,255,255,.8);font-size:12.5px;text-align:center}
+html.vp-max #vpWrap{padding:0}
+html.vp-max .vp-box{width:100vw;height:100vh;gap:0}
+html.vp-max .vp-bar{position:absolute;top:8px;right:8px;z-index:2;opacity:.35;transition:opacity .2s}
+html.vp-max .vp-bar:hover{opacity:1}
+html.vp-max .vp-t,html.vp-max .vp-tip{display:none}
+html.vp-max .vp-frame{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}
 </style>
 <body>
 <div class="app">
@@ -5005,9 +5035,9 @@ function _checkinProgressPanel(){
     html += '</div></div>';
   });
   var _gc = grtCfg();
-  html += '<div class="ck-cell ck-grt'+(_gc.on?' on':'')+'" onclick="grtPanel()">'
-    + '<div class="ck-e">👓</div><div class="ck-l" style="font-weight:700">光栅阅读</div>'
-    + '<div class="ck-n" style="font-weight:800">'+(_gc.on?'已开启':'点击开启')+'</div></div>';
+  html += '<div class="ck-cell ck-grt'+(_gc.on?' on':'')+'" onclick="_grtTab=null;grtPanel()">'
+    + '<div class="ck-e">👓</div><div class="ck-l" style="font-weight:700">视力训练</div>'
+    + '<div class="ck-n" style="font-weight:800">'+(_gc.on?(_gc.mode==='dich'?'双眼分视中':'光栅中'):'点击开始')+'</div></div>';
   html += '</div>';
   // 打卡日历按钮
   html += '<div style="text-align:right;margin-top:8px"><button onclick="showCheckinCalendar()" style="background:none;border:none;color:#6c5ce7;font-size:12px;cursor:pointer;font-family:inherit">📅 打卡日历 ›</button></div>';
@@ -5160,7 +5190,11 @@ function checkNewDay(){
   }
 }
 
-/* ══════════ 光栅阅读（弱视辅助）：光栅在底层，页面半透明叠在上面 ══════════ */
+/* ══════════ 视力训练（弱视辅助）：光栅刺激 / 双眼分视 / 立体视 ══════════
+   双眼分视参考：对比度再平衡（contrast-rebalanced）双眼分视治疗研究——
+   弱视眼 100% 对比度、健眼降低对比度、两眼看到互补的斑块区域、斑块每 10 秒更换、
+   每完成一次训练健眼对比度递增 10%；剂量参考 FDA 批准的 Luminopia（每天 1 小时，每周 6 天）。
+   具体参数请以眼科医生处方为准。 */
 var GRT_TYPES = [
   {k:'stripe',n:'条纹光栅', e:'▥'},
   {k:'check', n:'方格光栅', e:'🔲'},
@@ -5171,69 +5205,152 @@ var GRT_TYPES = [
   {k:'rgb',   n:'三色刺激', e:'🎨'}
 ];
 var GRT_PAL = {ry:['#ff0000','#ffff00','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff0000','#0044ff','红蓝'], rg:['#ff0000','#00b400','红绿'], by:['#0044ff','#ffff00','蓝黄']};
-var _grt = {cv:null, raf:0, t0:0, last:'', start:0};
+var _grt = {cv:null, raf:0, t0:0, last:'', start:0, maskT:0};
+var _grtTab = null;
 function grtCfg(){
   if(!S.grt || typeof S.grt!=='object') S.grt = {};
   var c = S.grt;
   if(!c.v2){ c.v2 = 1; c.type = 'stripe'; c.op = 45; c.pal = 'ry'; c.size = 48; if(c.hz==null) c.hz = 2; }
+  if(!c.v3){ c.v3 = 1; c.mode = c.mode || 'grating'; c.amb = c.amb || 'L'; c.redEye = c.redEye || 'L'; c.glass = c.glass || 'rb'; c.fc = c.fc || 40; if(c.auto==null) c.auto = true; }
   if(c.on==null) c.on = false;
   if(!GRT_PAL[c.pal]) c.pal = 'ry';
   if(c.hz>3) c.hz = 3;            // 闪烁不超过每秒 3 次（光敏安全上限）
   if(!c.min) c.min = 20;
   if(!c.size) c.size = 48;
   if(!c.op) c.op = 45;
+  if(!c.fc) c.fc = 40;
   return c;
 }
 function grtSet(k, v){
   var c = grtCfg(); c[k] = v;
-  if(k==='on'){ _grt.start = v ? Date.now() : 0; if(v) toast('👓 光栅阅读已开启，'+c.min+' 分钟后自动关闭'); }
+  if(k==='on'){ _grt.start = v ? Date.now() : 0; if(v) toast('👓 '+(c.mode==='dich'?'双眼分视':'光栅刺激')+'已开启，'+c.min+' 分钟后自动结束'); }
+  if(k==='mode' && c.on){ _grt.start = Date.now(); }
   save(); grtApply(); grtPanel(true);
   if(cur==='home') render();
 }
+function grtStart(mode){ var c = grtCfg(); c.mode = mode; grtSet('on', true); }
 function grtPanel(refresh){
   var c = grtCfg();
   if(refresh && !document.getElementById('grtPanelBox')) return;
+  if(!_grtTab) _grtTab = c.mode || 'grating';
   function row(key, list){
     return '<div class="grt-row">'+list.map(function(o){
       return '<button class="'+(c[key]===o[0]?'on':'')+'" onclick="grtSet(\''+key+'\','+JSON.stringify(o[0]).replace(/"/g,"&quot;")+')">'+o[1]+'</button>';
     }).join('')+'</div>';
   }
-  modal('<div id="grtPanelBox" style="padding:10px 6px 4px;text-align:center">'
-    +'<div style="font-size:40px;line-height:1.1">👓</div>'
-    +'<h3 style="margin:6px 0 4px">光栅阅读</h3>'
-    +'<p style="font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 12px;line-height:1.6">开启后，光栅铺在整个网页底下，页面半透明地叠在上面，孩子认字、读书、看视频、做题时都同时接受光栅刺激。<br>请按医生建议的时长使用；有癫痫或光敏感史的孩子不要使用闪烁。</p>'
-    +'<button class="big '+(c.on?'':'p')+'" style="width:100%;padding:14px;font-size:18px;margin-bottom:10px'+(c.on?';background:#eee;color:#555':'')+'" onclick="grtSet(\'on\','+(!c.on)+')">'+(c.on?'⏸ 关闭光栅':'▶ 开启光栅')+'</button>'
-    +'<div class="grt-lb">光栅类型</div>'
-    +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
-    +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
-    +row('pal', Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; }))
-    +'<div class="grt-lb">光栅强度（越高光栅越明显，页面越淡）</div>'
-    +row('op', [[30,'30%'],[45,'45%'],[60,'60%'],[75,'75%']])
-    +'<div class="grt-lb">闪烁速度</div>'
-    +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
-    +'<div class="grt-lb">光栅粗细</div>'
-    +row('size', [[24,'细'],[48,'中'],[90,'粗']])
-    +'<div class="grt-lb">每次使用时长（到时自动关闭）</div>'
-    +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']])
-    +'<button class="big" style="width:100%;padding:12px;margin-top:4px" onclick="closeModal()">完成</button>'
-    +'</div>');
+  var tabs = [['dich','👓 双眼分视'],['stereo','🧊 立体视'],['grating','▥ 光栅刺激'],['calib','🔧 眼镜校准']];
+  var h = '<div id="grtPanelBox" style="padding:8px 4px 4px;text-align:center">'
+    +'<h3 style="margin:2px 0 8px">视力训练</h3>'
+    +'<div class="grt-tabs">'+tabs.map(function(t){ return '<button class="'+(_grtTab===t[0]?'on':'')+'" onclick="_grtTab=\''+t[0]+'\';grtPanel(true)">'+t[1]+'</button>'; }).join('')+'</div>';
+  var running = c.on ? '<div class="grt-run">正在进行：'+(c.mode==='dich'?'双眼分视':'光栅刺激')+' · <a href="javascript:void 0" onclick="grtSet(\'on\',false)">结束</a></div>' : '';
+  if(_grtTab==='dich'){
+    h += running
+      +'<p class="grt-note">戴上<b>红蓝眼镜</b>后使用。网页会被分成许多不断变化的斑块：一部分只有弱视眼能看到（100% 对比度），另一部分只有健眼能看到（对比度降低），孩子必须两只眼睛一起用才能看全内容。可以配合看视频、认字、读绘本。</p>'
+      +'<button class="big p grt-go" onclick="grtStart(\'dich\')">'+(c.on&&c.mode==='dich'?'🔄 重新开始计时':'▶ 开始双眼分视')+'</button>'
+      +'<div class="grt-lb">弱视眼（按医生诊断选择）</div>'+row('amb', [['L','左眼'],['R','右眼']])
+      +'<div class="grt-lb">红色镜片戴在</div>'+row('redEye', [['L','左眼（常见）'],['R','右眼']])
+      +'<div class="grt-lb">另一片镜片颜色</div>'+row('glass', [['rb','蓝色'],['rc','青色（蓝绿）']])
+      +'<div class="grt-lb">健眼对比度（越低，弱视眼用得越多）</div>'+row('fc', [[20,'20%'],[30,'30%'],[40,'40%'],[50,'50%'],[60,'60%'],[80,'80%'],[100,'100%']])
+      +'<div class="grt-lb">每完成一次，健眼对比度自动 +10%</div>'+row('auto', [[true,'开'],[false,'关']])
+      +'<div class="grt-lb">每次时长（到时自动结束）</div>'+row('min', [[15,'15分钟'],[20,'20分钟'],[30,'30分钟'],[45,'45分钟'],[60,'60分钟']])
+      +'<p class="grt-note" style="font-size:12px">参考方案：研究中弱视眼保持 100%，健眼起始约 20–60%，每次训练后提高 10%；FDA 批准的同类产品为每天 1 小时、每周 6 天。请按医生建议设置。</p>';
+  } else if(_grtTab==='stereo'){
+    var st = S.stereo || {};
+    h += '<p class="grt-note">戴上<b>红蓝眼镜</b>，在随机点图里找出藏着的图形（圆、方、三角、星）。答对会逐步变难（视差越来越小），答错会变容易，用来练习立体视。</p>'
+      +(st.best ? '<div class="grt-run">目前最好成绩：视差 '+st.best+' 像素（约 '+stArc(st.best)+'″）</div>' : '')
+      +'<button class="big p grt-go" onclick="stereoOpen()">▶ 开始立体视训练</button>'
+      +'<div class="grt-lb">眼镜设置与「双眼分视」共用：红色镜片在'+(c.redEye==='L'?'左':'右')+'眼，另一片为'+(c.glass==='rc'?'青色':'蓝色')+'</div>';
+  } else if(_grtTab==='calib'){
+    var blue = c.glass==='rc' ? '#00ffff' : '#0040ff';
+    h += '<p class="grt-note">戴好红蓝眼镜，先闭上一只眼，再换另一只。<br>红镜片那只眼应该<b>只看到「红」</b>，另一只眼应该<b>只看到「蓝」</b>。如果两个字都看得到，请调暗屏幕或换一副眼镜。</p>'
+      +'<div style="background:#000;border-radius:16px;padding:26px 10px;display:flex;justify-content:center;gap:40px;margin:6px 0 12px">'
+      +'<span style="font-size:64px;font-weight:900;color:#ff0000">红</span><span style="font-size:64px;font-weight:900;color:'+blue+'">蓝</span></div>'
+      +'<div class="grt-lb">红色镜片戴在</div>'+row('redEye', [['L','左眼'],['R','右眼']])
+      +'<div class="grt-lb">另一片镜片颜色</div>'+row('glass', [['rb','蓝色'],['rc','青色（蓝绿）']]);
+  } else {
+    h += running
+      +'<p class="grt-note">光栅铺在整个网页底下，页面半透明叠在上面（传统 CAM 类刺激，研究证据较弱，建议作为辅助）。有癫痫或光敏感史的孩子不要使用闪烁。</p>'
+      +'<button class="big p grt-go" onclick="grtStart(\'grating\')">'+(c.on&&c.mode==='grating'?'🔄 重新开始计时':'▶ 开始光栅刺激')+'</button>'
+      +'<div class="grt-lb">光栅类型</div>'
+      +row('type', GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; }))
+      +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
+      +row('pal', Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; }))
+      +'<div class="grt-lb">光栅强度（越高光栅越明显，页面越淡）</div>'
+      +row('op', [[30,'30%'],[45,'45%'],[60,'60%'],[75,'75%']])
+      +'<div class="grt-lb">闪烁速度</div>'
+      +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
+      +'<div class="grt-lb">光栅粗细</div>'
+      +row('size', [[24,'细'],[48,'中'],[90,'粗']])
+      +'<div class="grt-lb">每次时长（到时自动结束）</div>'
+      +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']]);
+  }
+  h += '<button class="big" style="width:100%;padding:12px;margin-top:6px" onclick="closeModal()">完成</button></div>';
+  modal(h);
 }
 function grtChip(){
   var c = grtCfg(), el = document.getElementById('grtChip');
   if(!c.on){ if(el) el.remove(); return; }
-  if(!el){
-    el = document.createElement('div'); el.id = 'grtChip';
-    document.body.appendChild(el);
-  }
+  if(!el){ el = document.createElement('div'); el.id = 'grtChip'; document.body.appendChild(el); }
   var left = _grt.start ? Math.max(0, Math.ceil((_grt.start + c.min*60000 - Date.now())/60000)) : c.min;
-  el.innerHTML = '👓 光栅中 · 剩 '+left+' 分'
-    +'<button style="background:#fff;color:#4b3aa8" onclick="grtPanel()">设置</button>'
-    +'<button style="background:#ff6b6b;color:#fff" onclick="grtSet(\'on\',false)">关闭</button>';
+  el.innerHTML = '👓 '+(c.mode==='dich'?'双眼分视 '+c.fc+'%':'光栅中')+' · 剩 '+left+' 分'
+    +'<button style="background:#fff;color:#4b3aa8" onclick="_grtTab=null;grtPanel()">设置</button>'
+    +'<button style="background:#ff6b6b;color:#fff" onclick="grtSet(\'on\',false)">结束</button>';
+}
+/* —— 双眼分视：三层叠加（弱视眼颜色 / 健眼颜色 / 健眼降对比度），斑块蒙版每 10 秒更换 —— */
+function dchColors(c){
+  var red = '#ff0000', other = c.glass==='rc' ? '#00ffff' : '#0000ff', otherMid = c.glass==='rc' ? '#008080' : '#000080';
+  var ambRed = (c.amb === c.redEye);
+  return {A: ambRed?red:other, F: ambRed?other:red, Fmid: ambRed?otherMid:'#800000'};
+}
+function dchMasks(){
+  var w = Math.max(40, Math.ceil(window.innerWidth/6)), h = Math.max(40, Math.ceil(window.innerHeight/6));
+  var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  var g = cv.getContext('2d');
+  var cell = Math.max(10, Math.round(Math.min(w,h)/4));
+  try{ g.filter = 'blur('+Math.max(2, Math.round(cell/8))+'px)'; }catch(e){}
+  g.fillStyle = '#fff';
+  for(var y=-cell/2; y<h+cell; y+=cell){
+    for(var x=-cell/2; x<w+cell; x+=cell){
+      if(Math.random() < 0.5) continue;
+      var rx = cell*(0.45+Math.random()*0.35), ry = cell*(0.45+Math.random()*0.35);
+      g.beginPath(); g.ellipse(x+(Math.random()-.5)*cell*.5, y+(Math.random()-.5)*cell*.5, rx, ry, Math.random()*Math.PI, 0, Math.PI*2); g.fill();
+    }
+  }
+  var inv = document.createElement('canvas'); inv.width = w; inv.height = h;
+  var g2 = inv.getContext('2d'); g2.fillStyle = '#fff'; g2.fillRect(0,0,w,h);
+  g2.globalCompositeOperation = 'destination-out'; g2.drawImage(cv,0,0);
+  return [cv.toDataURL(), inv.toDataURL()];
+}
+function dchSetMask(el, url){
+  el.style.webkitMaskImage = el.style.maskImage = 'url('+url+')';
+  el.style.webkitMaskSize = el.style.maskSize = '100% 100%';
+  el.style.webkitMaskRepeat = el.style.maskRepeat = 'no-repeat';
+}
+function dchApply(on){
+  var ids = ['dchA','dchF','dchC'];
+  if(!on){ ids.forEach(function(id){ var e=document.getElementById(id); if(e) e.remove(); }); clearInterval(_grt.maskT); _grt.maskT = 0; return; }
+  var c = grtCfg(), col = dchColors(c);
+  var els = ids.map(function(id, i){
+    var e = document.getElementById(id);
+    if(!e){ e = document.createElement('div'); e.id = id; e.className = 'dch'; document.body.appendChild(e); }
+    e.style.zIndex = 9980 + i;
+    return e;
+  });
+  els[0].style.background = col.A; els[0].style.mixBlendMode = 'multiply';
+  els[1].style.background = col.F; els[1].style.mixBlendMode = 'multiply';
+  els[2].style.background = col.Fmid; els[2].style.mixBlendMode = 'normal'; els[2].style.opacity = String(Math.max(0, 1 - c.fc/100));
+  function remask(){ var m = dchMasks(); dchSetMask(els[0], m[0]); dchSetMask(els[1], m[1]); dchSetMask(els[2], m[1]); }
+  remask();
+  if(!_grt.maskT) _grt.maskT = setInterval(function(){ if(document.getElementById('dchA')) remask(); }, 10000);
 }
 function grtApply(){
   var c = grtCfg(), root = document.documentElement;
   if(c.on && !_grt.start) _grt.start = Date.now();
-  if(!c.on){
+  var gOn = c.on && c.mode !== 'dich', dOn = c.on && c.mode === 'dich';
+  dchApply(dOn);
+  if(!c.on && _grt.tick){ clearInterval(_grt.tick); _grt.tick = 0; }
+  if(c.on && !_grt.tick) _grt.tick = setInterval(grtTick, 5000);
+  if(!gOn){
     root.classList.remove('grt-on');
     if(_grt.cv){ cancelAnimationFrame(_grt.raf); _grt.cv.remove(); _grt.cv = null; }
     grtChip(); return;
@@ -5250,13 +5367,20 @@ function grtApply(){
   _grt.last = '';
   grtChip();
 }
+function grtTick(){
+  var c = grtCfg();
+  if(!c.on) return;
+  if(_grt.start && Date.now() - _grt.start > c.min*60000){
+    var msg = '⏰ 训练时间到啦，休息一下眼睛';
+    if(c.mode === 'dich' && c.auto && c.fc < 100){ c.fc = Math.min(100, Math.round(c.fc * 1.1)); msg += '（下次健眼对比度 '+c.fc+'%）'; }
+    c.on = false; _grt.start = 0; save(); grtApply(); toast(msg); if(cur==='home') render(); return;
+  }
+  grtChip();
+}
 function grtLoop(now){
   if(!_grt.cv) return;
   _grt.raf = requestAnimationFrame(grtLoop);
   var c = grtCfg();
-  if(_grt.start && Date.now() - _grt.start > c.min*60000){
-    c.on = false; _grt.start = 0; save(); grtApply(); toast('⏰ 光栅时间到啦，休息一下眼睛'); if(cur==='home') render(); return;
-  }
   var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
   if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; _grt.last = ''; }
   var t = (now - _grt.t0)/1000;
@@ -5268,7 +5392,6 @@ function grtLoop(now){
   key += '|' + c.type + '|' + c.size + '|' + c.pal + '|' + W + 'x' + H;
   if(key === _grt.last) return;
   _grt.last = key;
-  if(Math.floor(t) % 30 === 0) grtChip();
   var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[c.pal];
   var A = phase ? P[1] : P[0], B = phase ? P[0] : P[1];
   g.fillStyle = B; g.fillRect(0,0,W,H);
@@ -5289,9 +5412,7 @@ function grtLoop(now){
     }
   } else if(c.type === 'ring'){
     var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s, n = Math.ceil(R/s);
-    for(var i=n; i>0; i--){
-      g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill();
-    }
+    for(var i=n; i>0; i--){ g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill(); }
   } else if(c.type === 'rotate'){
     var ang = t * (c.hz||1) * 0.35, D = Math.hypot(W,H);
     g.save(); g.translate(W/2,H/2); g.rotate(ang);
@@ -5305,6 +5426,149 @@ function grtLoop(now){
     g.fillStyle = ['#ff0000','#00c000','#0044ff'][c.hz ? Math.floor(t * c.hz) % 3 : 0]; g.fillRect(0,0,W,H);
   }
 }
+
+/* ══════════ 立体视训练：红蓝随机点立体图（阶梯法） ══════════ */
+var ST_LV = [12, 9, 7, 5, 4, 3, 2, 1];           // 视差（CSS 像素）
+var ST_SHAPES = [['circle','⭕ 圆形'],['square','⬛ 方形'],['tri','🔺 三角'],['star','⭐ 星星']];
+var _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false};
+function stArc(px){ return Math.round(px * 0.2646 / 400 * 206265); }   // 按 40cm 观看距离估算
+function stereoOpen(){
+  _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false};
+  var S0 = Math.min(360, window.innerWidth - 60);
+  modal('<div id="stereoBox" style="text-align:center;padding:6px 2px">'
+    +'<h3 style="margin:2px 0 4px">🧊 立体视训练</h3>'
+    +'<div id="stInfo" style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-bottom:8px"></div>'
+    +'<canvas id="stCv" style="width:'+S0+'px;height:'+S0+'px;border-radius:14px;background:#000;display:block;margin:0 auto"></canvas>'
+    +'<div style="font-size:14px;font-weight:700;margin:10px 0 6px">戴上红蓝眼镜，图里藏着什么？</div>'
+    +'<div class="grt-row" id="stBtns">'+ST_SHAPES.map(function(o){ return '<button style="font-size:17px;padding:12px 14px" onclick="stereoPick(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:6px"><button class="big" style="flex:1;padding:11px;color:var(--ink)" onclick="stereoNext()">👀 看不出来，换一张</button>'
+    +'<button class="big" style="flex:1;padding:11px;color:var(--ink)" onclick="closeModal()">结束</button></div></div>');
+  stereoNext();
+}
+function stShapePath(g, shape, cx, cy, r){
+  g.beginPath();
+  if(shape==='circle'){ g.arc(cx, cy, r, 0, Math.PI*2); }
+  else if(shape==='square'){ g.rect(cx-r*0.85, cy-r*0.85, r*1.7, r*1.7); }
+  else if(shape==='tri'){ g.moveTo(cx, cy-r); g.lineTo(cx+r*0.95, cy+r*0.75); g.lineTo(cx-r*0.95, cy+r*0.75); g.closePath(); }
+  else { for(var i=0;i<10;i++){ var a = -Math.PI/2 + i*Math.PI/5, rr = (i%2)? r*0.45 : r*1.05; g.lineTo(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr); } g.closePath(); }
+}
+function stereoNext(){
+  var cv = document.getElementById('stCv'); if(!cv) return;
+  var c = grtCfg(), dpr = window.devicePixelRatio || 1;
+  var css = parseFloat(cv.style.width), W = Math.round(css*dpr);
+  cv.width = W; cv.height = W;
+  var dot = Math.max(1, Math.round(3*dpr)), d = Math.round(ST_LV[_st.lv]*dpr);
+  var shape = ST_SHAPES[Math.floor(Math.random()*4)][0]; _st.shape = shape;
+  // 随机点底图：右眼整体错开 D0（避免不戴眼镜时看出图形），图形区域再额外错开 d
+  var D0 = dot*2;
+  var base = document.createElement('canvas'); base.width = W + D0 + d + dot*2; base.height = W;
+  var bg = base.getContext('2d'); bg.fillStyle = '#000'; bg.fillRect(0,0,base.width,W); bg.fillStyle = '#fff';
+  for(var y=0; y<W; y+=dot) for(var x=0; x<base.width; x+=dot) if(Math.random()<0.35) bg.fillRect(x,y,dot,dot);
+  var r = W*0.26, cx = W/2 + (Math.random()-.5)*W*0.12, cy = W/2 + (Math.random()-.5)*W*0.12;
+  function eyeImg(isRight){
+    var e = document.createElement('canvas'); e.width = W; e.height = W;
+    var g = e.getContext('2d'); g.drawImage(base, isRight ? -D0 : 0, 0);
+    if(isRight){ g.save(); stShapePath(g, shape, cx, cy, r); g.clip(); g.drawImage(base, -(D0 + d), 0); g.restore(); }
+    return e;
+  }
+  var left = eyeImg(false), right = eyeImg(true);
+  var redImg = c.redEye==='L' ? left : right, othImg = c.redEye==='L' ? right : left;
+  var otherCol = c.glass==='rc' ? [0,255,255] : [0,0,255];
+  var g = cv.getContext('2d'); g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0,0,W,W);
+  function tint(img, rgb){
+    var t = document.createElement('canvas'); t.width = W; t.height = W; var tg = t.getContext('2d');
+    tg.drawImage(img,0,0); tg.globalCompositeOperation = 'multiply'; tg.fillStyle = 'rgb('+rgb.join(',')+')'; tg.fillRect(0,0,W,W);
+    return t;
+  }
+  g.globalCompositeOperation = 'lighter';
+  g.drawImage(tint(redImg,[255,0,0]),0,0); g.drawImage(tint(othImg,otherCol),0,0);
+  g.globalCompositeOperation = 'source-over';
+  var info = document.getElementById('stInfo');
+  if(info) info.innerHTML = '第 '+(_st.lv+1)+' 级 · 视差 '+ST_LV[_st.lv]+' 像素（约 '+stArc(ST_LV[_st.lv])+'″）· 答对 '+_st.ok+'/'+_st.n;
+  _st.busy = false;
+}
+function stereoPick(shape){
+  if(_st.busy || !_st.shape) return;
+  _st.busy = true; _st.n++;
+  var right = shape === _st.shape;
+  if(right){
+    _st.ok++; _st.streak++;
+    if(_st.streak >= 2){
+      if(!S.stereo) S.stereo = {};
+      var px = ST_LV[_st.lv];
+      if(!S.stereo.best || px < S.stereo.best){ S.stereo.best = px; }
+      if(_st.lv < ST_LV.length-1) _st.lv++;
+      _st.streak = 0;
+    }
+    toast('✅ 答对啦！'); try{ earn(1,'think'); }catch(e){}
+  } else {
+    var nm = (ST_SHAPES.find(function(o){ return o[0]===_st.shape; })||[])[1] || '';
+    toast('再看看，刚才是 '+nm); _st.streak = 0; if(_st.lv > 0) _st.lv--;
+  }
+  if(!S.stereo) S.stereo = {};
+  S.stereo.last = today(); S.stereo.trials = (S.stereo.trials||0) + 1;
+  save();
+  setTimeout(stereoNext, 700);
+}
+
+/* ══════════ 站内视频播放器（B站 / YouTube 不再跳出网站，可叠加视力训练） ══════════ */
+function vpParse(url){
+  if(!url || typeof url !== 'string') return null;
+  var m = url.match(/bilibili\.com\/video\/(BV[0-9A-Za-z]+)/);
+  if(m){
+    var pp = url.match(/[?&]p=(\d+)/);
+    return {kind:'bili', src:'https://player.bilibili.com/player.html?bvid='+m[1]+'&p='+(pp?pp[1]:1)+'&autoplay=1&high_quality=1&danmaku=0&isOutside=true', url:url};
+  }
+  var y = url.match(/youtube\.com\/watch\?[^#]*v=([\w-]{11})/) || url.match(/youtu\.be\/([\w-]{11})/) || url.match(/youtube\.com\/shorts\/([\w-]{11})/);
+  var lst = url.match(/[?&]list=([\w-]+)/);
+  var q = 'autoplay=1&rel=0&playsinline=1&fs=0&modestbranding=1';
+  if(y) return {kind:'yt', src:'https://www.youtube.com/embed/'+y[1]+'?'+q+(lst?'&list='+lst[1]:''), url:url};
+  if(lst && /youtube\.com\/playlist/.test(url)) return {kind:'yt', src:'https://www.youtube.com/embed/videoseries?list='+lst[1]+'&'+q, url:url};
+  return null;
+}
+function vpOpen(url, title, nav){
+  var v = vpParse(url);
+  if(!v){ window.open(url, '_blank'); return; }
+  vpClose();
+  var w = document.createElement('div'); w.id = 'vpWrap';
+  var navHtml = '';
+  if(nav && nav.prev) navHtml += '<button onclick="'+nav.prev+'">⏮ 上一集</button>';
+  if(nav && nav.next) navHtml += '<button onclick="'+nav.next+'">下一集 ⏭</button>';
+  w.innerHTML = '<div class="vp-box">'
+    + '<div class="vp-bar"><b class="vp-t">'+htmlEsc(title||'')+'</b>'
+    + navHtml
+    + '<button onclick="_grtTab=null;grtPanel()">👓 视力训练</button>'
+    + '<button onclick="vpMax()">⛶ 全屏</button>'
+    + '<button onclick="window.open(\''+v.url.replace(/'/g,"%27")+'\',\'_blank\')">↗ '+(v.kind==='bili'?'去B站':'去YouTube')+'</button>'
+    + '<button class="vp-x" onclick="vpClose()">✕ 关闭</button></div>'
+    + '<div class="vp-frame"><iframe src="'+v.src+'" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" frameborder="0"></iframe></div>'
+    + '<div class="vp-tip">如果视频播放不了（部分视频禁止外站播放），点「'+(v.kind==='bili'?'去B站':'去YouTube')+'」。请用这里的「全屏」按钮，视力训练效果才会保留。</div>'
+    + '</div>';
+  (document.querySelector('.app') || document.body).appendChild(w);
+}
+function vpClose(){
+  var w = document.getElementById('vpWrap'); if(w) w.remove();
+  document.documentElement.classList.remove('vp-max');
+  if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
+}
+function vpMax(){
+  var r = document.documentElement;
+  if(r.classList.contains('vp-max')){
+    r.classList.remove('vp-max');
+    if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
+  } else {
+    r.classList.add('vp-max');
+    try{ if(r.requestFullscreen) r.requestFullscreen(); else if(r.webkitRequestFullscreen) r.webkitRequestFullscreen(); }catch(e){}
+  }
+}
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement) document.documentElement.classList.remove('vp-max'); });
+document.addEventListener('click', function(e){
+  var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+  if(!a) return;
+  var href = a.getAttribute('href');
+  if(vpParse(href)){ e.preventDefault(); e.stopPropagation(); vpOpen(href, (a.textContent||'').trim().slice(0,60)); }
+}, true);
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && document.getElementById('vpWrap') && !document.fullscreenElement) vpClose(); });
 
 function render(){
   checkNewDay();
@@ -13390,7 +13654,7 @@ function playBookVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
-  if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=openUrl;}else{window.open(openUrl,'_blank');}return;
+  vpOpen(openUrl, ep.t||pl.name);return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbHtml=isBili
@@ -14756,7 +15020,10 @@ function playYtVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
-  if(navigator.maxTouchPoints>0||window.innerWidth<900){location.href=ytUrl;}else{window.open(ytUrl,'_blank');}return;
+  var _nav = {};
+  if(epIdx>0) _nav.prev = "playYtVideo('"+chId+"',"+plIdx+","+(epIdx-1)+")";
+  if(epIdx<pl.episodes.length-1) _nav.next = "playYtVideo('"+chId+"',"+plIdx+","+(epIdx+1)+")";
+  vpOpen(ytUrl, ep.t, _nav);return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
   var thumbUrl='https://img.youtube.com/vi/'+ep.v+'/hqdefault.jpg';
