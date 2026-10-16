@@ -5482,7 +5482,7 @@ var GRT_TYPES = [
   {k:'pin',   n:'光栅旋转', e:'🏁'},
   {k:'tri',   n:'三角光栅', e:'🔺'},
   {k:'ring',  n:'圆形光栅', e:'⭕'},
-  {k:'red',   n:'红光闪烁', e:'🔴'},
+  {k:'red',   n:'红黄闪烁', e:'🔴'},
   {k:'bw',    n:'黑白闪烁', e:'⚫'},
   {k:'rgb',   n:'三色刺激', e:'🎨'}
 ];
@@ -5563,8 +5563,8 @@ function grtPanel(refresh){
       +'<button class="big p grt-go" onclick="grtStart(\'grating\')">'+(c.on&&c.mode==='grating'?'🔄 重新开始计时':'▶ 开始光栅刺激')+'</button>'
       +'<div class="grt-lb">光栅类型</div>'
       +row('type', [['mix','🔀 轮流随机']].concat(GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; })))
-      +(c.type==='mix'?'<div class="grt-note" style="margin:4px 0">每 20 秒自动换一种：条纹、方格、旋转条纹、光栅旋转、三角、圆形（不含全屏的红光闪烁、黑白闪烁和三色刺激）</div>':'')
-      +'<div class="grt-lb">颜色（红光闪烁、黑白闪烁、三色刺激不受影响）</div>'
+      +(c.type==='mix'?'<div class="grt-note" style="margin:4px 0">每 20 秒自动换一种：条纹、方格、旋转条纹、光栅旋转、三角、圆形（不含全屏的红黄闪烁、黑白闪烁和三色刺激）</div>':'')
+      +'<div class="grt-lb">颜色（红黄闪烁、黑白闪烁、三色刺激不受影响）</div>'
       +row('pal', [['mix','🔀 轮流随机']].concat(Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; })))
       +'<div class="grt-lb">视力分级（按弱视眼矫正视力选，视力越低条纹越粗）</div>'
       +'<div class="grt-row">'+[['low','低视力 0.0–0.1',150],['m1','中低视力 0.2–0.4',75],['m2','中高视力 0.5–0.6',36],['hi','高视力 0.7–0.9',18]].map(function(o){
@@ -5743,7 +5743,7 @@ function grtLoop(now){
     for(var xx=-D/2; xx<D/2; xx+=s*2) g.fillRect(xx,-D/2,s,D);
     g.restore();
   } else if(ty === 'red'){
-    g.fillStyle = phase ? '#ff0000' : '#000000'; g.fillRect(0,0,W,H);
+    g.fillStyle = phase ? GRT_PAL.ry[1] : GRT_PAL.ry[0]; g.fillRect(0,0,W,H);
   } else if(ty === 'rgb'){
     g.fillStyle = ['#ff0000','#00c000','#0044ff'][c.hz ? Math.floor(t * c.hz) % 3 : 0]; g.fillRect(0,0,W,H);
   }
