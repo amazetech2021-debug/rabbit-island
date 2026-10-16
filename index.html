@@ -4411,7 +4411,7 @@ function playUrl(url, cacheKey, onEnd, onError){
 
 /* ElevenLabs（英文） */
 function ttsEleven(text, key, next){
-  if(!TTS.elevenKey || typeof fetch === 'undefined'){ next(); return; }
+  if(!TTS.elevenKey || typeof fetch === 'undefined' || ttsPref().en !== 'auto'){ next(); return; }
   const g0 = TTS.gen;
   let t = String(text).trim();
   if(/^[A-Za-z][A-Za-z'-]*$/.test(t)) t = t + '.';
@@ -4449,7 +4449,7 @@ function ttsEleven(text, key, next){
 
 /* 火山引擎豆包（中文）- 直连 ByteDance API */
 function ttsDoubao(text, key, next, onEnd, isSSML){
-  if(!TTS.doubaoKey || typeof fetch === 'undefined'){ next(); return; }
+  if(!TTS.doubaoKey || typeof fetch === 'undefined' || ttsPref().zh !== 'doubao'){ next(); return; }
   const apiUrl = 'https://openspeech.bytedance.com/api/v3/tts/unidirectional?api_key=' + encodeURIComponent(TTS.doubaoKey);
   const g0 = TTS.gen;
   try{
@@ -4511,6 +4511,40 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
 }
 
 /* 浏览器合成（最后兜底） */
+/* 朗读声音设置：中文 doubao（豆包，用 API）/ system（跟随系统）/ 某个浏览器声音名；英文 auto / system / 声音名 */
+function ttsPref(){
+  try{ if(!S.ttsPref || typeof S.ttsPref !== 'object') S.ttsPref = {zh:'doubao', en:'auto'}; return S.ttsPref; }
+  catch(e){ return {zh:'doubao', en:'auto'}; }
+}
+function ttsVoices(){ try{ var v = _voicesCache.length ? _voicesCache : speechSynthesis.getVoices(); return v || []; }catch(e){ return []; } }
+function ttsVoicePanel(){
+  var p = ttsPref(), vs = ttsVoices();
+  function opts(isEn){
+    var cur = isEn ? p.en : p.zh;
+    var base = isEn ? [['auto','自动（词典真人发音 → 网页声音）'],['system','跟随系统设置（iPhone / iPad 用）']]
+                    : [['doubao','豆包语音（最自然，会用豆包 API）'],['system','跟随系统设置（iPhone / iPad 用，不用 API）']];
+    var list = vs.filter(function(v){ return isEn ? /^en/i.test(v.lang) : /^(zh|cmn|yue)/i.test(v.lang); })
+      .map(function(v){ return [v.name, v.name + ' · ' + v.lang]; });
+    var seen = {};
+    return base.concat(list).filter(function(o){ if(seen[o[0]]) return false; seen[o[0]] = 1; return true; })
+      .map(function(o){ return '<option value="' + htmlEsc(o[0]) + '"' + (o[0] === cur ? ' selected' : '') + '>' + htmlEsc(o[1]) + '</option>'; }).join('');
+  }
+  modal('<h3 style="margin:0 0 6px">🔊 朗读声音</h3>'
+    + '<div style="font-size:13px;color:var(--ink-soft);line-height:1.6;margin-bottom:12px">选「跟随系统设置」或某个网页声音时，不会用豆包 API。iPad 上的系统声音在「设置 → 辅助功能 → 朗读内容 → 声音」里换，下载「增强」或「优化」版本会更自然。</div>'
+    + '<label style="display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:12px">中文声音<select id="ttsZh" style="font-size:15px;padding:9px;border-radius:12px;border:2px solid var(--cream-2)">' + opts(false) + '</select></label>'
+    + '<label style="display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:14px">英文声音<select id="ttsEn" style="font-size:15px;padding:9px;border-radius:12px;border:2px solid var(--cream-2)">' + opts(true) + '</select></label>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<button class="dk-btn p" onclick="ttsSavePref()">保存</button>'
+    + '<button class="dk-btn y" onclick="ttsSavePref(true);speak(\'小兔子乖乖，把门开开。\',\'zh-CN\')">试听中文</button>'
+    + '<button class="dk-btn y" onclick="ttsSavePref(true);speak(\'I see a bear at the zoo.\',\'en-US\')">试听英文</button>'
+    + '<button class="dk-btn" onclick="closeModal()">关闭</button></div>');
+  if(!vs.length){ try{ speechSynthesis.onvoiceschanged = function(){ _voicesCache = speechSynthesis.getVoices(); }; }catch(e){} }
+}
+function ttsSavePref(keepOpen){
+  var p = ttsPref(), z = $('ttsZh'), e = $('ttsEn');
+  if(z) p.zh = z.value; if(e) p.en = e.value;
+  save(); if(!keepOpen){ closeModal(); toast('已保存朗读声音'); }
+}
 function ttsBrowser(text, isEn){
   TTS.busy = false;
   if(!('speechSynthesis' in window)) return;
@@ -4521,6 +4555,10 @@ function ttsBrowser(text, isEn){
     u.rate  = isEn ? 0.82 : 0.75;
     u.pitch = 1.05;
     const voices = _voicesCache.length ? _voicesCache : speechSynthesis.getVoices();
+    const want = isEn ? ttsPref().en : ttsPref().zh;
+    if(want === 'system'){ speechSynthesis.speak(u); return; }
+    const picked = voices.find(vv => vv.name === want);
+    if(picked){ u.voice = picked; u.lang = picked.lang; speechSynthesis.speak(u); return; }
     const prefs = isEn
       ? ['Samantha','Microsoft Jenny','Google US English','Karen','en-US','en']
       : ['Microsoft Xiaoxiao','Ting-Ting','Mei-Jia','Google 普通话','zh-CN','zh'];
@@ -4556,6 +4594,8 @@ function speak(text, lang){
   const key  = (isEn?'en|':'zh|') + text;
   stopSpeak();
 
+  const _pref = ttsPref();
+  if(isEn ? _pref.en !== 'auto' : _pref.zh !== 'doubao'){ ttsBrowser(text, isEn); return; }
   if(TTS.cache.has(key)){ playUrl(TTS.cache.get(key), null); return; }
   TTS.busy = true;
 
@@ -4575,7 +4615,7 @@ function speakForced(chr, ph){
   if(TTS.cache.has(key)){ playUrl(TTS.cache.get(key), null); return; }
 
   /* SSML 关掉了、或没配豆包 → 直接读汉字本身 */
-  if(!TTS.useSSML || !TTS.doubaoKey){ speak(chr, 'zh-CN'); return; }
+  if(!TTS.useSSML || !TTS.doubaoKey || ttsPref().zh !== 'doubao'){ speak(chr, 'zh-CN'); return; }
 
   TTS.busy = true;
   const ssml = '<speak><phoneme alphabet="py" ph="' + ph + '">' + chr + '</phoneme></speak>';
@@ -4607,7 +4647,7 @@ function speakFast(text, lang){ speak(text, lang); }
 TTS._pending = TTS._pending || {};
 function ttsPrefetch(text, key){
   if(!text || TTS.cache.has(key) || TTS._pending[key]) return;
-  if(!TTS.doubaoKey || typeof fetch === 'undefined') return;
+  if(!TTS.doubaoKey || typeof fetch === 'undefined' || ttsPref().zh !== 'doubao') return;
   const apiUrl = 'https://openspeech.bytedance.com/api/v3/tts/unidirectional?api_key=' + encodeURIComponent(TTS.doubaoKey);
   TTS._pending[key] = fetch(apiUrl, {
     method:'POST',
@@ -4645,7 +4685,7 @@ function speakPoemLine(line, done){
     clearTimeout(guard); finish();
   };
   TTS.busy = true;
-  if(TTS.cache.has(key)){ playUrl(TTS.cache.get(key), null, end); return; }
+  if(TTS.cache.has(key) && ttsPref().zh === 'doubao'){ playUrl(TTS.cache.get(key), null, end); return; }
   const fallback = () => {
     if(_poemSpeakGen !== gen) return;
     ttsBrowser(String(line), false);
@@ -4661,6 +4701,7 @@ function speakPoemLine(line, done){
     };
     setTimeout(poll, 220);
   };
+  if(ttsPref().zh !== 'doubao'){ fallback(); return; }
   if(TTS._pending[key]){
     const g1 = TTS.gen;
     TTS._pending[key].then(() => {
@@ -6145,7 +6186,7 @@ function dkSayText(t){ if(t) speak(t, dkLang(t)); }
 function pgDict(){
   var d = dkCfg(); dkLoadStored(); dkNeedPy();
   var tabs = [['book','📖 绘本阅读'],['dict','✍️ 听写'],['cmd','💻 终端命令']];
-  var h = '<div class="tabs dk-tabs">' + tabs.map(function(t){ return '<button class="tab ' + (d.tab===t[0]?'on':'') + '" onclick="dkCfg().tab=\'' + t[0] + '\';save();render()">' + t[1] + '</button>'; }).join('') + '</div>';
+  var h = '<div class="tabs dk-tabs">' + tabs.map(function(t){ return '<button class="tab ' + (d.tab===t[0]?'on':'') + '" onclick="dkCfg().tab=\'' + t[0] + '\';save();render()">' + t[1] + '</button>'; }).join('') + '<button class="tab" onclick="ttsVoicePanel()">🔊 声音</button></div>';
   if(d.tab === 'dict') h += dkDictHtml();
   else if(d.tab === 'cmd') h += dkCmdHtml();
   else h += dkBookHtml();
@@ -6181,6 +6222,7 @@ function dkBookHtml(){
       + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span><span style="flex:1"></span>'
       + dkSizeBtns()
       + '<button class="dk-btn y" onclick="dkReadPage()">🔊 读这一页</button>'
+      + '<button class="dk-btn" onclick="ttsVoicePanel()">🔊 声音</button>'
       + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
       + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
       + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
@@ -6280,7 +6322,7 @@ function dkDictHtml(){
     return '<div class="dk-full dk-fulld" id="dkFullD"><div class="dk-fbar"><button class="dk-btn" onclick="DK.editAll=false;DK.editCue=null;dkCfg().going=false;dkStopMedia();save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span><span style="flex:1"></span>'
       + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
-      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
+      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '<button class="tab" style="padding:7px 12px" onclick="ttsVoicePanel()">🔊 声音</button></div></div>'
       + '<div class="dk-play dk-dbody"><div class="dk-stage">'
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : '')
       + '<div class="dk-tools" style="justify-content:center">'
