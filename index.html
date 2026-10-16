@@ -5585,7 +5585,7 @@ function grtChip(){
   if(!c.on){ if(el) el.remove(); return; }
   if(!el){ el = document.createElement('div'); el.id = 'grtChip'; document.body.appendChild(el); }
   var left = _grt.start ? Math.max(0, Math.ceil((_grt.start + c.min*60000 - Date.now())/60000)) : c.min;
-  el.innerHTML = '👓 '+(c.mode==='dich'?'双眼分视 '+c.fc+'%':'光栅中')+' · 剩 '+left+' 分'
+  el.innerHTML = '👓 '+(c.mode==='dich'?'双眼分视 '+c.fc+'%':'光栅中'+(_grt.cv && _grt.cv.width > window.innerWidth ? ' · 高清×'+Math.round(_grt.cv.width/window.innerWidth) : ''))+' · 剩 '+left+' 分'
     +'<button style="background:#fff;color:#4b3aa8" onclick="_grtTab=null;grtPanel()">设置</button>'
     +'<button style="background:#ff6b6b;color:#fff" onclick="grtSet(\'on\',false)">结束</button>';
 }
