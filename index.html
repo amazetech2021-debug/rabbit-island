@@ -6185,7 +6185,7 @@ function dkBookHtml(){
     + '<button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartRead()">▶ 开始阅读</button>'
-    + '<button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkCfg().tab=\'dict\';dkUseBookForDict()">✍️ 文字听写</button></div>'
+    + '</div>'
     + '</div>';
 }
 function dkStartRead(){
@@ -6242,7 +6242,7 @@ function dkUseBookForDict(){
   var d = dkCfg(); dkTextSave('pages');
   var t = dkBookPages().join('\n');
   if(!t.trim()){ toast('先填绘本的文字'); render(); return; }
-  d.subs = t; d.di = 0; d.done = {}; d.going = true; save(); render();
+  d.subs = t; d.di = 0; d.done = {}; d.going = false; save(); render(); toast('已放进字幕框，点「开始听写」');
 }
 function dkDictHtml(){
   var d = dkCfg(), cues = DK.cues = dkCues();
@@ -6290,7 +6290,7 @@ function dkDictHtml(){
     + '<button class="dk-btn" onclick="dkCfg().subs=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkUseBookForDict()">用绘本的文字</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'dict\')">✍️ 开始听写</button>'
-    + '<button class="dk-btn y" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'read\')">👀 看着字跟读</button></div>'
+    + '</div>'
     + '</div>';
 }
 function dkMS(t){ t = Math.max(0, Math.floor(t || 0)); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), x = t%60; return (h ? h + ':' + (m<10?'0':'') : '') + m + ':' + (x<10?'0':'') + x; }
