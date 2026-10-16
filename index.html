@@ -1195,6 +1195,10 @@ html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,2
   .dk-ftext .dk-words{min-height:0}
   .dk-fbody.nopic .dk-ftext{flex-basis:min(900px,100%)}
 }
+
+.dk-c.rd b{background:#f3edff}
+.dk-sent .dk-w.rd b{background:#efe7ff;border-color:#c9b6f3!important}
+.dk-c.on b{background:#ffe08a;border-color:#f5a623;transition:background .1s}
 </style>
 <body>
 <div class="app">
@@ -4374,13 +4378,34 @@ function stopSpeak(){
   TTS.busy = false;
 }
 
+/* iPad/iPhone 只允许“点过一次”的播放器在异步加载后出声：第一次点屏幕时解锁一个共用播放器 */
+TTS.el = null;
+function ttsEl(){
+  if(!TTS.el){ TTS.el = new Audio(); TTS.el.preload = 'auto'; TTS.el.setAttribute('playsinline', ''); }
+  return TTS.el;
+}
+(function(){
+  var SIL = 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//OEwAAAAAAAAAAAAEluZm8AAAAPAAAACQAABCAARUVFRUVFRUVFRUVdXV1dXV1dXV1dXXR0dHR0dHR0dHR0i4uLi4uLi4uLi4uioqKioqKioqKiorq6urq6urq6urq60dHR0dHR0dHR0dHo6Ojo6Ojo6Ojo6P//////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQD8AAAAAAAAAQgDeb0IwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//NExAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExFMAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKYAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NExKwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NExKwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  function unlock(){
+    try{ var a = ttsEl(); if(!a.src || a.src.indexOf('data:') === 0){ a.src = SIL; var p = a.play(); if(p && p.catch) p.catch(function(){}); } }catch(e){}
+    try{ if(window.speechSynthesis){ var u = new SpeechSynthesisUtterance(''); u.volume = 0; speechSynthesis.speak(u); } }catch(e){}
+    document.removeEventListener('touchend', unlock, true); document.removeEventListener('click', unlock, true);
+  }
+  document.addEventListener('touchend', unlock, true); document.addEventListener('click', unlock, true);
+})();
+function ttsWarn(msg){
+  if(TTS._warned) return; TTS._warned = true;
+  try{ toast('中文语音服务连不上，先用系统语音（' + msg + '）'); }catch(e){}
+}
 function playUrl(url, cacheKey, onEnd, onError){
-  const a = new Audio(url);
+  const a = ttsEl();
+  try{ a.pause(); }catch(e){}
+  a.src = url;
   TTS.cur = a;
   a.onended = () => { TTS.cur = null; TTS.busy = false; if(onEnd) onEnd(); };
   a.onerror = () => { TTS.cur = null; TTS.busy = false; if(onError) onError(); else if(onEnd) onEnd(); };
   a.volume = 1.0;
-  a.play().catch(()=>{ TTS.busy = false; if(onError) onError(); });
+  a.play().catch((e)=>{ TTS.busy = false; console.warn('播放被拦截:', e && e.name); if(onError) onError(); });
   if(cacheKey) TTS.cache.set(cacheKey, url);
 }
 
@@ -4430,6 +4455,7 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
   try{
     const ctrl = new AbortController();
     TTS._ctrl = ctrl;
+    const _to = setTimeout(function(){ if(TTS._ctrl === ctrl){ try{ ctrl.abort(); }catch(e){} TTS._ctrl = null; if(g0 === TTS.gen){ TTS._dbFail = (TTS._dbFail||0) + 1; ttsWarn('超时'); next(); } } }, 8000);
     fetch(apiUrl, {
       signal: ctrl.signal,
       method:'POST',
@@ -4450,6 +4476,7 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
       })
     })
     .then(r => {
+      clearTimeout(_to);
       TTS._ctrl = null;
       if(!r.ok){
         return r.json().then(j => { throw new Error('豆包 '+r.status+': '+(j.message||j.error||JSON.stringify(j))); })
@@ -4479,7 +4506,7 @@ function ttsDoubao(text, key, next, onEnd, isSSML){
       if(g0 !== TTS.gen) return;             /* 已经离开/换了别的朗读 → 不再出声 */
       playUrl(u, key, onEnd);
     })
-    .catch(e => { TTS._ctrl = null; if(e.name==='AbortError') return; if(g0 !== TTS.gen) return; TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS:', e.message); next(); });
+    .catch(e => { TTS._ctrl = null; if(e.name==='AbortError') return; if(g0 !== TTS.gen) return; TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS:', e.message); ttsWarn(/fetch|network|load failed/i.test(e.message) ? '网络' : e.message.slice(0,24)); next(); });
   }catch(e){ TTS._dbFail = (TTS._dbFail||0) + 1; console.warn('豆包TTS 异常:', e.message); next(); }
 }
 
@@ -6027,11 +6054,56 @@ function dkCells(text, opt){
   flush();
   return out.join('');
 }
+function dkHLClear(){ document.querySelectorAll('.dk-c.on,.dk-w.on,.dk-c.rd,.dk-w.rd').forEach(function(x){ x.classList.remove('on'); x.classList.remove('rd'); }); }
+function dkHLWeights(els){
+  var w = [], tot = 0;
+  els.forEach(function(el){
+    var x;
+    if(el.classList.contains('dk-c')) x = 1;
+    else { var t = el.getAttribute('data-w') || ''; x = /^\d/.test(t) ? t.length * 0.8 : Math.max(0.9, (t.replace(/[^aeiouy]+/gi, ' ').trim().split(/\s+/).length) * 0.95); }
+    if(el.parentNode && el.parentNode.classList && el.parentNode.classList.contains('dk-glue')) x += 0.7;
+    w.push([tot, tot + x]); tot += x;
+  });
+  return {w:w, tot:tot || 1};
+}
+function dkHLSet(els, W, frac){
+  var pos = frac * W.tot, k = -1;
+  for(var i=0;i<W.w.length;i++){ if(pos >= W.w[i][0]) k = i; }
+  els.forEach(function(el, i){ el.classList.toggle('on', i === k); el.classList.toggle('rd', i < k); });
+}
+var _dkHL = 0;
+function dkSpeakHL(text, els){
+  dkHLClear();
+  if(!text) return;
+  var lang = dkLang(text);
+  speak(text, lang);
+  if(!els || !els.length) return;
+  var g = TTS.gen, my = ++_dkHL, W = dkHLWeights(els), t0 = Date.now(), started = false;
+  var est = (lang === 'en-US' ? 0.42 : 0.3) * W.tot * 1000 + 400;
+  (function tick(){
+    if(my !== _dkHL || g !== TTS.gen){ return; }
+    var a = TTS.cur, frac = null;
+    if(a && a.duration && isFinite(a.duration) && a.duration > 0 && a.src && a.src.indexOf('data:') !== 0){
+      started = true;
+      if(a.ended){ dkHLClear(); return; }
+      frac = Math.max(0, (a.currentTime - 0.12) / Math.max(0.3, a.duration - 0.35));
+    } else if(window.speechSynthesis && speechSynthesis.speaking){
+      if(!started){ started = true; t0 = Date.now(); }
+      frac = (Date.now() - t0) / est;
+    } else if(started){ dkHLClear(); return; }
+    else if(Date.now() - t0 > 12000){ return; }
+    if(frac != null) dkHLSet(els, W, Math.min(frac, 0.999));
+    requestAnimationFrame(tick);
+  })();
+}
+function dkReadPage(){
+  var box = document.querySelector('.dk-ftext');
+  var els = box ? [].slice.call(box.querySelectorAll('.dk-c,.dk-w')) : [];
+  dkSpeakHL(dkBookPages()[dkCfg().pi] || '', els);
+}
 function dkSentClick(ev, el){
   if(ev.target.closest && ev.target.closest('.dk-c,.dk-w')) return;
-  document.querySelectorAll('.dk-c.on,.dk-w.on').forEach(function(x){ x.classList.remove('on'); });
-  el.querySelectorAll('.dk-c,.dk-w').forEach(function(x){ x.classList.add('on'); });
-  var t = el.getAttribute('data-t'); if(t) speak(t, dkLang(t));
+  var t = el.getAttribute('data-t'); if(t) dkSpeakHL(t, [].slice.call(el.querySelectorAll('.dk-c,.dk-w')));
 }
 function dkSaySent(btn){
   document.querySelectorAll('.dk-c.on,.dk-w.on').forEach(function(x){ x.classList.remove('on'); });
@@ -6092,7 +6164,7 @@ function dkBookHtml(){
       + '<div class="dk-fbar"><button class="dk-btn" onclick="DK.editPage=false;dkCfg().reading=false;save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span><span style="flex:1"></span>'
       + dkSizeBtns()
-      + '<button class="dk-btn y" onclick="dkSayText(dkBookPages()[dkCfg().pi]||\'\')">🔊 读这一页</button>'
+      + '<button class="dk-btn y" onclick="dkReadPage()">🔊 读这一页</button>'
       + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
       + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
       + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
@@ -6269,7 +6341,13 @@ function dkAfterDict(){
   var l = $('dkList'), on = l && l.querySelector('.dk-li.on');
   if(on){ l.scrollTop = on.offsetTop - l.offsetTop - 60; }
   var v = $('dkVid');
-  if(v && !v._dk){ v._dk = 1; v.addEventListener('timeupdate', function(){ if(DK.stopAt != null && v.currentTime >= DK.stopAt){ v.pause(); DK.stopAt = null; } }); }
+  if(v && !v._dk){ v._dk = 1; v.addEventListener('timeupdate', function(){ if(DK.stopAt != null && v.currentTime >= DK.stopAt){ v.pause(); DK.stopAt = null; dkHLClear(); } dkVidHL(v); }); }
+}
+function dkVidHL(v){
+  var c = DK.cues[dkCfg().di]; if(!c || c.s == null || c.e == null || v.paused) return;
+  var els = [].slice.call(document.querySelectorAll('#dkAns .dk-c,#dkAns .dk-w')); if(!els.length) return;
+  if(v.currentTime < c.s || v.currentTime > c.e + 0.2){ return; }
+  dkHLSet(els, dkHLWeights(els), (v.currentTime - c.s) / Math.max(0.3, c.e - c.s));
 }
 function dkStopMedia(){ var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; }
 function dkGo(i){
@@ -6284,7 +6362,7 @@ function dkPlay(){
     try{ v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
     return;
   }
-  dkSayText(c.t);
+  dkSpeakHL(c.t, [].slice.call(document.querySelectorAll('#dkAns .dk-c,#dkAns .dk-w')));
 }
 function dkNorm(s){ return String(s || '').toLowerCase().replace(/[^\u3400-\u9fffa-z0-9]/g, ''); }
 function dkCheck(){
