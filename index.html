@@ -6186,7 +6186,7 @@ function dkSayText(t){ if(t) speak(t, dkLang(t)); }
 function pgDict(){
   var d = dkCfg(); dkLoadStored(); dkNeedPy();
   var tabs = [['book','📖 绘本阅读'],['dict','✍️ 听写'],['cmd','💻 终端命令']];
-  var h = '<div class="tabs dk-tabs">' + tabs.map(function(t){ return '<button class="tab ' + (d.tab===t[0]?'on':'') + '" onclick="dkCfg().tab=\'' + t[0] + '\';save();render()">' + t[1] + '</button>'; }).join('') + '<button class="tab" onclick="ttsVoicePanel()">🔊 声音</button></div>';
+  var h = '<div class="tabs dk-tabs">' + tabs.map(function(t){ return '<button class="tab ' + (d.tab===t[0]?'on':'') + '" onclick="dkCfg().tab=\'' + t[0] + '\';save();render()">' + t[1] + '</button>'; }).join('') + '</div>';
   if(d.tab === 'dict') h += dkDictHtml();
   else if(d.tab === 'cmd') h += dkCmdHtml();
   else h += dkBookHtml();
@@ -6222,7 +6222,6 @@ function dkBookHtml(){
       + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span><span style="flex:1"></span>'
       + dkSizeBtns()
       + '<button class="dk-btn y" onclick="dkReadPage()">🔊 读这一页</button>'
-      + '<button class="dk-btn" onclick="ttsVoicePanel()">🔊 声音</button>'
       + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
       + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
       + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
@@ -6322,7 +6321,7 @@ function dkDictHtml(){
     return '<div class="dk-full dk-fulld" id="dkFullD"><div class="dk-fbar"><button class="dk-btn" onclick="DK.editAll=false;DK.editCue=null;dkCfg().going=false;dkStopMedia();save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span><span style="flex:1"></span>'
       + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
-      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '<button class="tab" style="padding:7px 12px" onclick="ttsVoicePanel()">🔊 声音</button></div></div>'
+      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
       + '<div class="dk-play dk-dbody"><div class="dk-stage">'
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : '')
       + '<div class="dk-tools" style="justify-content:center">'
@@ -6852,6 +6851,7 @@ function rabbitRender(){
     <div class="rbrand">小白兔养成岛<small>CARROT ISLAND</small></div>
     
     <div class="rstatbar" id="rpurse" title="长按 1.5 秒进入家长模式">
+     <button class="rstat-pill rcal-pill" onclick="ttsVoicePanel()">🔊 朗读声音</button>
      <button class="rstat-pill rcal-pill" onclick="showCheckinCalendar()">📅 打卡日历</button>
      <div class="rstat-pill rreward-pill">🎁 ${S.rewardDays||0}&thinsp;天可兑</div>
      <div class="rstat-pill rtotal-pill">🌟 ${totalCheckins}&thinsp;天</div>
