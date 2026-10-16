@@ -5695,7 +5695,8 @@ function grtLoop(now){
   }
   var phase = c.hz ? Math.floor(t * c.hz * 2) % 2 : 0;   // 每秒反转 hz 次
   var key;
-  if(ty === 'rotate' || ty === 'pin') key = 'a' + Math.floor(t * 30);
+  if(ty === 'pin') key = 'a' + Math.floor(t * 60);
+  else if(ty === 'rotate') key = 'a' + Math.floor(t * 30);
   else if(ty === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
   else key = 'p' + phase;
   key += '|' + ty + '|' + c.size + '|' + pk + '|' + W + 'x' + H;
@@ -5725,7 +5726,7 @@ function grtLoop(now){
     for(var i=n; i>0; i--){ g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill(); }
   } else if(ty === 'pin'){
     /* 光栅旋转：整张方格光栅绕屏幕中心缓慢旋转 */
-    var Dp = Math.hypot(W,H), ap = t * Math.min(c.hz||1, 3) * 0.3;
+    var Dp = Math.hypot(W,H), ap = t * (({0:1.2, 1:1.8, 2:2.4, 3:3.0, 5:3.6})[c.hz||0] || 2.4);  /* 约每 2.7 秒转一圈（参考训练网站） */
     g.save(); g.translate(W/2, H/2); g.rotate(ap);
     g.fillStyle = P[1]; g.fillRect(-Dp/2, -Dp/2, Dp, Dp);
     g.fillStyle = P[0];
