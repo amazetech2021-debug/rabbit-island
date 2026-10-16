@@ -1003,6 +1003,67 @@ html.vp-max #vpWrap.vp-web .vp-frame{height:100vh}
 .vp-ios{background:#fff8e1;border:2px solid #ffd54f;border-radius:14px;padding:10px 14px;text-align:center;font-size:14px;font-weight:700;color:#5a3c00;display:flex;flex-direction:column;gap:6px;align-items:center}
 .vp-ios button{border:none;border-radius:16px;background:#6c5ce7;color:#fff;font-size:16px;font-weight:800;padding:10px 18px;cursor:pointer;font-family:inherit}
 #vpWrap.vp-web:has(.vp-ios) .vp-frame{height:calc(100vh - 230px)}
+
+/* ══════════ 听写阅读 ══════════ */
+.dk-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dk-btn{border:none;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--paper);color:var(--ink);box-shadow:0 2px 5px rgba(100,80,160,.12)}
+.dk-btn.p{background:var(--purple);color:#fff}
+.dk-btn.y{background:#ffd54f;color:#5a3c00}
+.dk-btn:disabled{opacity:.4;cursor:default}
+.dk-ta{width:100%;box-sizing:border-box;min-height:150px;border:2px solid var(--cream-2);border-radius:14px;padding:12px;font-size:15px;line-height:1.6;font-family:inherit;background:#fff;color:var(--ink);resize:vertical}
+.dk-src{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.dk-box{background:var(--cream);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dk-box h4{margin:0;font-size:16px;font-weight:900;color:var(--ink)}
+.dk-note{font-size:13px;color:var(--ink-soft);line-height:1.6}
+.dk-file{font-size:13.5px;font-weight:700;color:var(--purple);overflow-wrap:anywhere}
+.dk-vh{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
+label.dk-btn{display:inline-flex;align-items:center}
+/* 阅读页：上图下字 */
+.dk-read{display:flex;flex-direction:column;gap:14px}
+.dk-pic{background:#fff;border-radius:20px;overflow:hidden;display:flex;justify-content:center;align-items:center;min-height:120px;box-shadow:0 4px 16px rgba(100,80,160,.12)}
+.dk-pic img,.dk-pic canvas{display:block;max-width:100%;max-height:50vh;width:auto;height:auto;object-fit:contain}
+.dk-words{background:#fff;border-radius:20px;padding:18px 20px 16px;box-shadow:0 4px 16px rgba(100,80,160,.12);display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 4px;justify-content:flex-start}
+.dk-br{flex-basis:100%;height:0}
+.dk-c,.dk-w,.dk-p{display:inline-flex;flex-direction:column;align-items:center;cursor:pointer;-webkit-user-select:none;user-select:none}
+.dk-c i,.dk-w i,.dk-p i{font-style:normal;font-size:var(--dkpy,16px);line-height:1.3;height:1.3em;color:#5b4fa8;font-weight:700;font-family:'Lexend','Avenir Next',sans-serif;white-space:nowrap}
+.dk-c b{display:flex;align-items:center;justify-content:center;width:var(--dkcs,64px);height:var(--dkcs,64px);font-size:calc(var(--dkcs,64px)*.72);font-weight:500;color:var(--ink);font-family:"Kaiti SC","STKaiti","KaiTi",serif;
+  border:2px solid #f0a7a0;box-sizing:border-box;margin-left:-2px;
+  background:linear-gradient(#fff0,#fff0) ,
+   linear-gradient(to right,transparent calc(50% - .5px),#f6c9c4 calc(50% - .5px),#f6c9c4 calc(50% + .5px),transparent calc(50% + .5px)),
+   linear-gradient(to bottom,transparent calc(50% - .5px),#f6c9c4 calc(50% - .5px),#f6c9c4 calc(50% + .5px),transparent calc(50% + .5px)),#fff}
+.dk-w b{display:flex;align-items:center;height:var(--dkcs,64px);padding:0 12px;font-size:calc(var(--dkcs,64px)*.56);font-weight:700;color:var(--ink);border:2px solid #b9a8f0;border-radius:12px;background:#f7f4ff;font-family:'Lexend','Avenir Next',sans-serif}
+.dk-p b{display:flex;align-items:flex-end;justify-content:center;width:calc(var(--dkcs,64px)*.42);height:var(--dkcs,64px);font-size:calc(var(--dkcs,64px)*.6);color:var(--ink-soft);padding-bottom:4px;box-sizing:border-box}
+.dk-c.on b,.dk-w.on b{background:#ffe08a;border-color:#f5a623}
+.dk-nopy .dk-c i,.dk-nopy .dk-w i,.dk-nopy .dk-p i{display:none}
+.dk-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dk-pos{font-weight:900;color:var(--ink-soft);font-size:15px}
+.dk-size{display:inline-flex;gap:4px}
+/* 听写 */
+.dk-stage{background:#fff;border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(100,80,160,.12);display:flex;flex-direction:column;gap:14px}
+.dk-vid{width:100%;max-height:46vh;border-radius:16px;background:#000}
+.dk-ask{text-align:center;font-size:20px;font-weight:900;color:var(--ink)}
+.dk-in{width:100%;box-sizing:border-box;font-size:26px;padding:14px 16px;border:2px dashed #b9a8f0;border-radius:16px;font-family:inherit;background:#fbf9ff;color:var(--ink);text-align:center}
+.dk-in:focus{outline:none;border-style:solid;border-color:var(--purple)}
+.dk-res{text-align:center;font-weight:900;font-size:17px}
+.dk-c.ok b{background:#d8f3e2;border-color:#3cb371}
+.dk-c.bad b{background:#ffdcd6;border-color:#e5443c}
+.dk-w.ok b{background:#d8f3e2;border-color:#3cb371}
+.dk-w.bad b{background:#ffdcd6;border-color:#e5443c}
+.dk-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
+.dk-li{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border-radius:12px;background:var(--cream);cursor:pointer;font-size:15px;line-height:1.5}
+.dk-li.on{background:#ffe9a8}
+.dk-li em{font-style:normal;color:var(--ink-soft);font-size:12px;min-width:2.2em;padding-top:2px}
+.dk-li.done em::after{content:" ✓";color:#2e9e6b}
+/* 终端命令 */
+.dk-cmd{background:#fff;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;border-left:5px solid var(--purple)}
+.dk-cmd pre{margin:0;background:var(--cream);border-radius:10px;padding:10px 12px;font:12.5px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all;max-height:11em;overflow:auto}
+.dk-cmd .hd{display:flex;align-items:center;gap:8px}
+.dk-cmd .hd strong{flex:1}
+.dk-in2{width:100%;box-sizing:border-box;border:2px solid var(--cream-2);border-radius:12px;padding:9px 12px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+@media (min-width:1100px){
+  .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+}
+html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-box{background-color:rgba(255,255,255,var(--grt-bg,.45))!important}
 </style>
 <body>
 <div class="app">
@@ -5157,6 +5218,7 @@ const PAGES = [
 
   {k:"poem", n:"古诗", e:"🎵", bg:"#CAC2F2"},
   {k:"think",n:"思维", e:"🎯", bg:"#D0C8F8"},
+  {k:"dict", n:"听写阅读", e:"📝", bg:"#D6CEFF"},
   {k:"book", n:"BiliBili", e:"<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAKTUlEQVR42q2YW4xdZRXHf+vb37mfuXZKhzoUOtiScElDFRSIdy4+4T3qk4nRqG/G+OCLD74YY0yMkniJ8ZUXgfCiIYK3oA2gFAwV2lo70M4MM9POzJmZc9/7W8uHb59LhaIm7GRn73P2d1nfWv/1XxcxMwNADZyQAt0zF9GT50mWL+Oa3fjt7bycoPUyYWEOd3yR8k3XURiTAUDMzDADEdqbO6SPnqD60jK+r0jiQATk7ZULA8ywoGRFR/u2BQqfupvqvikGsoipGiLsLq2S/PRJapsdqBajQFhcZPyS/9jgra58ieHzDetIFKTdp7WvQvjafUwePghmUWPtyw3se49T2+lDpQhB3+K0Nrbhf1Gl2VCutxybOOj0aU0VkW99nOrcNC7FSB89Qe1SC0oe0gxU3/w2xaaq2NwE5h2EcPWxIUDRw/4JbLKCmV59bJpByVO71CJ99AQphu+eXaZ68jWoFCBNr34qNWyygkyUoyZma9jaNhJ4IwbNsCSBmRriHZQKaK+HNHtDcL9x/QCVAtWTr9E9u4zTZ/+J7+YKtze5yW9x0Ndo5kyRxMPUBKZvMlcFpuvReTKDTHF9Bdxovavs5buGPvtPvCxtIGJR9TaGUMmBOaAKAdlLsQRkdhJUkVqJ0C7i2t2oidzbqFeRaikeQgS73EBaXUgEwogyhnsMNS2IGLK0gfe77fxPvcJzTBVLHNSKSOIwJ4i4fPFs6ADJTBXqRWwAbjOk4OMYDBQoF7CCx1QRA0LAuikSAiJvdHO/28YTNGLCxlw7GFYvIzO1/GS5ASx/0bFDiECpkMPMRhSgYaT8aikfb0PvlKCw3cKa3StwJ2YQFD80l+bqzRSrlnAz9VyA0WLR/W1ESxY1PVzWuah5NWwc5BriwYbcmJ9qpo6pQqsbMSw5+6vhCZa7N9hOD8pFmJuI/wlYL4N2bzgB1SiUSMSQWq48w9r9yEm1MhLC6EBOoqmdi4evFZFKKa43WYVWL2LcyUgws7iZek/40G24D98Gp1dwJ05HR3l9Oz+hjJwgU6wbyVh8EjUpgr5rEbv3GPL3Jdzjz+Emq6ODjFmarT2YquV0kqClAtLsxh3UMFOcWHRnip7kK/eS3LKABI3gb3XjNxngA0gDYW6C7PPvQxfmsF4aKcMn8NUH8McPk/gEy81ulptuEDGygNYr9O87Rrowi/X6SOIi5jQKJgoOzTG03UKWNhC1aAZVJA3xd2ZIiNiSfsD2TSCfuwdZPIB0UsQnyG4HW9qIpkgDLuRzNH8GQwwkVdxkFffp95IcnodehhWSqFUdHAJc9EqQbh/WdyItIIgZlik2xjOh2SXr9pDVLRI1mKgQun202UWbHWStEfFkhjniM9Nh7LV2L45fbyBpgFoJTQPa7mGdfo71GM5GXpkpLG/FBRKHZGOkGxTNFN5/C7YwC6+sQJohBybJ7jqCu30R/vgPOL+GcAyrlWB+BqlXsFYv4nGvQ3jPEWzxADx3DrfZxColuH4/3H4YO3EGXliKkLAh+ANOFVvZJANcyUMAF3KtlQtIwaN3HkXuWIT2X6DRhmoRf/012IN3IMub6Pn1IW+ZOCgUkSmPTVUiMR87jHzwFni9AWvbUCsh+yaR+46hjRZ64jSuXsHM8JJzER5soxGjWa08DGmIwewkFD32wnlYb8DLF9C7jkC1DM+cITjBnVnFZTmpFj2sbmIoFAtIsQj1OpxexZpd7NSrJMdvgBuvJVzchMeexZ08D6Uk8uIQY0Ejz1zejeRZr8BuC9veg70O0mxDv49cuAQHZ6BeRpc2sOka1s/g+muw6Rp6eS9CYbqGXdpB/rUKZ5fR19axvSayuoUtzCI3LcDqFlKvRAd7xyw2XR/hMSgejRgSJ7DTIuy24YY59IHbYXcPu7iJLV3CnV8neecB0ruP4hp7sLKJHF+E2TruI7fhVi5jf34FdlroDddgn70H8YKtbmNLG7hzK9DqkNx9Ey5x2NMvYyUPlQLJXUdhu4k98TwUfM78g0DrHNrp49YbcOQg+oUPYEAC0GgRnnwRefhpkrUdbP8UvHQRaiWs00fUoFJCEke4uIW79Tr0Gw+S5vPdXofs96fgl09ROLMK+yex7RZS9FjOXfTSPGUyBMuDeDAsAToptt0iMche3cD95Al41yLuY3fCZ+4hXDuLO78Gh/bDdhMRQXBYUKxWQaZrWCPOZ3UL/fFv4NbrsI/fif/YHWTXTqPn15D334w0O9GzE0HSDBPJTWmYGk7y+CchEio7MQ1ytTLJiVfQP52KmgScGvLyBWT/JLQ6hFoJvf5ATGEaLWSng/SzGHmqRZK/vIL94RTa6kU/SgR9eZlQjXEy+ASqBWyvEysjjYIRdBQrMYdkCrttTEDqZbIffhG58wgA6V/PkXz3UeTWQ1jJY/0Av/gtnFuJOZYosrwJK1sx+FdLpN//AsndR/FA9uIS8p1HkGumURG0UkQeeQY29wDBCkkMS6bjPDYKBWF9B9dL46DFeXjiBfR3L5E8cxZnSnb6Inz15/hXN5DnzxEqJezbD2ONFlIvohc3Iov3M5Kj87inXiQ8dQr/zBkkC4R+Bl/+GWzv4Ze3oZBgP/o1euESrlaKCYIZ0vr096y63gQvWDD02hncwr4YyM++jry+FfmlUoqayBTpZ1AqgHcxG2j3kYIDn2DeIRMxq2Cng7VyM+XcaBrrSOamkOv2xfkrW7C5h9SKkAbaByZyurC8UFDFdXrIZuQjCh7q5aEAMQGVWHsOwliOp0G+L/0QSRgB75B6NU8WdZTAFgtYsQA5IVvBIUU3NGOki5zHYjGh0OmjEoO4TFWwbi8mcoNi94riYbyqHv/hhik6WTpKwQfthloJmSzHcCfEDFYVwij59DZIZ4MiSMzB9jpIvRIHH5iO5htkq6qI5im2MdZwGVTvLso8rBUkZixOEJFYKPsk8pUXaHaRdj8KrfkeAl6nqnBhO5proJG1LXjHHJSLMZ9KXPw+VtvKmzYqRpqTq7Q7xEZtAWv3I4ZNRyOzgE5V8XrzQezkq0gpiVoTiVx0YQObmYBaGRIXs8xh+Sdj74Ml7coUeijQWGPGiK2CzKDZwRp7o3CYF0OWpujNB/Fy/3GyXz1HIQt55ZOvEhRZ344FRBIxY85hzuUFdV5gyECsHFfoqPC1PLVWi2WZ5ulziD0LSXKz53CQEMhKBeT+4/jqsRtpf/hmCo/9DZmbjA0OGSvHsOg9BpBdgfWBRix/k//0h7Fu0xUVvgxKPRtpuODh8i6dT76b6rEbcd4g+fqDNA/NxHCUJHlRwKjetBFaZNjLGNwuml8EcoCLjH8f63+QtxHG11binjttmodmSL7+IN7AYUZtfh/60JdozdfhUiNOEoZVzv986/8xdqByNbjUoDVfRx/6ErX5faPG3aD32V7bJPvBY1Se+ge+k0YM5Dh4+/qdIwxbULJKgc69t+C/+Qmq83PDPqyMmsMKzsXm8Mkz2BMvIKcu4LaakTLeJsGM2D7Q2Tp26yHko7dTPn5T3hzWHNfwb3AkafmnTIqQAAAAAElFTkSuQmCC\" style=\"width:34px;height:34px;object-fit:contain;border-radius:8px\">", bg:"#D0C8F8"},
   {k:"cartoon", n:"YouTube", e:"<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAcCAYAAAAN3M1lAAACeElEQVR42s2YMUscQRTHfzO7MRqCAXNILISkkASSSkgwksJGIan8CHb6WewOG/0sYiEEg5aXE8UmcBaHRYSEcJi72/2nmB1vXGJw91YuA4+7nZ198+PNvDfzngEQWAOp4BHwAXgDvACeAU+BJ8Bj3PuHwBjwAIgBGwhAGkgf6AFd4DfQAX4BP4HvQBv4BjSBzwY6ngVlCgWrghOBRiSnglVvKLI/H4MBqaAfSJJJmpO7Tpj/zusL5wj1ffJQE4KzrLM3Qov5uc8EExZYBOYcIzGja3HGMAcsWuBd1pEy+pZmLG8t8BIwpdQYA1FUNZwBXllgNugoBiVBkjg4Y6qCApi1wHQpFdbCzg6srDg4CeLKtug0gvPAre/mQca432ZTkqTtbWlmZvDO2rKe6RlaCC5Lgx0cSGnq4NptaX19MCaKBuOKg10idwwUU+AnPDx0UFdXum77+9LCwk3A4pbrUCqo5sH6fWe5ft89J4lUr0tTUzfHFwi2FDxebgfzzUNK0sWFtLHhrFZs36X2XsKkDx3dLvR65XTcy1J2u9LmpjQ5OdRSVrv5d3el+flKNv9w4cK383NpbW0wJo6HDhet0mDHxw6qXpdqNddnbWUB9mv2kBRSEkXS1pa0tDTssoXiGRoI9kqBhctULsr/C2wvBloDBy3iznIHuTHuEK+meYZWDJwWhrq+1t3L3VLAqQWOsnuQ/Q9usDZjOUIwHqRt3REmI37uE7ncFQTLOZdN/pK+lUnhbkvd8vpDXcuEyWWWWzZGaLGGzymzbPxGiWAMeA+8Bp4DM0AtVyIYz5UIomBvEGRcSa5EcBWUCH7kSgTHwBfjltMaSP8A2C6XfF2BfJkAAAAASUVORK5CYII=\" style=\"width:36px;height:26px;object-fit:contain\">", bg:"#D8C8F0"},
   {k:"links", n:"书签", e:"🔖", bg:"#D0C8F8"},
@@ -5640,6 +5702,435 @@ document.addEventListener('click', function(e){
 }, true);
 document.addEventListener('keydown', function(e){ if(e.key==='Escape' && document.getElementById('vpWrap') && !document.fullscreenElement) vpClose(); });
 
+
+/* ══════════ 听写阅读：绘本阅读（单字格+拼音，点字发音）、文字/字幕/视频听写、终端命令 ══════════ */
+var DK = {book:null, bookUrls:[], pdf:null, media:null, mediaUrl:'', cues:[], pyReady:false, loadingPy:false, pdfLoading:false};
+function dkCfg(){
+  if(!S.dict || typeof S.dict !== 'object') S.dict = {};
+  var d = S.dict;
+  if(!d.tab) d.tab = 'book';
+  if(d.py == null) d.py = true;
+  if(!d.cs) d.cs = 64;
+  if(d.pi == null) d.pi = 0;
+  if(d.di == null) d.di = 0;
+  if(!d.mode) d.mode = 'dict';
+  if(d.pages == null) d.pages = '';
+  if(d.subs == null) d.subs = '';
+  if(!d.done) d.done = {};
+  if(!d.vl) d.vl = 'zh';
+  return d;
+}
+/* —— 外部库按需加载 —— */
+function dkScript(src, ok, fail){
+  var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail || function(){}; document.head.appendChild(s);
+}
+function dkNeedPy(){
+  if(window.pinyinPro){ DK.pyReady = true; return; }
+  if(DK.loadingPy) return; DK.loadingPy = true;
+  dkScript('https://cdn.jsdelivr.net/npm/pinyin-pro@3.26.0/dist/index.js', function(){ DK.pyReady = true; if(cur==='dict') render(); },
+    function(){ DK.loadingPy = false; toast('拼音库加载失败，请检查网络'); });
+}
+function dkNeedPdf(cb){
+  if(window.pdfjsLib){ cb(); return; }
+  dkScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', function(){
+    try{ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}
+    cb();
+  }, function(){ toast('PDF 工具加载失败，请检查网络'); });
+}
+/* —— 本机保存（IndexedDB，文件太大放不进普通存储） —— */
+function dkDb(){
+  return new Promise(function(res, rej){
+    var r = indexedDB.open('rabbitDict', 1);
+    r.onupgradeneeded = function(){ r.result.createObjectStore('kv'); };
+    r.onsuccess = function(){ res(r.result); }; r.onerror = function(){ rej(r.error); };
+  });
+}
+function dkPut(k, v){ return dkDb().then(function(db){ return new Promise(function(res, rej){ var t = db.transaction('kv','readwrite'); if(v==null) t.objectStore('kv').delete(k); else t.objectStore('kv').put(v, k); t.oncomplete = function(){ res(); }; t.onerror = function(){ rej(t.error); }; }); }); }
+function dkGet(k){ return dkDb().then(function(db){ return new Promise(function(res, rej){ var r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = function(){ res(r.result); }; r.onerror = function(){ rej(r.error); }; }); }); }
+var _dkLoaded = false;
+function dkLoadStored(){
+  if(_dkLoaded) return; _dkLoaded = true;
+  dkGet('book').then(function(b){ if(b){ dkSetBook(b, true); } }).catch(function(){});
+  dkGet('media').then(function(m){ if(m){ dkSetMedia(m, true); } }).catch(function(){});
+}
+function dkSetBook(b, quiet){
+  DK.bookUrls.forEach(function(u){ try{ URL.revokeObjectURL(u); }catch(e){} });
+  DK.book = b; DK.bookUrls = []; DK.pdf = null;
+  if(!b){ if(cur==='dict') render(); return; }
+  if(b.type === 'img'){ DK.bookUrls = b.blobs.map(function(x){ return URL.createObjectURL(x); }); if(cur==='dict') render(); }
+  else if(b.type === 'pdf'){
+    DK.pdfLoading = true;
+    dkNeedPdf(function(){
+      b.blob.arrayBuffer().then(function(buf){ return pdfjsLib.getDocument({data:buf}).promise; })
+       .then(function(pdf){ DK.pdf = pdf; DK.pdfLoading = false; if(cur==='dict') render(); })
+       .catch(function(){ DK.pdfLoading = false; toast('这个 PDF 打不开'); });
+    });
+  }
+}
+function dkSetMedia(m, quiet){
+  if(DK.mediaUrl){ try{ URL.revokeObjectURL(DK.mediaUrl); }catch(e){} }
+  DK.media = m; DK.mediaUrl = m ? URL.createObjectURL(m.blob) : '';
+  if(cur==='dict' && !quiet) render(); else if(cur==='dict') render();
+}
+function dkPickBook(inp){
+  var fs = [].slice.call(inp.files || []); inp.value = '';
+  if(!fs.length) return;
+  var pdf = fs.find(function(f){ return /\.pdf$/i.test(f.name) || f.type === 'application/pdf'; });
+  var b;
+  if(pdf) b = {type:'pdf', name:pdf.name, blob:pdf};
+  else {
+    var imgs = fs.filter(function(f){ return /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp|heic)$/i.test(f.name); });
+    if(!imgs.length){ toast('请选 PDF 或图片'); return; }
+    imgs.sort(function(a, c){ return a.name.localeCompare(c.name, undefined, {numeric:true}); });
+    b = {type:'img', name:imgs.length + ' 张图片（' + imgs[0].name + ' 起）', blobs:imgs};
+  }
+  dkCfg().pi = 0; save();
+  dkPut('book', b).catch(function(){ toast('文件太大，这台设备存不下，只能这次用'); });
+  dkSetBook(b);
+}
+function dkClearBook(){ dkPut('book', null).catch(function(){}); dkSetBook(null); }
+function dkPickText(inp, field){
+  var f = inp.files && inp.files[0]; inp.value = ''; if(!f) return;
+  f.text().then(function(t){ var d = dkCfg(); d[field] = t; if(field==='subs'){ d.di = 0; d.done = {}; } else d.pi = 0; save(); render(); });
+}
+function dkPickMedia(inp){
+  var f = inp.files && inp.files[0]; inp.value = ''; if(!f) return;
+  var m = {name:f.name, blob:f};
+  dkPut('media', m).catch(function(){ toast('视频太大，这台设备存不下，只能这次用'); });
+  dkSetMedia(m);
+}
+function dkClearMedia(){ dkPut('media', null).catch(function(){}); dkSetMedia(null); }
+function dkTextSave(field){ var el = $('dkT_' + field); if(!el) return; var d = dkCfg(); d[field] = el.value; if(field==='subs'){ d.di = 0; d.done = {}; } save(); }
+
+/* —— 文字切分 —— */
+function dkBookPages(){
+  var raw = String(dkCfg().pages || '').replace(/\r/g, '');
+  var re = /^\s*=+\s*第\s*(\d+)\s*页\s*=+\s*$/gm, parts = [], m, last = null, lastIdx = 0;
+  while((m = re.exec(raw))){ if(last !== null) parts[last-1] = raw.slice(lastIdx, m.index).trim(); last = +m[1]; lastIdx = re.lastIndex; }
+  if(last !== null){ parts[last-1] = raw.slice(lastIdx).trim(); for(var i=0;i<parts.length;i++) if(parts[i]==null) parts[i] = ''; return parts; }
+  raw = raw.trim(); if(!raw) return [];
+  var n = dkPicCount();
+  if(n > 1) return raw.split(/\n\s*\n+/).map(function(x){ return x.trim(); });
+  return [raw];
+}
+function dkPicCount(){ if(!DK.book) return 0; if(DK.book.type==='img') return DK.bookUrls.length; return DK.pdf ? DK.pdf.numPages : 0; }
+function dkTs(s){ var p = s.replace(',', '.').split(':').map(Number); var t = 0; p.forEach(function(x){ t = t*60 + (x||0); }); return t; }
+function dkCues(){
+  var raw = String(dkCfg().subs || '').replace(/\r/g, '').replace(/^\uFEFF/, '').trim();
+  if(!raw) return [];
+  var cues = [];
+  if(/\d+:\d+[,.]\d+\s*-->/.test(raw)){                          // SRT / VTT
+    raw.split(/\n\s*\n/).forEach(function(blk){
+      var ls = blk.split('\n'), k = ls.findIndex(function(l){ return /-->/.test(l); });
+      if(k < 0) return;
+      var mm = ls[k].match(/([\d:.,]+)\s*-->\s*([\d:.,]+)/); if(!mm) return;
+      var tx = ls.slice(k+1).join(' ').replace(/<[^>]+>/g, '').replace(/\{[^}]*\}/g, '').replace(/\s+/g, ' ').trim();
+      if(tx) cues.push({s:dkTs(mm[1]), e:dkTs(mm[2]), t:tx});
+    });
+  } else if(/^\d{1,2}:\d{2}(:\d{2})?\s*$/m.test(raw)){           // YouTube 文字记录：时间一行、文字一行
+    var ls2 = raw.split('\n'), cur2 = null;
+    ls2.forEach(function(l){
+      l = l.trim(); if(!l) return;
+      if(/^\d{1,2}:\d{2}(:\d{2})?$/.test(l)){ if(cur2 && cur2.t) cues.push(cur2); cur2 = {s:dkTs(l), e:null, t:''}; }
+      else if(cur2) cur2.t = (cur2.t ? cur2.t + ' ' : '') + l;
+      else cues.push({s:null, e:null, t:l});
+    });
+    if(cur2 && cur2.t) cues.push(cur2);
+    for(var i=0;i<cues.length;i++) if(cues[i].s!=null && cues[i].e==null) cues[i].e = (cues[i+1] && cues[i+1].s!=null) ? cues[i+1].s : cues[i].s + 6;
+  } else {                                                          // 普通文字：按句切
+    raw.split('\n').forEach(function(l){
+      l = l.trim(); if(!l) return;
+      (l.match(/[^。！？!?；;…]+[。！？!?；;…]*["”’」』]?|[^。！？!?；;…]+$/g) || [l]).forEach(function(x){
+        x = x.trim(); if(!x) return;
+        if(/[.]\s/.test(x) && !/[\u4e00-\u9fff]/.test(x)) x.replace(/\.\s+/g, '.\n').split('\n').forEach(function(y){ if(y.trim()) cues.push({s:null, e:null, t:y.trim()}); });
+        else cues.push({s:null, e:null, t:x});
+      });
+    });
+  }
+  return cues;
+}
+
+/* —— 单字格 —— */
+function dkPyRun(run){
+  if(!window.pinyinPro) return {sym:[], num:[]};
+  try{
+    return {sym:pinyinPro.pinyin(run, {type:'array'}), num:pinyinPro.pinyin(run, {type:'array', toneType:'num'})};
+  }catch(e){ return {sym:[], num:[]}; }
+}
+function dkCells(text, opt){
+  opt = opt || {};
+  var out = [], s = String(text || ''), i = 0, k = 0;
+  var tok = s.match(/[\u3400-\u9fff]+|[A-Za-z][A-Za-z'’\-]*|\d+(?:[.,]\d+)?|\n|\s+|[\s\S]/g) || [];
+  tok.forEach(function(t){
+    if(/^[\u3400-\u9fff]/.test(t)){
+      var py = dkPyRun(t);
+      for(var j=0;j<t.length;j++){
+        var c = t[j], cls = opt.marks ? (opt.marks[k] || '') : '';
+        out.push('<span class="dk-c ' + cls + '" data-c="' + c + '" data-n="' + (py.num[j] || '') + '" onclick="dkSayEl(this)"><i>' + (py.sym[j] || '&nbsp;') + '</i><b>' + c + '</b></span>');
+        k++;
+      }
+    } else if(/^[A-Za-z]/.test(t) || /^\d/.test(t)){
+      var cls2 = opt.marks ? (opt.marks[k] || '') : '';
+      out.push('<span class="dk-w ' + cls2 + '" data-w="' + htmlEsc(t) + '" onclick="dkSayEl(this)"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>');
+      k++;
+    } else if(t === '\n'){ out.push('<span class="dk-br"></span>'); }
+    else if(/^\s+$/.test(t)){ out.push('<span style="width:6px"></span>'); }
+    else out.push('<span class="dk-p"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>');
+  });
+  return out.join('');
+}
+function dkSayEl(el){
+  document.querySelectorAll('.dk-c.on,.dk-w.on').forEach(function(x){ x.classList.remove('on'); });
+  el.classList.add('on');
+  if(el.dataset.c){
+    var n = el.dataset.n || '';
+    if(/[1-4]$/.test(n) && typeof speakForced === 'function') speakForced(el.dataset.c, n);
+    else speak(el.dataset.c, 'zh-CN');
+  } else if(el.dataset.w){
+    var w = el.dataset.w;
+    speak(w, /^\d/.test(w) && dkCfg().vl === 'zh' ? 'zh-CN' : 'en-US');
+  }
+}
+function dkLang(t){ var zh = (String(t).match(/[\u4e00-\u9fff]/g) || []).length, en = (String(t).match(/[A-Za-z]/g) || []).length; return zh >= en/3 ? 'zh-CN' : 'en-US'; }
+function dkSayText(t){ if(t) speak(t, dkLang(t)); }
+
+/* —— 页面 —— */
+function pgDict(){
+  var d = dkCfg(); dkLoadStored(); dkNeedPy();
+  var tabs = [['book','📖 绘本阅读'],['dict','✍️ 听写'],['cmd','💻 终端命令']];
+  var h = '<div class="tabs">' + tabs.map(function(t){ return '<button class="tab ' + (d.tab===t[0]?'on':'') + '" onclick="dkCfg().tab=\'' + t[0] + '\';save();render()">' + t[1] + '</button>'; }).join('') + '</div>';
+  if(d.tab === 'dict') h += dkDictHtml();
+  else if(d.tab === 'cmd') h += dkCmdHtml();
+  else h += dkBookHtml();
+  $('page').innerHTML = h;
+  if(d.tab === 'book') dkDrawPic();
+  if(d.tab === 'dict') dkAfterDict();
+  if(d.tab === 'cmd') dkCmdFill();
+}
+function dkSizeBtns(){
+  var d = dkCfg();
+  return '<span class="dk-size">' + [[48,'小'],[64,'中'],[84,'大']].map(function(o){ return '<button class="tab ' + (d.cs===o[0]?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().cs=' + o[0] + ';save();render()">' + o[1] + '</button>'; }).join('') + '</span>'
+    + '<button class="tab ' + (d.py?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().py=!dkCfg().py;save();render()">拼音</button>';
+}
+function dkBookHtml(){
+  var d = dkCfg(), pages = dkBookPages(), np = dkPicCount(), n = Math.max(pages.length, np);
+  if(d.reading && n){
+    if(d.pi >= n) d.pi = n - 1; if(d.pi < 0) d.pi = 0;
+    var tx = pages[d.pi] || '';
+    var hasPic = np > d.pi;
+    return '<div class="dk-read' + (hasPic ? ' wide' : '') + '">'
+      + '<div class="dk-nav"><button class="dk-btn" onclick="dkCfg().reading=false;save();render()">← 换绘本</button>'
+      + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span>'
+      + '<div class="dk-tools">' + dkSizeBtns()
+      + '<button class="dk-btn y" onclick="dkSayText(dkBookPages()[dkCfg().pi]||\'\')">🔊 读这一页</button>'
+      + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkCfg().pi--;save();render()">⏮ 上一页</button>'
+      + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkCfg().pi++;save();render()">下一页 ⏭</button></div></div>'
+      + (hasPic ? '<div class="dk-pic" id="dkPic">' + (DK.pdfLoading ? '<div style="padding:30px">正在打开绘本…</div>' : '') + '</div>' : '')
+      + '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
+      + (tx ? dkCells(tx) : '<div class="dk-note" style="padding:10px">这一页没有文字。可以在「换绘本」里给它配上文字。</div>') + '</div>'
+      + (!DK.pyReady && /[\u4e00-\u9fff]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '')
+      + '<div class="dk-note">点一个字或一个单词就会读出来。</div>'
+      + '</div>';
+  }
+  var bk = DK.book;
+  return '<div class="card"><div class="secthead"><h3>📖 绘本阅读</h3><em>PDF / 图片 + 每页的文字</em></div>'
+    + '<div class="dk-src">'
+    + '<div class="dk-box"><h4>① 绘本或图片（可以不选）</h4><div class="dk-note">选一个 PDF，或一次选几张图片（按文件名排序，每张一页）。保存在这台设备上，下次打开还在。</div>'
+    + (bk ? '<div class="dk-file">📘 ' + htmlEsc(bk.name) + (dkPicCount() ? '（' + dkPicCount() + ' 页）' : '') + '</div>' : '')
+    + '<div class="dk-tools"><label class="dk-btn p" for="dkBookIn">选择文件</label><input type="file" id="dkBookIn" class="dk-vh" multiple accept=".pdf,application/pdf,image/*" onchange="dkPickBook(this)">'
+    + (bk ? '<button class="dk-btn" onclick="dkClearBook()">清除</button>' : '') + '</div></div>'
+    + '<div class="dk-box"><h4>② 每页的文字（中文、英文都可以）</h4><div class="dk-note">用「=== 第 1 页 ===」分页；没有分页的话，有绘本时按空行分页，没有绘本就是一整页。可以选终端命令认出来的「.pages.txt」。</div>'
+    + '<textarea class="dk-ta" id="dkT_pages" placeholder="=== 第 1 页 ===&#10;两元钱！&#10;=== 第 2 页 ===&#10;十颗豆豆两人分。&#10;=== 第 3 页 ===&#10;I see a red apple." oninput="dkTextSave(\'pages\')">' + htmlEsc(d.pages) + '</textarea>'
+    + '<div class="dk-tools"><label class="dk-btn" for="dkPgIn">选择文字文件</label><input type="file" id="dkPgIn" class="dk-vh" accept=".txt,text/plain" onchange="dkPickText(this,\'pages\')">'
+    + '<button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button></div></div>'
+    + '</div>'
+    + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:18px;padding:14px 30px" onclick="dkStartRead()">▶ 开始阅读</button>'
+    + '<button class="dk-btn" onclick="dkCfg().tab=\'dict\';dkUseBookForDict()">用这些文字做听写</button></div>'
+    + '</div>';
+}
+function dkStartRead(){
+  var d = dkCfg(); dkTextSave('pages');
+  var n = Math.max(dkBookPages().length, dkPicCount());
+  if(!n){ toast(DK.pdfLoading ? '绘本还在打开，稍等一下' : '先选绘本或填文字'); return; }
+  d.reading = true; d.pi = 0; save(); render();
+}
+var _dkDrawTok = 0;
+function dkDrawPic(){
+  var box = $('dkPic'); if(!box || !DK.book) return;
+  var i = dkCfg().pi;
+  if(DK.book.type === 'img'){ box.innerHTML = '<img src="' + DK.bookUrls[i] + '" alt="">'; return; }
+  if(!DK.pdf) return;
+  var tok = ++_dkDrawTok;
+  DK.pdf.getPage(i+1).then(function(pg){
+    if(tok !== _dkDrawTok) return;
+    var v1 = pg.getViewport({scale:1}), w = Math.min(1600, Math.max(600, (box.clientWidth || 800) * (window.devicePixelRatio || 1)));
+    var vp = pg.getViewport({scale: w / v1.width});
+    var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+    return pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise.then(function(){ if(tok === _dkDrawTok){ box.innerHTML = ''; box.appendChild(cv); } });
+  }).catch(function(){ box.innerHTML = '<div style="padding:30px">这一页打不开</div>'; });
+}
+
+/* —— 听写 —— */
+function dkUseBookForDict(){
+  var d = dkCfg(); dkTextSave('pages');
+  var t = dkBookPages().join('\n');
+  if(!t.trim()){ toast('先填绘本的文字'); render(); return; }
+  d.subs = t; d.di = 0; d.done = {}; d.going = true; save(); render();
+}
+function dkDictHtml(){
+  var d = dkCfg(), cues = DK.cues = dkCues();
+  if(d.going && cues.length){
+    if(d.di >= cues.length) d.di = cues.length - 1; if(d.di < 0) d.di = 0;
+    var c = cues[d.di], timed = c.s != null && DK.media;
+    var showTx = d.mode === 'read' || d.reveal;
+    var list = '<div class="dk-list" id="dkList">' + cues.map(function(x, i){
+      return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + '</em><span>' + (d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span></div>';
+    }).join('') + '</div>';
+    return '<div class="dk-nav" style="margin-bottom:12px"><button class="dk-btn" onclick="dkCfg().going=false;dkStopMedia();save();render()">← 换素材</button>'
+      + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span>'
+      + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
+      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
+      + '<div class="dk-play"><div class="dk-stage">'
+      + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : '')
+      + '<div class="dk-tools" style="justify-content:center">'
+      + '<button class="dk-btn" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
+      + '<button class="dk-btn y" style="font-size:18px;padding:12px 24px" onclick="dkPlay()">🔊 ' + (timed ? '播放这一句' : '读这一句') + '</button>'
+      + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button></div>'
+      + (d.mode === 'dict'
+        ? '<div class="dk-ask">听一听，把这句写下来</div>'
+          + '<input class="dk-in" id="dkIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="在这里打字，或写在本子上" onkeydown="if(event.key===\'Enter\')dkCheck()">'
+          + '<div class="dk-tools" style="justify-content:center"><button class="dk-btn p" onclick="dkCheck()">✅ 对一对</button><button class="dk-btn" onclick="dkCfg().reveal=true;dkCfg().done[dkCfg().di]=1;save();render()">👀 看答案</button></div>'
+          + '<div class="dk-res" id="dkRes"></div>'
+        : '')
+      + '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" id="dkAns" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px;' + (showTx?'':'display:none') + '">' + dkCells(c.t) + '</div>'
+      + '</div>' + list + '</div>';
+  }
+  return '<div class="card"><div class="secthead"><h3>✍️ 听写</h3><em>视频/音频 + 字幕，或者只用文字</em></div>'
+    + '<div class="dk-src">'
+    + '<div class="dk-box"><h4>① 视频或音频（可以不选）</h4><div class="dk-note">mp4、mov、mp3、m4a 等，在这里播放，一句放完自动停。RMVB、AVI 先用「终端命令 → 格式转换」转成 mp4。不选的话，就用语音一句一句读给孩子听。</div>'
+    + (DK.media ? '<div class="dk-file">🎬 ' + htmlEsc(DK.media.name) + '</div>' : '')
+    + '<div class="dk-tools"><label class="dk-btn p" for="dkMedIn">选择文件</label><input type="file" id="dkMedIn" class="dk-vh" accept="video/*,audio/*" onchange="dkPickMedia(this)">'
+    + (DK.media ? '<button class="dk-btn" onclick="dkClearMedia()">清除</button>' : '') + '</div></div>'
+    + '<div class="dk-box"><h4>② 字幕或文字</h4><div class="dk-note">选 .srt、.vtt、.txt 文件，或直接粘贴。带时间点的会跟着视频一句一句放；普通文字按句号、问号分句。</div>'
+    + '<textarea class="dk-ta" id="dkT_subs" placeholder="小兔子乖乖，把门开开。&#10;I like apples. I like bananas." oninput="dkTextSave(\'subs\')">' + htmlEsc(d.subs) + '</textarea>'
+    + '<div class="dk-tools"><label class="dk-btn" for="dkSubIn">选择字幕文件</label><input type="file" id="dkSubIn" class="dk-vh" accept=".srt,.vtt,.txt,text/plain" onchange="dkPickText(this,\'subs\')">'
+    + '<button class="dk-btn" onclick="dkCfg().subs=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkUseBookForDict()">用绘本的文字</button></div></div>'
+    + '</div>'
+    + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:18px;padding:14px 30px" onclick="dkStartDict(\'dict\')">✍️ 开始听写</button>'
+    + '<button class="dk-btn y" style="font-size:18px;padding:14px 30px" onclick="dkStartDict(\'read\')">👀 看着字跟读</button></div>'
+    + '</div>';
+}
+function dkStartDict(mode){
+  var d = dkCfg(); dkTextSave('subs');
+  if(!dkCues().length){ toast('先填字幕或文字'); return; }
+  d.going = true; d.mode = mode; d.reveal = false; if(d.di == null) d.di = 0; save(); render();
+  setTimeout(dkPlay, 300);
+}
+function dkAfterDict(){
+  var l = $('dkList'), on = l && l.querySelector('.dk-li.on');
+  if(on){ l.scrollTop = on.offsetTop - l.offsetTop - 60; }
+  var v = $('dkVid');
+  if(v && !v._dk){ v._dk = 1; v.addEventListener('timeupdate', function(){ if(DK.stopAt != null && v.currentTime >= DK.stopAt){ v.pause(); DK.stopAt = null; } }); }
+}
+function dkStopMedia(){ var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; }
+function dkGo(i){
+  var d = dkCfg(), n = DK.cues.length; if(i < 0 || i >= n) return;
+  d.di = i; d.reveal = false; save(); render(); setTimeout(dkPlay, 200);
+}
+function dkPlay(){
+  var d = dkCfg(), c = DK.cues[d.di]; if(!c) return;
+  var v = $('dkVid');
+  if(v && c.s != null){
+    stopSpeak && stopSpeak();
+    try{ v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    return;
+  }
+  dkSayText(c.t);
+}
+function dkNorm(s){ return String(s || '').toLowerCase().replace(/[^\u3400-\u9fffa-z0-9]/g, ''); }
+function dkCheck(){
+  var d = dkCfg(), c = DK.cues[d.di], inp = $('dkIn'); if(!c || !inp) return;
+  var typed = inp.value;
+  if(!typed.trim()){ toast('先写一写，再对答案～'); return; }
+  /* 逐字（中文）/ 逐词（英文）对比 */
+  var units = String(c.t).match(/[\u3400-\u9fff]|[A-Za-z][A-Za-z'’\-]*|\d+(?:[.,]\d+)?/g) || [];
+  var tUnits = String(typed).match(/[\u3400-\u9fff]|[A-Za-z][A-Za-z'’\-]*|\d+(?:[.,]\d+)?/g) || [];
+  var marks = [], right = 0;
+  units.forEach(function(u, i){ var ok = tUnits[i] && dkNorm(tUnits[i]) === dkNorm(u); marks.push(ok ? 'ok' : 'bad'); if(ok) right++; });
+  var box = $('dkAns'); box.style.display = ''; box.innerHTML = dkCells(c.t, {marks:marks});
+  var all = right === units.length && tUnits.length === units.length;
+  $('dkRes').innerHTML = all ? '<span style="color:#2e9e6b">🎉 全对啦！</span>' : '<span style="color:#e5443c">对了 ' + right + ' / ' + units.length + '，红色的再看看</span>';
+  d.done[d.di] = 1; save();
+  var li = document.querySelectorAll('.dk-li')[d.di]; if(li){ li.classList.add('done'); li.querySelector('span').textContent = c.t; }
+}
+
+/* —— 终端命令（Mac）—— */
+function dkShq(x){ return "'" + String(x).replace(/'/g, "'\\''") + "'"; }
+function dkPath(v, dflt){ v = String(v || '').trim().replace(/[\r\n]+/g, ' '); if(/^(['"]).*\1$/.test(v)) v = v.slice(1, -1); else if(v.indexOf('\\') >= 0 && v[0] === '/') v = v.replace(/\\(.)/g, '$1'); v = v.replace(/\/+$/, ''); if(!v) return dflt; return v.indexOf('~/') === 0 ? '"$HOME"' + dkShq(v.slice(1)) : (v[0] === '/' ? dkShq(v) : '~/Downloads/' + dkShq(v)); }
+var DK_OCRPY = "import sys, os, re, subprocess, tempfile\nfrom ocrmac import ocrmac\nsrc = os.path.abspath(os.path.expanduser(sys.argv[1].rstrip('/')))\nlang = sys.argv[2] if len(sys.argv) > 2 else 'zh'\nLP = {'en': ['en-US'], 'zh': ['zh-Hans', 'zh-Hant', 'en-US']}.get(lang, ['zh-Hans', 'en-US'])\nIMG = ('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.heic', '.heif')\ndef nat(s): return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\\d+)', s)]\ndef pages():\n    if os.path.isdir(src):\n        for f in sorted((f for f in os.listdir(src) if f.lower().endswith(IMG) and not f.startswith('.')), key=nat):\n            yield os.path.join(src, f)\n    elif src.lower().endswith('.pdf'):\n        import pypdfium2 as pdfium\n        pdf = pdfium.PdfDocument(src)\n        for i in range(len(pdf)):\n            yield pdf[i].render(scale=2.5).to_pil()\n    else:\n        yield src\ndef read(img):\n    if isinstance(img, str) and img.lower().endswith(('.heic', '.heif')):\n        tmp = os.path.join(tempfile.gettempdir(), 'ocrbook.jpg')\n        subprocess.run(['sips', '-s', 'format', 'jpeg', img, '--out', tmp], capture_output=True)\n        img = tmp\n    res = ocrmac.OCR(img, recognition_level='accurate', language_preference=LP).recognize()\n    return [t.strip() for t, conf, box in res if t.strip() and conf >= 0.3]\nif not os.path.exists(src):\n    sys.exit('没找到：' + src)\nout = src + '.pages.txt'\nblocks = []\nfor n, img in enumerate(pages(), 1):\n    print('正在识别第 %d 页…' % n, flush=True)\n    blocks.append('=== 第 %d 页 ===\\n%s\\n' % (n, '\\n'.join(read(img))))\nif not blocks:\n    sys.exit('这里面没有找到图片或页面。')\nopen(out, 'w', encoding='utf-8').write('\\n'.join(blocks))\nprint('完成，共 %d 页：%s' % (len(blocks), out))\n";
+function dkCmdCard(id, title, note, extra){
+  return '<div class="dk-cmd"><div class="hd"><strong>' + title + '</strong><button class="dk-btn" style="padding:6px 14px" onclick="dkCopy(\'' + id + '\',this)">复制</button></div>'
+    + (note ? '<div class="dk-note">' + note + '</div>' : '') + (extra || '') + '<pre id="' + id + '"></pre></div>';
+}
+function dkCmdHtml(){
+  var d = dkCfg(), inp = function(id, ph){ return '<input class="dk-in2" id="' + id + '" placeholder="' + ph + '" value="' + htmlEsc((d.cmdv || {})[id] || '') + '" oninput="dkCmdSave(this)" spellcheck="false" autocapitalize="off">'; };
+  return '<div class="card"><div class="secthead"><h3>💻 终端命令</h3><em>在 Mac 的「终端」里粘贴、回车</em></div>'
+    + '<div class="dk-note" style="margin-bottom:10px">做好的视频、字幕、绘本文字都在「下载」文件夹里，回到「听写」或「绘本阅读」里选它们。只用在允许下载的内容上。</div>'
+    + '<div class="dk-tools" style="margin-bottom:12px"><span class="dk-note">视频里说的是：</span>'
+    + [['zh','中文'],['en','英语']].map(function(o){ return '<button class="tab ' + (d.vl===o[0]?'on':'') + '" style="padding:7px 14px" onclick="dkCfg().vl=\'' + o[0] + '\';save();render()">' + o[1] + '</button>'; }).join('') + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:12px">'
+    + dkCmdCard('dkC0', '第一次用：先装工具（只需一次）', '需要先装好 Homebrew（brew.sh）。装完下面的命令都能直接用。')
+    + '<h4 style="margin:6px 0 0">🌐 网上的视频</h4>' + inp('dkUrl', '粘贴视频链接 https://…')
+    + dkCmdCard('dkC1', '下载视频，并识别出字幕（推荐）', '跑完后「下载」里有 视频名.mp4 和 视频名.mp4.srt，一起导入「听写」。')
+    + dkCmdCard('dkC2', '下载视频 + 网站自带字幕', '更快，但不是每个视频都有字幕。')
+    + dkCmdCard('dkC3', '只下载字幕', '')
+    + '<h4 style="margin:6px 0 0">💾 电脑里的视频 / 音频</h4>' + inp('dkFile', '文件名（在「下载」里），或完整路径：访达里选中按 ⌥⌘C 拷贝')
+    + dkCmdCard('dkC4', '识别一个视频的字幕', '跑完后同一个文件夹里会多出「文件名.srt」。')
+    + inp('dkDir', '文件夹（不填就是「下载」文件夹）')
+    + dkCmdCard('dkC5', '识别整个文件夹里的视频和音频', '已经有字幕的会跳过，中途关掉再运行会接着做。')
+    + '<h4 style="margin:6px 0 0">🔄 格式转换</h4>' + inp('dkConv', 'RMVB、AVI 等文件名或完整路径')
+    + dkCmdCard('dkC6', '把一个视频转成 mp4', '转好的 mp4 在原文件旁边。')
+    + inp('dkConvDir', '文件夹（不填就是「下载」文件夹）')
+    + dkCmdCard('dkC7', '把整个文件夹里的视频都转成 mp4', '')
+    + '<h4 style="margin:6px 0 0">📖 绘本认字</h4>' + inp('dkBook', '绘本.pdf 或图片文件夹（图片按 1.jpg、2.jpg 命名）')
+    + dkCmdCard('dkC8', '第一次用：装绘本认字工具', '用 Mac 自带的文字识别，不耗流量。装好会显示「装好了」。')
+    + dkCmdCard('dkC9', '识别绘本每一页的文字', '跑完后旁边会多出「…pages.txt」，在「绘本阅读」第②步选它。')
+    + '</div></div>';
+}
+function dkCmdSave(el){ var d = dkCfg(); d.cmdv = d.cmdv || {}; d.cmdv[el.id] = el.value; save(); dkCmdFill(); }
+function dkCmdFill(){
+  if(!$('dkC0')) return;
+  var d = dkCfg(), v = d.cmdv || {}, VL = d.vl === 'en' ? 'en' : 'zh';
+  var WM = VL === 'en' ? 'ggml-small.en.bin' : 'ggml-small.bin', WL = VL;
+  var raw = String(v.dkUrl || '').trim(), u = /^https?:\/\/\S+$/.test(raw) ? dkShq(raw) : '"视频网址"';
+  var GETM = '[ -f ~/whisper/' + WM + ' ] || { echo "先下载识别模型（只需一次）…"; mkdir -p ~/whisper && curl -fL -o ~/whisper/' + WM + '.part https://hf-mirror.com/ggerganov/whisper.cpp/resolve/main/' + WM + ' && mv ~/whisper/' + WM + '.part ~/whisper/' + WM + '; }';
+  var W = 'ffmpeg -y -i {} -ar 16000 -ac 1 /tmp/a.wav && whisper-cli -m ~/whisper/' + WM + ' -l ' + WL + ' -f /tmp/a.wav -osrt -of {}';
+  var FMT = '-f "bv*[vcodec^=avc1][height<=720]+ba[ext=m4a]/b[ext=mp4]" --merge-output-format mp4';
+  var set = function(id, t){ var e = $(id); if(e) e.textContent = t; };
+  set('dkC0', 'brew install yt-dlp ffmpeg whisper-cpp');
+  set('dkC1', 'cd ~/Downloads\n' + GETM + '\nyt-dlp ' + FMT + ' -o "%(title)s.%(ext)s" --exec "' + W + '" ' + u);
+  set('dkC2', 'cd ~/Downloads\nyt-dlp ' + FMT + ' --write-subs --write-auto-subs --sub-langs ' + (VL==='zh'?'"zh.*"':'en') + ' --convert-subs srt -o "%(title)s.%(ext)s" ' + u);
+  set('dkC3', 'cd ~/Downloads\nyt-dlp --skip-download --write-subs --write-auto-subs --sub-langs ' + (VL==='zh'?'"zh.*"':'en') + ' --convert-subs srt -o "%(title)s" ' + u);
+  var fn = String(v.dkFile || '').trim();
+  var F = fn ? 'f=' + (dkPath(fn, '').replace(/^~\/Downloads\//, '')) : 'f="文件名.mp4"';
+  set('dkC4', 'cd ~/Downloads\n' + GETM + '\n' + F + '\nffmpeg -y -i "$f" -ar 16000 -ac 1 /tmp/a.wav && whisper-cli -m ~/whisper/' + WM + ' -l ' + WL + ' -f /tmp/a.wav -osrt -of "$f"');
+  var DQ = dkPath(v.dkDir, '~/Downloads');
+  set('dkC5', GETM + '\ncd ' + DQ + ' && { find . -maxdepth 1 -type f \\( -iname "*.mp4" -o -iname "*.mov" -o -iname "*.m4v" -o -iname "*.webm" -o -iname "*.mp3" -o -iname "*.m4a" -o -iname "*.wav" \\) -print0 | while IFS= read -r -d "" f; do f="${f#./}"; if [ -e "$f.srt" ]; then echo "跳过（已有字幕）：$f"; continue; fi; echo "正在识别：$f"; ffmpeg -nostdin -loglevel error -y -i "$f" -ar 16000 -ac 1 /tmp/a.wav && whisper-cli -np -m ~/whisper/' + WM + ' -l ' + WL + ' -f /tmp/a.wav -osrt -of "$f" && echo "完成：$f.srt"; done; echo "全部识别完了"; }');
+  var FF = '-c:v libx264 -preset veryfast -crf 23 -c:a aac -b:a 128k -movflags +faststart', FI = 'ffmpeg -nostdin -loglevel error -stats -fflags +genpts -y -i "$f" ';
+  var cv = String(v.dkConv || '').trim();
+  set('dkC6', 'cd ~/Downloads\nf=' + (cv ? dkPath(cv, '').replace(/^~\/Downloads\//, '') : '"视频.rmvb"') + '\n' + FI + FF + ' "${f%.*}.mp4" && echo "转好了：${f%.*}.mp4"');
+  var CVD = dkPath(v.dkConvDir, '~/Downloads');
+  set('dkC7', 'cd ' + CVD + ' && { find . -maxdepth 1 -type f \\( -iname "*.rmvb" -o -iname "*.rm" -o -iname "*.avi" -o -iname "*.flv" -o -iname "*.wmv" -o -iname "*.mkv" -o -iname "*.ts" -o -iname "*.mpg" -o -iname "*.mpeg" -o -iname "*.vob" \\) -print0 | while IFS= read -r -d "" f; do f="${f#./}"; g="${f%.*}.mp4"; if [ -e "$g" ]; then echo "跳过（已经有 mp4）：$f"; continue; fi; echo "正在转换：$f"; ' + FI + FF + ' "$g" && echo "完成：$g"; done; echo "全部转换完了"; }');
+  set('dkC8', "python3 -m venv ~/ocrenv && ~/ocrenv/bin/pip install -q ocrmac pypdfium2 && cat > ~/ocrbook.py <<'EOF'\n" + DK_OCRPY + "EOF\necho 装好了");
+  var bk = String(v.dkBook || '').trim();
+  set('dkC9', 'cd ~/Downloads\n~/ocrenv/bin/python ~/ocrbook.py ' + (bk ? dkPath(bk, '').replace(/^~\/Downloads\//, '') : '"绘本.pdf"') + ' ' + VL);
+}
+function dkCopy(id, btn){
+  var t = ($(id) || {}).textContent || '';
+  var done = function(ok){ btn.textContent = ok ? '已复制 ✓' : '请手动选中复制'; setTimeout(function(){ btn.textContent = '复制'; }, 1800); };
+  try{ navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(false); }); }catch(e){ done(false); }
+}
+
 function render(){
   checkNewDay();
   // If cur is an unknown page (e.g. "gemini" after it was moved), redirect to English
@@ -5654,7 +6145,7 @@ function render(){
   const p = PAGES.find(x=>x.k===cur);
   $("ptitle").textContent = cur==="home" ? "🐰 开心兔兔养成岛" : (p&&p.e&&p.e[0]==="<"?p.n:(p?p.e+" "+p.n:""));
   ({home:pgHome, hz:pgHanzi, py:pgPinyin, math:pgMath, en:pgEnglish, poem:pgPoem,
-    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook, links:pgLinks, gemini:pgGemini})[cur]();
+    think:pgThink, book:pgBook, cartoon:pgCartoon, gift:pgGift, memo:pgMemo, textbook:pgTextbook, links:pgLinks, gemini:pgGemini, dict:pgDict})[cur]();
   scrollTabsIntoView();
   try{ grtApply(); }catch(e){}
 }
