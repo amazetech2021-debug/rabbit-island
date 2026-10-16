@@ -1184,6 +1184,17 @@ html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,2
   .dk-fpic img,.dk-fpic canvas{max-height:62vh}
   .dk-ftext{flex:1;min-height:0;max-height:none}
 }
+
+/* 横屏/电脑：图和文字作为一组，在页面里上下左右居中，顶部对齐 */
+:root{--dktw:min(560px,36vw)}
+@media (orientation:landscape){
+  #page .dk-fbody{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;align-items:flex-start;gap:16px}
+  .dk-fpic{flex:0 0 auto;max-width:calc(100% - var(--dktw) - 16px);max-height:100%}
+  .dk-fpic img,.dk-fpic canvas{max-width:calc(100vw - var(--dktw) - 60px);max-height:calc(100vh - 90px)}
+  .dk-ftext{flex:0 0 var(--dktw);max-height:calc(100vh - 90px)}
+  .dk-ftext .dk-words{min-height:0}
+  .dk-fbody.nopic .dk-ftext{flex-basis:min(900px,100%)}
+}
 </style>
 <body>
 <div class="app">
@@ -6135,7 +6146,9 @@ function dkDrawPic(){
   DK.pdf.getPage(i+1).then(function(pg){
     if(tok !== _dkDrawTok) return;
     var v1 = pg.getViewport({scale:1}), dpr = Math.min(2, window.devicePixelRatio || 1);
-    var bw = box.clientWidth || 800, bh = (window.innerHeight > window.innerWidth) ? window.innerHeight * 0.62 : (box.clientHeight || 600);
+    var _land = window.innerWidth >= window.innerHeight;
+    var bw = _land ? (window.innerWidth - Math.min(560, window.innerWidth * 0.36) - 60) : (box.clientWidth || 800);
+    var bh = _land ? (window.innerHeight - 90) : window.innerHeight * 0.62;
     var sc = Math.min(bw / v1.width, bh / v1.height) * dpr;
     sc = Math.max(0.5, Math.min(sc, 2600 / v1.width));
     var vp = pg.getViewport({scale: sc});
