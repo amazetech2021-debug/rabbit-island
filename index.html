@@ -5479,7 +5479,7 @@ var GRT_TYPES = [
   {k:'stripe',n:'条纹光栅', e:'▥'},
   {k:'check', n:'方格光栅', e:'🔲'},
   {k:'rotate',n:'旋转条纹', e:'🌀'},
-  {k:'pin',   n:'光栅旋转', e:'🎡'},
+  {k:'pin',   n:'光栅旋转', e:'🏁'},
   {k:'tri',   n:'三角光栅', e:'🔺'},
   {k:'ring',  n:'圆形光栅', e:'⭕'},
   {k:'red',   n:'红光闪烁', e:'🔴'},
@@ -5497,7 +5497,7 @@ function grtCfg(){
   if(!c.v3){ c.v3 = 1; c.mode = c.mode || 'grating'; c.amb = c.amb || 'L'; c.redEye = c.redEye || 'L'; c.glass = c.glass || 'rb'; c.fc = c.fc || 40; if(c.auto==null) c.auto = true; }
   if(c.on==null) c.on = false;
   if(c.pal!=='mix' && !GRT_PAL[c.pal]) c.pal = 'ry';
-  if(c.hz>3) c.hz = 3;            // 闪烁不超过每秒 3 次（光敏安全上限）
+  if(c.hz>5) c.hz = 5;            // 闪烁最多每秒 5 次
   if(!c.min) c.min = 20;
   if(!c.size) c.size = 48;
   if(!c.op) c.op = 45;
@@ -5574,7 +5574,7 @@ function grtPanel(refresh){
       +'<input type="range" min="0" max="100" step="5" value="'+c.op+'" style="flex:1;accent-color:#6c5ce7" oninput="grtOp(this.value)">'
       +'<span style="font-size:13px">100%</span><button class="big" style="padding:6px 12px;font-size:13px;color:var(--ink)" onclick="grtOp(55,true)">重置</button></div>'
       +'<div class="grt-lb">闪烁速度</div>'
-      +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒']])
+      +row('hz', [[0,'不闪'],[1,'慢 1次/秒'],[2,'中 2次/秒'],[3,'快 3次/秒'],[5,'很快 5次/秒']]) + (c.hz>=5?'<div class="grt-note" style="margin:4px 0;color:#c62828">5 次/秒闪得很快：有癫痫、偏头痛或光敏感的孩子不要用；建议按眼科医生的处方使用。</div>':'')
 
       +'<div class="grt-lb">每次时长（到时自动结束）</div>'
       +row('min', [[10,'10分钟'],[15,'15分钟'],[20,'20分钟'],[30,'30分钟']]);
@@ -5724,13 +5724,14 @@ function grtLoop(now){
     var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s, n = Math.ceil(R/s);
     for(var i=n; i>0; i--){ g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill(); }
   } else if(ty === 'pin'){
-    /* 光栅旋转：从中心放射的扇形黑白/彩色光栅，整体缓慢旋转（CAM 风车式） */
-    var cxp = W/2, cyp = H/2, Rp = Math.hypot(W,H)/2 + 4;
-    var nS = Math.max(8, Math.min(48, Math.round(Math.PI * Math.min(W,H) / 2 / s))) * 2;
-    var a0 = t * (c.hz||1) * 0.6, da = Math.PI*2 / nS;
-    g.fillStyle = P[1]; g.fillRect(0,0,W,H);
+    /* 光栅旋转：整张方格光栅绕屏幕中心缓慢旋转 */
+    var Dp = Math.hypot(W,H), ap = t * Math.min(c.hz||1, 3) * 0.3;
+    g.save(); g.translate(W/2, H/2); g.rotate(ap);
+    g.fillStyle = P[1]; g.fillRect(-Dp/2, -Dp/2, Dp, Dp);
     g.fillStyle = P[0];
-    for(var k=0; k<nS; k+=2){ g.beginPath(); g.moveTo(cxp,cyp); g.arc(cxp,cyp,Rp,a0+k*da,a0+(k+1)*da); g.closePath(); g.fill(); }
+    var n0 = Math.ceil(Dp / 2 / s);
+    for(var yy=-n0; yy<n0; yy++) for(var xx=-n0 + ((yy + n0) & 1); xx<n0; xx+=2) g.fillRect(xx*s, yy*s, s, s);
+    g.restore();
   } else if(ty === 'bw'){
     g.fillStyle = phase ? '#ffffff' : '#000000'; g.fillRect(0,0,W,H);
   } else if(ty === 'rotate'){
