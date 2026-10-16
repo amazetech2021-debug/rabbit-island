@@ -1070,7 +1070,7 @@ html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-
 
 .dk-sent{display:contents}
 .dk-sp{width:4px}
-.dk-sb{align-self:flex-end;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0 4px 4px 2px;border-radius:50%;background:#efe9ff;font-size:14px;cursor:pointer;flex:none}
+.dk-sb{align-self:flex-end;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0 10px 4px 6px;border-radius:50%;background:#efe9ff;font-size:14px;cursor:pointer;flex:none}
 .dk-sb:hover{background:#e0d5ff}
 .dk-words:not(:has(.dk-c)) i{display:none}
 .dk-words:not(:has(.dk-c)){row-gap:12px}
@@ -5910,7 +5910,7 @@ function dkCells(text, opt){
     if(cur.length){
       var t = curT.replace(/\s+/g, ' ').trim();
       var has = /[㐀-鿿A-Za-z0-9]/.test(t);
-      out.push('<span class="dk-sent">' + (has && opt.sent !== false ? '<span class="dk-sb" data-t="' + htmlEsc(t) + '" onclick="dkSaySent(this)" title="读这一句">🔊</span>' : '') + cur.join('') + '</span>');
+      out.push('<span class="dk-sent">' + cur.join('') + (has && opt.sent !== false ? '<span class="dk-sb" data-t="' + htmlEsc(t) + '" onclick="dkSaySent(this)" title="读这一句">🔊</span>' : '') + '</span>');
     }
     cur = []; curT = '';
   }
