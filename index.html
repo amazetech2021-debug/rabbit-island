@@ -1156,6 +1156,21 @@ html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,2
 .dk-sent:not(:has(.dk-c)) .dk-w b,.dk-sent:not(:has(.dk-c)) .dk-p b{height:auto;line-height:1.5;width:auto;padding:0 2px;display:inline;font-size:calc(var(--dkcs,64px)*.5)}
 .dk-sent:not(:has(.dk-c)) .dk-sb{align-self:center;margin-left:12px}
 .dk-sent .dk-sb{margin-left:12px}
+
+/* 单词保留小框，整句在大框里；点大框空白处读整句 */
+.dk-sent[data-t]{cursor:pointer}
+.dk-sent[data-t]:hover{border-color:#b9a8f0}
+.dk-sent .dk-w{margin:0 3px}
+.dk-sent .dk-w b,.dk-sent:not(:has(.dk-c)) .dk-w b{display:flex;align-items:center;height:calc(var(--dkcs,64px)*.82);line-height:1;padding:0 9px;border:1.5px solid #b9a8f0!important;border-radius:10px;background:#f7f4ff;font-family:var(--dkread);font-weight:400;font-size:calc(var(--dkcs,64px)*.48)}
+.dk-sent .dk-w:hover b{text-decoration:none;border-color:#7a3bd1!important}
+.dk-sent .dk-w.on b{background:#ffe08a;border-color:#f5a623!important}
+.dk-sent .dk-w.ok b{background:#d8f3e2;border-color:#3cb371!important}
+.dk-sent .dk-w.bad b{background:#ffdcd6;border-color:#e5443c!important}
+.dk-sent:not(:has(.dk-c)){align-items:flex-end;row-gap:10px}
+.dk-sent:not(:has(.dk-c)) .dk-p b{display:flex;align-items:flex-end;height:calc(var(--dkcs,64px)*.82);width:auto;padding:0 2px 6px}
+
+.dk-glue{display:inline-flex;align-items:flex-end}
+.dk-sent:not(:has(.dk-c)) .dk-glue{align-items:flex-end}
 </style>
 <body>
 <div class="app">
@@ -5958,7 +5973,7 @@ function dkCells(text, opt){
     if(cur.length){
       var t = curT.replace(/\s+/g, ' ').trim();
       var has = /[㐀-鿿A-Za-z0-9]/.test(t);
-      out.push('<span class="dk-sent">' + cur.join('') + (has && opt.sent !== false ? '<span class="dk-sb" data-t="' + htmlEsc(t) + '" onclick="dkSaySent(this)" title="读这一句">🔊</span>' : '') + '</span>');
+      out.push('<span class="dk-sent"' + (has ? ' data-t="' + htmlEsc(t) + '" onclick="dkSentClick(event,this)"' : '') + '>' + cur.join('') + '</span>');
     }
     cur = []; curT = '';
   }
@@ -5978,12 +5993,21 @@ function dkCells(text, opt){
     } else if(t === '\n'){ flush(); out.push('<span class="dk-br"></span>'); }
     else if(/^\s+$/.test(t)){ if(cur.length){ cur.push('<span class="dk-sp"></span>'); curT += ' '; } }
     else {
-      cur.push('<span class="dk-p"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>'); curT += t;
+      var pu = '<span class="dk-p"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>';
+      if(cur.length && cur[cur.length-1].indexOf('dk-sp') < 0) cur[cur.length-1] = '<span class="dk-glue">' + cur[cur.length-1] + pu + '</span>';
+      else cur.push(pu);
+      curT += t;
       if(/^[。！？!?.；;…]$/.test(t)) flush();
     }
   });
   flush();
   return out.join('');
+}
+function dkSentClick(ev, el){
+  if(ev.target.closest && ev.target.closest('.dk-c,.dk-w')) return;
+  document.querySelectorAll('.dk-c.on,.dk-w.on').forEach(function(x){ x.classList.remove('on'); });
+  el.querySelectorAll('.dk-c,.dk-w').forEach(function(x){ x.classList.add('on'); });
+  var t = el.getAttribute('data-t'); if(t) speak(t, dkLang(t));
 }
 function dkSaySent(btn){
   document.querySelectorAll('.dk-c.on,.dk-w.on').forEach(function(x){ x.classList.remove('on'); });
