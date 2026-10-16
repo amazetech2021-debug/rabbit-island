@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🐰 开心兔兔养成岛</title>
-<!-- 语音引擎：豆包直连 ByteDance API（中文）+ ElevenLabs（英文）+ 浏览器兜底 --><style>
+<!-- 语音引擎：豆包直连 ByteDance API（中文）+ ElevenLabs（英文）+ 浏览器兜底 --><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
 :root{
   --cream:#EDE8F8; --cream-2:#E0D9F2; --paper:#FAFAFE;
   --ink:#2C2448; --ink-soft:#6E6499;
@@ -1123,6 +1124,38 @@ html.grt-on .dk-full{background:transparent}
   .dk-fulld .dk-side{flex:none}
   .dk-fulld .dk-side .dk-list{max-height:36vh}
 }
+
+/* —— 跟读打字台风格：每句一个卡片、衬线字体、时间点 —— */
+:root{--dkread:"Literata",Georgia,"Songti SC","STSong","Noto Serif SC",serif;--dkmono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace}
+.dk-list{gap:10px;padding:2px}
+.dk-li{flex-wrap:wrap;gap:4px 10px;background:#fff;border:1px solid #d9cce4;border-left:4px solid transparent;border-radius:12px;padding:10px 14px 12px;font-family:var(--dkread);font-size:17px;line-height:1.7;color:var(--ink)}
+.dk-li.on{background:#ecdffb;border-color:#7a3bd1;border-left-color:#c6408f}
+.dk-li em{flex-basis:100%;min-width:0;padding:0;font-family:var(--dkmono);font-size:11.5px;letter-spacing:.04em;color:#6a5c78}
+.dk-li span{flex:1}
+.dk-li.edit{background:#fff8e1}
+.dk-words{background:transparent;box-shadow:none;padding:0;flex-direction:column;align-items:stretch;gap:12px}
+.dk-ftext .dk-words{min-height:0}
+.dk-br{display:none}
+.dk-sent{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 4px;background:#fff;border:1px solid #d9cce4;border-left:4px solid #c6408f;border-radius:14px;padding:14px 16px;box-shadow:0 4px 18px rgba(91,42,134,.08)}
+.dk-sent:has(.on){background:#ecdffb;border-color:#7a3bd1}
+.dk-w b{border:none!important;background:transparent;padding:0 3px;border-radius:6px;font-family:var(--dkread);font-weight:400;font-size:calc(var(--dkcs,64px)*.5);color:var(--ink)}
+.dk-w:hover b{text-decoration:underline;text-decoration-color:#c6408f;text-decoration-thickness:2px;text-underline-offset:6px}
+.dk-w.on b{background:#ffe08a}
+.dk-w.ok b{background:#d8f3e2}
+.dk-w.bad b{background:#ffdcd6}
+.dk-p b{font-family:var(--dkread)}
+.dk-words.dk-edit{background:#fff;border-radius:14px;padding:14px}
+.dk-stage .dk-words{margin-top:4px}
+html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,255,var(--grt-bg,.45))!important}
+
+.dk-sent{column-gap:0}
+.dk-sp{width:.32em}
+.dk-sent .dk-c+.dk-c{margin-left:2px}
+.dk-sent:not(:has(.dk-c)){align-items:baseline;row-gap:4px}
+.dk-sent:not(:has(.dk-c)) i{display:none}
+.dk-sent:not(:has(.dk-c)) .dk-w b,.dk-sent:not(:has(.dk-c)) .dk-p b{height:auto;line-height:1.5;width:auto;padding:0 2px;display:inline;font-size:calc(var(--dkcs,64px)*.5)}
+.dk-sent:not(:has(.dk-c)) .dk-sb{align-self:center;margin-left:12px}
+.dk-sent .dk-sb{margin-left:12px}
 </style>
 <body>
 <div class="app">
@@ -6098,7 +6131,7 @@ function dkDictHtml(){
     var list = '<div class="dk-side"><div class="dk-list" id="dkList">' + cues.map(function(x, i){
       if(DK.editCue === i) return '<div class="dk-li edit"><em>' + (i+1) + '</em><div style="flex:1;display:flex;flex-direction:column;gap:6px"><textarea class="dk-ta" id="dkCueEd" style="min-height:70px">' + htmlEsc(x.t) + '</textarea>'
         + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSaveCue(' + i + ')">💾 保存</button><button class="dk-btn" onclick="DK.editCue=null;render()">取消</button></div></div></div>';
-      return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + '</em><span>' + (DK.editAll || d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span>'
+      return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + (x.s != null ? ' · ' + dkMS(x.s) + (x.e != null ? ' – ' + dkMS(x.e) : '') : '') + '</em><span>' + (DK.editAll || d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span>'
         + (DK.editAll ? '<button class="dk-ib" title="改" onclick="event.stopPropagation();DK.editCue=' + i + ';render()">✏️</button><button class="dk-ib" title="删掉" onclick="event.stopPropagation();dkDelCue(' + i + ')">🗑</button>' : '') + '</div>';
     }).join('') + '</div>'
     + '<div class="dk-tools" style="margin-top:8px">'
@@ -6139,6 +6172,7 @@ function dkDictHtml(){
     + '<button class="dk-btn y" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'read\')">👀 看着字跟读</button></div>'
     + '</div>';
 }
+function dkMS(t){ t = Math.max(0, Math.floor(t || 0)); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), x = t%60; return (h ? h + ':' + (m<10?'0':'') : '') + m + ':' + (x<10?'0':'') + x; }
 function dkFmtT(t){ t = Math.max(0, t || 0); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), sec = Math.floor(t%60), ms = Math.round((t - Math.floor(t))*1000); function z(n, w){ n = String(n); while(n.length < (w||2)) n = '0' + n; return n; } return z(h) + ':' + z(m) + ':' + z(sec) + ',' + z(ms, 3); }
 function dkWriteCues(cues){
   var d = dkCfg(), timed = cues.some(function(c){ return c.s != null; });
