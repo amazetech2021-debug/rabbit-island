@@ -5652,7 +5652,7 @@ function grtApply(){
   root.style.setProperty('--grt-bg', String(Math.max(0, Math.min(1, 1 - c.op/100))));
   if(!_grt.cv){
     var cv = document.createElement('canvas'); cv.id = 'grtCanvas';
-    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:0';
+    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:0;image-rendering:pixelated;image-rendering:crisp-edges';
     document.body.insertBefore(cv, document.body.firstChild);
     _grt.cv = cv; _grt.t0 = performance.now();
     _grt.raf = requestAnimationFrame(grtLoop);
@@ -5675,7 +5675,8 @@ function grtLoop(now){
   _grt.raf = requestAnimationFrame(grtLoop);
   var c = grtCfg();
   var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
-  if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; _grt.last = ''; }
+  var DPR = Math.min(3, window.devicePixelRatio || 1), PW = Math.round(W * DPR), PH = Math.round(H * DPR);
+  if(cv.width !== PW || cv.height !== PH){ cv.width = PW; cv.height = PH; cv.style.width = W + 'px'; cv.style.height = H + 'px'; _grt.last = ''; }
   var t = (now - _grt.t0)/1000;
   var ty = c.type, pk = c.pal;
   if(ty === 'mix' || pk === 'mix'){
@@ -5699,6 +5700,7 @@ function grtLoop(now){
   if(key === _grt.last) return;
   _grt.last = key;
   var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[pk];
+  g.setTransform(DPR, 0, 0, DPR, 0, 0); g.imageSmoothingEnabled = false;
   var A = phase ? P[1] : P[0], B = phase ? P[0] : P[1];
   g.fillStyle = B; g.fillRect(0,0,W,H);
   if(ty === 'stripe'){
