@@ -1108,6 +1108,21 @@ html.grt-on .dk-full{background:transparent}
 .dk-li span{flex:1}
 .dk-li.edit{cursor:default;background:#fff8e1}
 @media (orientation:landscape) and (min-width:800px){ .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start} }
+
+.dk-fulld .dk-fbar .dk-tools{gap:6px}
+#page .dk-fulld .dk-dbody{flex:1;min-height:0;gap:12px;align-items:stretch}
+.dk-fulld .dk-stage{box-sizing:border-box;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px;gap:10px}
+.dk-fulld .dk-vid{width:100%;aspect-ratio:16/9;height:auto;max-height:calc(100vh - 230px);object-fit:contain;flex:none}
+.dk-fulld .dk-side{min-height:0;display:flex;flex-direction:column}
+.dk-fulld .dk-side .dk-list{flex:1;min-height:0;max-height:none}
+@media (orientation:landscape){ #page .dk-fulld .dk-dbody{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(240px,.8fr)} }
+@media (orientation:portrait){
+  #page .dk-fulld .dk-dbody{display:flex;flex-direction:column;overflow:auto}
+  .dk-fulld .dk-stage{overflow:visible;flex:none}
+  .dk-fulld .dk-vid{max-height:46vh}
+  .dk-fulld .dk-side{flex:none}
+  .dk-fulld .dk-side .dk-list{max-height:36vh}
+}
 </style>
 <body>
 <div class="app">
@@ -6090,11 +6105,11 @@ function dkDictHtml(){
     + (DK.editAll ? '<button class="dk-btn" onclick="dkAddCue()">＋ 在第 ' + (d.di+1) + ' 句后面加一句</button><button class="dk-btn p" onclick="DK.editAll=false;DK.editCue=null;render()">✓ 改好了</button>'
                   : '<button class="dk-btn" onclick="DK.editAll=true;render()">✏️ 修改字幕 / 文字</button>')
     + '</div></div>';
-    return '<div class="dk-nav" style="margin-bottom:12px"><button class="dk-btn" onclick="dkCfg().going=false;dkStopMedia();save();render()">← 换素材</button>'
-      + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span>'
+    return '<div class="dk-full dk-fulld" id="dkFullD"><div class="dk-fbar"><button class="dk-btn" onclick="DK.editAll=false;DK.editCue=null;dkCfg().going=false;dkStopMedia();save();render()">← 返回</button>'
+      + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span><span style="flex:1"></span>'
       + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
       + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
-      + '<div class="dk-play"><div class="dk-stage">'
+      + '<div class="dk-play dk-dbody"><div class="dk-stage">'
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : '')
       + '<div class="dk-tools" style="justify-content:center">'
       + '<button class="dk-btn" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
@@ -6107,7 +6122,7 @@ function dkDictHtml(){
           + '<div class="dk-res" id="dkRes"></div>'
         : '')
       + '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" id="dkAns" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px;' + (showTx?'':'display:none') + '">' + dkCells(c.t) + '</div>'
-      + '</div>' + list + '</div>';
+      + '</div>' + list + '</div></div>';
   }
   return '<div class="card"><div class="secthead"><h3>✍️ 听写</h3><em>视频/音频 + 字幕，或者只用文字</em></div>'
     + '<div class="dk-src">'
