@@ -955,7 +955,9 @@ body{
 html.grt-on .app{position:relative;z-index:1}
 html.grt-on #modal{background:transparent}
 html.grt-on .app,html.grt-on #mbox{text-shadow:0 0 2px rgba(255,255,255,.95),0 0 5px rgba(255,255,255,.85)}
-html.grt-on .side,html.grt-on .nav .ico{background:rgba(255,255,255,var(--grt-bg,.45))!important;backdrop-filter:none!important}
+html.grt-on .side{background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
+html.grt-on .nav .ico{background:rgba(255,255,255,var(--grt-bg,.45))!important;backdrop-filter:none!important}
+html.grt-on .nav.on{background:transparent!important}
 html.grt-on .app :is(.card,.filterbar,.secthead em,.tile,.wtile,.pytile,.pmcard,.cell,.choice,.tab:not(.on),.coll-card,.coll-info,.coll-meta,.ck-cell:not(.ck-grt.on),.ck-box,.rpanel,.rtop,.ep-item,.ep-header,.pill,.big:not(.p):not(.o),select,input,textarea,.hw-right,.mq-grid>button),
 html.grt-on .app [style*="background:var(--paper)"],html.grt-on .app [style*="background:#fff"],html.grt-on .app [style*="background: #fff"],
 html.grt-on .app [style*="background:var(--cream"],html.grt-on .app [style*="background:var(--card)"],html.grt-on .app [style*="background:#fafafa"],
@@ -5482,7 +5484,7 @@ var GRT_TYPES = [
   {k:'red',   n:'红光闪烁', e:'🔴'},
   {k:'rgb',   n:'三色刺激', e:'🎨'}
 ];
-var GRT_PAL = {ry:['#ff0000','#ffff00','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff0000','#0044ff','红蓝'], rg:['#ff0000','#00b400','红绿'], by:['#0044ff','#ffff00','蓝黄']};
+var GRT_PAL = {ry:['#e00000','#eaea00','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#e00000','#0030d8','红蓝'], rg:['#e00000','#009a00','红绿'], by:['#0030d8','#eaea00','蓝黄']};
 var _grt = {cv:null, raf:0, t0:0, last:'', start:0, maskT:0};
 var _grtTab = null;
 function grtCfg(){
