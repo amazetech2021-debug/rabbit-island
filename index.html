@@ -1086,6 +1086,28 @@ html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-
 .dk-num{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:800}
 .dk-cmd .hd strong{font-size:14.5px}
 .dk-cmd pre{max-height:6.5em}
+
+#page > .dk-full{zoom:1!important}
+.dk-full{position:fixed;inset:0;z-index:55;background:var(--cream);display:flex;flex-direction:column;gap:10px;box-sizing:border-box;
+  padding:calc(10px + env(safe-area-inset-top,0px)) 14px calc(10px + env(safe-area-inset-bottom,0px))}
+html.grt-on .dk-full{background:transparent}
+.dk-fbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:none}
+.dk-fbar .tab{font-size:13px;padding:7px 12px}
+.dk-fbody{flex:1;min-height:0;display:grid;gap:12px}
+.dk-fpic{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.dk-fpic img,.dk-fpic canvas{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 4px 18px rgba(100,80,160,.16);background:#fff}
+.dk-ftext{min-width:0;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:20px}
+.dk-ftext .dk-words{min-height:100%;box-sizing:border-box;align-content:flex-start}
+.dk-words.dk-edit{flex-direction:column;align-items:stretch}
+@media (orientation:landscape){ .dk-fbody{grid-template-columns:minmax(0,1.75fr) minmax(280px,1fr)} }
+@media (orientation:portrait){ .dk-fbody{grid-template-rows:minmax(0,1fr) auto} .dk-ftext{max-height:38vh} }
+.dk-fbody.nopic{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important}
+.dk-fbody.nopic .dk-fpic{display:none}
+.dk-fbody.nopic .dk-ftext{max-height:none}
+.dk-ib{border:none;background:transparent;font-size:15px;cursor:pointer;padding:0 4px;flex:none}
+.dk-li span{flex:1}
+.dk-li.edit{cursor:default;background:#fff8e1}
+@media (orientation:landscape) and (min-width:800px){ .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start} }
 </style>
 <body>
 <div class="app">
@@ -5959,19 +5981,28 @@ function dkBookHtml(){
     if(d.pi >= n) d.pi = n - 1; if(d.pi < 0) d.pi = 0;
     var tx = pages[d.pi] || '';
     var hasPic = np > d.pi;
-    return '<div class="dk-read' + (hasPic ? ' wide' : '') + '">'
-      + '<div class="dk-nav"><button class="dk-btn" onclick="dkCfg().reading=false;save();render()">← 换绘本</button>'
-      + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span>'
-      + '<div class="dk-tools">' + dkSizeBtns()
+    var txt;
+    if(DK.editPage){
+      txt = '<div class="dk-words dk-edit"><div class="dk-note" style="width:100%">改第 ' + (d.pi+1) + ' 页的文字（每行一句；可以加句子、删句子）</div>'
+        + '<textarea class="dk-ta" id="dkPgEd" style="min-height:220px">' + htmlEsc(tx) + '</textarea>'
+        + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSavePage()">💾 保存</button><button class="dk-btn" onclick="DK.editPage=false;render()">取消</button>'
+        + '<button class="dk-btn" onclick="var e=$(\'dkPgEd\');if(e)e.value=\'\'">清空这一页</button></div></div>';
+    } else {
+      txt = '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
+        + (tx ? dkCells(tx) : '<div class="dk-note" style="padding:10px">这一页没有文字，点上面「✏️ 改文字」加上。</div>') + '</div>'
+        + (!DK.pyReady && /[一-鿿]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '');
+    }
+    return '<div class="dk-full" id="dkFull">'
+      + '<div class="dk-fbar"><button class="dk-btn" onclick="DK.editPage=false;dkCfg().reading=false;save();render()">← 返回</button>'
+      + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span><span style="flex:1"></span>'
+      + dkSizeBtns()
       + '<button class="dk-btn y" onclick="dkSayText(dkBookPages()[dkCfg().pi]||\'\')">🔊 读这一页</button>'
-      + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkCfg().pi--;save();render()">⏮ 上一页</button>'
-      + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkCfg().pi++;save();render()">下一页 ⏭</button></div></div>'
-      + (hasPic ? '<div class="dk-pic" id="dkPic">' + (DK.pdfLoading ? '<div style="padding:30px">正在打开绘本…</div>' : '') + '</div>' : '')
-      + '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
-      + (tx ? dkCells(tx) : '<div class="dk-note" style="padding:10px">这一页没有文字。可以在「换绘本」里给它配上文字。</div>') + '</div>'
-      + (!DK.pyReady && /[\u4e00-\u9fff]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '')
-      + '<div class="dk-note">点一个字或一个单词就会读出来。</div>'
-      + '</div>';
+      + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
+      + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
+      + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
+      + '<div class="dk-fbody' + (hasPic ? '' : ' nopic') + '">'
+      + '<div class="dk-fpic" id="dkPic">' + (hasPic && DK.pdfLoading ? '<div style="padding:30px">正在打开绘本…</div>' : '') + '</div>'
+      + '<div class="dk-ftext">' + txt + '</div></div></div>';
   }
   var bk = DK.book;
   return '<div class="card"><div class="secthead"><h3>📖 绘本阅读</h3><em>PDF / 图片 + 每页的文字</em></div>'
@@ -5996,20 +6027,45 @@ function dkStartRead(){
   d.reading = true; d.pi = 0; save(); render();
 }
 var _dkDrawTok = 0;
+function dkTurn(k){
+  var d = dkCfg(), n = Math.max(dkBookPages().length, dkPicCount());
+  var to = d.pi + k; if(to < 0 || to >= n) return;
+  DK.editPage = false; d.pi = to; save(); render();
+}
+function dkSavePage(){
+  var e = $('dkPgEd'); if(!e) return;
+  var d = dkCfg(), pages = dkBookPages(), n = Math.max(pages.length, dkPicCount());
+  while(pages.length < n) pages.push('');
+  pages[d.pi] = e.value.replace(/\r/g, '').trim();
+  d.pages = pages.map(function(t, i){ return '=== 第 ' + (i+1) + ' 页 ===\n' + t; }).join('\n');
+  DK.editPage = false; save(); render(); toast('已保存');
+}
 function dkDrawPic(){
   var box = $('dkPic'); if(!box || !DK.book) return;
   var i = dkCfg().pi;
+  if(i >= dkPicCount()) return;
   if(DK.book.type === 'img'){ box.innerHTML = '<img src="' + DK.bookUrls[i] + '" alt="">'; return; }
   if(!DK.pdf) return;
   var tok = ++_dkDrawTok;
   DK.pdf.getPage(i+1).then(function(pg){
     if(tok !== _dkDrawTok) return;
-    var v1 = pg.getViewport({scale:1}), w = Math.min(1600, Math.max(600, (box.clientWidth || 800) * (window.devicePixelRatio || 1)));
-    var vp = pg.getViewport({scale: w / v1.width});
+    var v1 = pg.getViewport({scale:1}), dpr = Math.min(2, window.devicePixelRatio || 1);
+    var bw = box.clientWidth || 800, bh = box.clientHeight || 600;
+    var sc = Math.min(bw / v1.width, bh / v1.height) * dpr;
+    sc = Math.max(0.5, Math.min(sc, 2600 / v1.width));
+    var vp = pg.getViewport({scale: sc});
     var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
     return pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise.then(function(){ if(tok === _dkDrawTok){ box.innerHTML = ''; box.appendChild(cv); } });
   }).catch(function(){ box.innerHTML = '<div style="padding:30px">这一页打不开</div>'; });
 }
+var _dkRz = 0;
+window.addEventListener('resize', function(){ clearTimeout(_dkRz); _dkRz = setTimeout(function(){ if($('dkFull') && DK.book && DK.book.type === 'pdf') dkDrawPic(); }, 250); });
+document.addEventListener('keydown', function(e){
+  if(!$('dkFull') || DK.editPage) return;
+  var t = e.target && e.target.tagName; if(t === 'INPUT' || t === 'TEXTAREA') return;
+  if(e.key === 'ArrowRight' || e.key === 'PageDown') dkTurn(1);
+  else if(e.key === 'ArrowLeft' || e.key === 'PageUp') dkTurn(-1);
+});
 
 /* —— 听写 —— */
 function dkUseBookForDict(){
@@ -6024,9 +6080,16 @@ function dkDictHtml(){
     if(d.di >= cues.length) d.di = cues.length - 1; if(d.di < 0) d.di = 0;
     var c = cues[d.di], timed = c.s != null && DK.media;
     var showTx = d.mode === 'read' || d.reveal;
-    var list = '<div class="dk-list" id="dkList">' + cues.map(function(x, i){
-      return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + '</em><span>' + (d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span></div>';
-    }).join('') + '</div>';
+    var list = '<div class="dk-side"><div class="dk-list" id="dkList">' + cues.map(function(x, i){
+      if(DK.editCue === i) return '<div class="dk-li edit"><em>' + (i+1) + '</em><div style="flex:1;display:flex;flex-direction:column;gap:6px"><textarea class="dk-ta" id="dkCueEd" style="min-height:70px">' + htmlEsc(x.t) + '</textarea>'
+        + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSaveCue(' + i + ')">💾 保存</button><button class="dk-btn" onclick="DK.editCue=null;render()">取消</button></div></div></div>';
+      return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + '</em><span>' + (DK.editAll || d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span>'
+        + (DK.editAll ? '<button class="dk-ib" title="改" onclick="event.stopPropagation();DK.editCue=' + i + ';render()">✏️</button><button class="dk-ib" title="删掉" onclick="event.stopPropagation();dkDelCue(' + i + ')">🗑</button>' : '') + '</div>';
+    }).join('') + '</div>'
+    + '<div class="dk-tools" style="margin-top:8px">'
+    + (DK.editAll ? '<button class="dk-btn" onclick="dkAddCue()">＋ 在第 ' + (d.di+1) + ' 句后面加一句</button><button class="dk-btn p" onclick="DK.editAll=false;DK.editCue=null;render()">✓ 改好了</button>'
+                  : '<button class="dk-btn" onclick="DK.editAll=true;render()">✏️ 修改字幕 / 文字</button>')
+    + '</div></div>';
     return '<div class="dk-nav" style="margin-bottom:12px"><button class="dk-btn" onclick="dkCfg().going=false;dkStopMedia();save();render()">← 换素材</button>'
       + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span>'
       + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
@@ -6061,6 +6124,43 @@ function dkDictHtml(){
     + '<button class="dk-btn y" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'read\')">👀 看着字跟读</button></div>'
     + '</div>';
 }
+function dkFmtT(t){ t = Math.max(0, t || 0); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), sec = Math.floor(t%60), ms = Math.round((t - Math.floor(t))*1000); function z(n, w){ n = String(n); while(n.length < (w||2)) n = '0' + n; return n; } return z(h) + ':' + z(m) + ':' + z(sec) + ',' + z(ms, 3); }
+function dkWriteCues(cues){
+  var d = dkCfg(), timed = cues.some(function(c){ return c.s != null; });
+  if(timed){
+    var last = 0;
+    d.subs = cues.map(function(c, i){
+      var st = c.s != null ? c.s : last, en = c.e != null ? c.e : st;
+      last = en;
+      return (i+1) + '\n' + dkFmtT(st) + ' --> ' + dkFmtT(en) + '\n' + c.t;
+    }).join('\n\n');
+  } else d.subs = cues.map(function(c){ return c.t; }).join('\n');
+  save();
+}
+function dkShiftDone(from, by){
+  var d = dkCfg(), nd = {};
+  Object.keys(d.done || {}).forEach(function(k){ k = +k; if(k < from) nd[k] = 1; else if(k + by >= from) nd[k + by] = 1; });
+  d.done = nd;
+}
+function dkSaveCue(i){
+  var e = $('dkCueEd'); if(!e) return;
+  var cues = dkCues(), v = e.value.replace(/\s*\n\s*/g, ' ').trim();
+  if(!v){ dkDelCue(i); return; }
+  cues[i].t = v; DK.editCue = null; dkWriteCues(cues); render();
+}
+function dkDelCue(i){
+  var cues = dkCues(); if(cues.length <= 1){ toast('至少留一句'); return; }
+  cues.splice(i, 1); dkShiftDone(i + 1, -1); delete dkCfg().done[i];
+  var d = dkCfg(); if(d.di >= cues.length) d.di = cues.length - 1;
+  DK.editCue = null; dkWriteCues(cues); render();
+}
+function dkAddCue(){
+  var d = dkCfg(), cues = dkCues(), at = Math.min(d.di + 1, cues.length);
+  var prev = cues[at-1];
+  cues.splice(at, 0, {s: prev && prev.e != null ? prev.e : null, e: prev && prev.e != null ? prev.e : null, t: '新句子'});
+  dkShiftDone(at, 1); DK.editCue = at; dkWriteCues(cues); render();
+  setTimeout(function(){ var e = $('dkCueEd'); if(e){ e.focus(); e.select(); } }, 50);
+}
 function dkStartDict(mode){
   var d = dkCfg(); dkTextSave('subs');
   if(!dkCues().length){ toast('先填字幕或文字'); return; }
@@ -6081,7 +6181,7 @@ function dkGo(i){
 function dkPlay(){
   var d = dkCfg(), c = DK.cues[d.di]; if(!c) return;
   var v = $('dkVid');
-  if(v && c.s != null){
+  if(v && c.s != null && !(c.e != null && c.e - c.s < 0.3)){
     stopSpeak && stopSpeak();
     try{ v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
     return;
