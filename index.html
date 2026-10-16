@@ -5598,7 +5598,7 @@ function dchColors(c){
   return {A: ambRed?red:other, F: ambRed?other:red, Fmid: ambRed?otherMid:'#800000'};
 }
 function dchMasks(){
-  var w = Math.max(40, Math.ceil(window.innerWidth/6)), h = Math.max(40, Math.ceil(window.innerHeight/6));
+  var w = Math.max(80, Math.ceil(window.innerWidth/2)), h = Math.max(80, Math.ceil(window.innerHeight/2));
   var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   var g = cv.getContext('2d');
   var cell = Math.max(10, Math.round(Math.min(w,h)/4));
@@ -5760,7 +5760,7 @@ function stereoOpen(){
   modal('<div id="stereoBox" style="text-align:center;padding:6px 2px">'
     +'<h3 style="margin:2px 0 4px">🧊 立体视训练</h3>'
     +'<div id="stInfo" style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-bottom:8px"></div>'
-    +'<canvas id="stCv" style="width:'+S0+'px;height:'+S0+'px;border-radius:14px;background:#000;display:block;margin:0 auto"></canvas>'
+    +'<canvas id="stCv" style="width:'+S0+'px;height:'+S0+'px;border-radius:14px;background:#000;display:block;margin:0 auto;image-rendering:pixelated"></canvas>'
     +'<div style="font-size:14px;font-weight:700;margin:10px 0 6px">戴上红蓝眼镜，图里藏着什么？</div>'
     +'<div class="grt-row" id="stBtns">'+ST_SHAPES.map(function(o){ return '<button style="font-size:17px;padding:12px 14px" onclick="stereoPick(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')+'</div>'
     +'<div style="display:flex;gap:8px;margin-top:6px"><button class="big" style="flex:1;padding:11px;color:var(--ink)" onclick="stereoNext()">👀 看不出来，换一张</button>'
@@ -5777,7 +5777,8 @@ function stShapePath(g, shape, cx, cy, r){
 function stereoNext(){
   var cv = document.getElementById('stCv'); if(!cv) return;
   var c = grtCfg(), dpr = window.devicePixelRatio || 1;
-  var css = parseFloat(cv.style.width), W = Math.round(css*dpr);
+  /* 按屏幕真实像素绘制：弹窗在大屏上有放大（zoom），所以用实际显示尺寸 × 设备像素比 */
+  var css = cv.getBoundingClientRect().width || parseFloat(cv.style.width), W = Math.round(css*dpr);
   cv.width = W; cv.height = W;
   var dot = Math.max(1, Math.round(3*dpr)), d = Math.round(ST_LV[_st.lv]*dpr);
   var shape = ST_SHAPES[Math.floor(Math.random()*4)][0]; _st.shape = shape;
