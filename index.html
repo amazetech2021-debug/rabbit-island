@@ -6341,7 +6341,7 @@ function dkAfterDict(){
   var l = $('dkList'), on = l && l.querySelector('.dk-li.on');
   if(on){ l.scrollTop = on.offsetTop - l.offsetTop - 60; }
   var v = $('dkVid');
-  if(v && !v._dk){ v._dk = 1; v.addEventListener('timeupdate', function(){ if(DK.stopAt != null && v.currentTime >= DK.stopAt){ v.pause(); DK.stopAt = null; dkHLClear(); } dkVidHL(v); }); }
+  if(v && !v._dk){ v._dk = 1; v.addEventListener('timeupdate', function(){ if(DK.stopAt != null && v.currentTime >= DK.stopAt){ v.pause(); DK.stopAt = null; dkHLClear(); } }); }
 }
 function dkVidHL(v){
   var c = DK.cues[dkCfg().di]; if(!c || c.s == null || c.e == null || v.paused) return;
