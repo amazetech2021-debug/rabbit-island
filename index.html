@@ -5479,12 +5479,14 @@ var GRT_TYPES = [
   {k:'stripe',n:'条纹光栅', e:'▥'},
   {k:'check', n:'方格光栅', e:'🔲'},
   {k:'rotate',n:'旋转条纹', e:'🌀'},
+  {k:'pin',   n:'光栅旋转', e:'🎡'},
   {k:'tri',   n:'三角光栅', e:'🔺'},
   {k:'ring',  n:'圆形光栅', e:'⭕'},
   {k:'red',   n:'红光闪烁', e:'🔴'},
+  {k:'bw',    n:'黑白闪烁', e:'⚫'},
   {k:'rgb',   n:'三色刺激', e:'🎨'}
 ];
-var GRT_PAL = {ry:['#e00000','#eaea00','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#e00000','#0030d8','红蓝'], rg:['#e00000','#009a00','红绿'], by:['#0030d8','#eaea00','蓝黄']};
+var GRT_PAL = {ry:['#ff1e1e','#fff200','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff1e1e','#2a6bff','红蓝'], rg:['#ff1e1e','#1fd01f','红绿'], by:['#2a6bff','#fff200','蓝黄']};
 var _grt = {cv:null, raf:0, t0:0, last:'', start:0, maskT:0};
 var _grtTab = null;
 function grtCfg(){
@@ -5561,8 +5563,8 @@ function grtPanel(refresh){
       +'<button class="big p grt-go" onclick="grtStart(\'grating\')">'+(c.on&&c.mode==='grating'?'🔄 重新开始计时':'▶ 开始光栅刺激')+'</button>'
       +'<div class="grt-lb">光栅类型</div>'
       +row('type', [['mix','🔀 轮流随机']].concat(GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; })))
-      +(c.type==='mix'?'<div class="grt-note" style="margin:4px 0">每 20 秒自动换一种：条纹、方格、旋转、三角、圆形（不含全屏红光闪烁和三色刺激）</div>':'')
-      +'<div class="grt-lb">颜色（红光闪烁、三色刺激不受影响）</div>'
+      +(c.type==='mix'?'<div class="grt-note" style="margin:4px 0">每 20 秒自动换一种：条纹、方格、旋转条纹、光栅旋转、三角、圆形（不含全屏的红光闪烁、黑白闪烁和三色刺激）</div>':'')
+      +'<div class="grt-lb">颜色（红光闪烁、黑白闪烁、三色刺激不受影响）</div>'
       +row('pal', [['mix','🔀 轮流随机']].concat(Object.keys(GRT_PAL).map(function(k){ return [k, '<span class="grt-sw" style="background:linear-gradient(90deg,'+GRT_PAL[k][0]+' 50%,'+GRT_PAL[k][1]+' 50%)"></span>'+GRT_PAL[k][2]]; })))
       +'<div class="grt-lb">视力分级（按弱视眼矫正视力选，视力越低条纹越粗）</div>'
       +'<div class="grt-row">'+[['low','低视力 0.0–0.1',150],['m1','中低视力 0.2–0.4',75],['m2','中高视力 0.5–0.6',36],['hi','高视力 0.7–0.9',18]].map(function(o){
@@ -5676,14 +5678,14 @@ function grtLoop(now){
   var c = grtCfg();
   var cv = _grt.cv, W = window.innerWidth, H = window.innerHeight;
   var DPR = Math.min(3, window.devicePixelRatio || 1), PW = Math.round(W * DPR), PH = Math.round(H * DPR);
-  if(cv.width !== PW || cv.height !== PH){ cv.width = PW; cv.height = PH; cv.style.width = W + 'px'; cv.style.height = H + 'px'; _grt.last = ''; }
+  if(cv.width !== PW || cv.height !== PH){ cv.width = PW; cv.height = PH; cv.style.width = W + 'px'; cv.style.height = H + 'px'; _grt.last = ''; try{ grtChip(); }catch(e){} }
   var t = (now - _grt.t0)/1000;
   var ty = c.type, pk = c.pal;
   if(ty === 'mix' || pk === 'mix'){
     var slot = Math.floor(t / 20);
     if(_grt.mixSlot !== slot){
       _grt.mixSlot = slot;
-      var TL = ['stripe','check','rotate','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
+      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
       do { a = TL[Math.floor(Math.random()*TL.length)]; } while(a === _grt.mixT && TL.length > 1);
       do { b = PL[Math.floor(Math.random()*PL.length)]; } while(b === _grt.mixP && PL.length > 1);
       _grt.mixT = a; _grt.mixP = b;
@@ -5693,7 +5695,7 @@ function grtLoop(now){
   }
   var phase = c.hz ? Math.floor(t * c.hz * 2) % 2 : 0;   // 每秒反转 hz 次
   var key;
-  if(ty === 'rotate') key = 'a' + Math.floor(t * 20);
+  if(ty === 'rotate' || ty === 'pin') key = 'a' + Math.floor(t * 30);
   else if(ty === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
   else key = 'p' + phase;
   key += '|' + ty + '|' + c.size + '|' + pk + '|' + W + 'x' + H;
@@ -5721,6 +5723,16 @@ function grtLoop(now){
   } else if(ty === 'ring'){
     var cx = W/2, cy = H/2, R = Math.hypot(W,H)/2 + s, n = Math.ceil(R/s);
     for(var i=n; i>0; i--){ g.beginPath(); g.arc(cx,cy,i*s,0,Math.PI*2); g.fillStyle = (i%2) ? A : B; g.fill(); }
+  } else if(ty === 'pin'){
+    /* 光栅旋转：从中心放射的扇形黑白/彩色光栅，整体缓慢旋转（CAM 风车式） */
+    var cxp = W/2, cyp = H/2, Rp = Math.hypot(W,H)/2 + 4;
+    var nS = Math.max(8, Math.min(48, Math.round(Math.PI * Math.min(W,H) / 2 / s))) * 2;
+    var a0 = t * (c.hz||1) * 0.6, da = Math.PI*2 / nS;
+    g.fillStyle = P[1]; g.fillRect(0,0,W,H);
+    g.fillStyle = P[0];
+    for(var k=0; k<nS; k+=2){ g.beginPath(); g.moveTo(cxp,cyp); g.arc(cxp,cyp,Rp,a0+k*da,a0+(k+1)*da); g.closePath(); g.fill(); }
+  } else if(ty === 'bw'){
+    g.fillStyle = phase ? '#ffffff' : '#000000'; g.fillRect(0,0,W,H);
   } else if(ty === 'rotate'){
     var ang = t * (c.hz||1) * 0.35, D = Math.hypot(W,H);
     g.save(); g.translate(W/2,H/2); g.rotate(ang);
