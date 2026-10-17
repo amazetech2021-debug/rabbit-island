@@ -1201,6 +1201,11 @@ html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,2
 .dk-c.rd b{background:#f3edff}
 .dk-sent .dk-w.rd b{background:#efe7ff;border-color:#c9b6f3!important}
 .dk-c.on b{background:#ffe08a;border-color:#f5a623;transition:background .1s}
+
+/* 开着光栅时，全屏阅读/听写页面背景透明，但后面的页面要藏起来，只留这一页 */
+html.grt-on .app:has(.dk-full) .side{visibility:hidden}
+html.grt-on .app:has(.dk-full) .main > :not(:has(.dk-full)){visibility:hidden}
+html.grt-on #page:has(.dk-full) > :not(.dk-full){visibility:hidden}
 </style>
 <body>
 <div class="app">
