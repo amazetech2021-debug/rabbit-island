@@ -5901,6 +5901,20 @@ function vpOpen(url, title, nav){
     fr.parentNode.insertBefore(tip, fr);
   }
 }
+function vpWatchRefresh(){
+  // 播放计数后，刷新播放器后面的列表，让 👁 次数马上更新（不跳回频道、不丢滚动位置）
+  try{
+    var pg = $('page'), y1 = pg ? pg.scrollTop : 0, y2 = window.scrollY || 0;
+    var has = function(id){ var e = document.getElementById(id); return e && e.offsetParent !== null; };
+    if(has('bk-list') && typeof _renderBkPage === 'function') _renderBkPage(_bkPage);
+    if(has('bk-pl-list') && typeof _renderBkPlPage === 'function') _renderBkPlPage(_bkPlPage);
+    if(has('yt-ch-list') && typeof _renderYtChPage === 'function') _renderYtChPage(_ytChPage);
+    if(has('yt-pl-list') && typeof _renderYtPlPage === 'function') _renderYtPlPage(_ytPlPage);
+    var q1 = $('ytSearchInput'); if(q1 && q1.value && has('ytSearchResults')) searchYtVideos(q1.value);
+    var q2 = $('bk-search-home') || document.querySelector('[oninput^="bkHomeSearch"]'); if(q2 && q2.value && has('bk-home-results')) bkHomeSearch(q2.value);
+    if(pg) pg.scrollTop = y1; if(window.scrollY !== y2) window.scrollTo(0, y2);
+  }catch(e){}
+}
 function vpClose(){
   var w = document.getElementById('vpWrap'); if(w) w.remove();
   document.documentElement.classList.remove('vp-max');
@@ -14627,6 +14641,7 @@ function playBookVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
+  vpWatchRefresh();
   vpOpen(openUrl, ep.t||pl.name, vpNav('playBookVideo', chId, ch.playlists, plIdx, epIdx||0));return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
@@ -15993,6 +16008,7 @@ function playYtVideo(chId,plIdx,epIdx){
     save();
   }catch(e){}
   // Skip modal: mobile=same tab (back works), desktop=new tab
+  vpWatchRefresh();
   vpOpen(ytUrl, ep.t, vpNav('playYtVideo', chId, ch.playlists, plIdx, epIdx));return;
   var m=$('mbox');
   if(m) m.style.cssText='max-width:min(560px,98vw);padding:14px 14px 18px;border-radius:20px';
