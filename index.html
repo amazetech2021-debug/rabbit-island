@@ -5616,12 +5616,13 @@ function grtPanel(refresh){
   var c = grtCfg();
   if(refresh && !document.getElementById('grtPanelBox')) return;
   if(!_grtTab) _grtTab = c.mode || 'grating';
+  if(_grtTab === 'stereo') _grtTab = 'dich';   // 立体视已移到「视力」页
   function row(key, list){
     return '<div class="grt-row">'+list.map(function(o){
       return '<button class="'+(c[key]===o[0]?'on':'')+'" onclick="grtSet(\''+key+'\','+JSON.stringify(o[0]).replace(/"/g,"&quot;")+')">'+o[1]+'</button>';
     }).join('')+'</div>';
   }
-  var tabs = [['dich','👓 双眼分视'],['stereo','🧊 立体视'],['grating','▥ 光栅刺激'],['calib','🔧 眼镜校准']];
+  var tabs = [['dich','👓 双眼分视'],['grating','▥ 光栅刺激'],['calib','🔧 眼镜校准']];
   var h = '<div id="grtPanelBox" style="padding:8px 4px 4px;text-align:center">'
     +'<h3 style="margin:2px 0 8px">视力训练</h3>'
     +'<div class="grt-tabs">'+tabs.map(function(t){ return '<button class="'+(_grtTab===t[0]?'on':'')+'" onclick="_grtTab=\''+t[0]+'\';grtPanel(true)">'+t[1]+'</button>'; }).join('')+'</div>';
