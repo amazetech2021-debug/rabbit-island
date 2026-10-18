@@ -1091,7 +1091,6 @@ html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-
 .dk-cmd pre{max-height:6.5em}
 
 #page > .dk-full{zoom:1!important}
-#page > .eye-pg-test{zoom:1!important}
 .eye-pg{display:flex;flex-direction:column;gap:12px}
 .eye-pg-test{height:calc(100vh - 110px);height:calc(100dvh - 110px);min-height:480px}
 .eye-tabs{display:flex;gap:4px;flex-wrap:wrap;background:var(--paper);padding:5px;border-radius:18px;box-shadow:0 2px 10px rgba(100,80,160,.1)}
@@ -1132,6 +1131,52 @@ html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-
 .eg-pad{position:absolute;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px;opacity:.5;z-index:1}
 .eg-pad button{background:#2a2a2a;color:#ccc;border:1px solid #555;border-radius:16px;font-size:22px;touch-action:none}
 html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
+#page > .eye-pg{zoom:1!important}
+.st-wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.st-left{background:#000;border-radius:20px;padding:12px;box-shadow:0 4px 16px rgba(100,80,160,.15)}
+.st-cv{display:block;width:100%;max-width:640px;aspect-ratio:1;margin:0 auto;border-radius:12px;background:#000;image-rendering:pixelated}
+.st-info{font-size:14px;font-weight:800;color:var(--ink-soft);margin:6px 0 10px}
+.st-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:6px 0 10px}
+.st-btns button{display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--cream-2);background:#fff;border-radius:16px;padding:12px 10px;font:inherit;font-size:17px;font-weight:900;color:var(--ink);cursor:pointer}
+.st-btns button span{font-size:26px;line-height:1}
+.st-btns button:active{transform:scale(.97)}
+.st-skip{width:100%;margin-bottom:6px}
+.eg-banner{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:center;border-radius:24px;padding:20px 22px;color:#fff;box-shadow:0 8px 24px rgba(220,40,80,.18)}
+.eg-banner-stim{background:linear-gradient(120deg,#f87171,#e11d48)}
+.eg-banner-rb{background:linear-gradient(120deg,#8b7cf6,#4f46e5);box-shadow:0 8px 24px rgba(79,70,229,.2)}
+.eg-bi{width:68px;height:68px;border-radius:20px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:36px}
+.eg-bt h3{margin:0 0 4px;font-size:24px}
+.eg-bt p{margin:0;font-size:14px;line-height:1.6;opacity:.95}
+.eg-bsets{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:18px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.eg-bsets small{font-size:12px;opacity:.9;line-height:1.5}
+.eg-bsets small a,.eg-bsets small b{color:#fff}
+.eg-bsel{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eg-bsel > span{font-size:12.5px;font-weight:900;min-width:4.5em}
+.eg-bsel > div{display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex:1}
+.eg-bsel button{border:none;border-radius:11px;padding:5px 9px;font:inherit;font-size:12.5px;font-weight:800;background:rgba(255,255,255,.25);color:#fff;cursor:pointer}
+.eg-bsel button.on{background:#fff;color:#be123c}
+.eg-banner-rb .eg-bsel button.on{color:#4338ca}
+.eg-bsel input[type=range]{flex:1;min-width:120px;accent-color:#fff}
+.eg-sec{font-size:18px;font-weight:900;color:var(--ink);margin:6px 2px 0}
+.eg-sec small{font-size:12.5px;color:var(--ink-soft);font-weight:700;margin-left:8px}
+.eg-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.eg-gcard{display:flex;align-items:center;gap:14px;text-align:left;border:none;background:var(--paper);border-radius:20px;padding:16px 18px;font:inherit;color:var(--ink);cursor:pointer;box-shadow:0 3px 12px rgba(100,80,160,.1);transition:transform .12s}
+.eg-gcard:active{transform:scale(.98)}
+.eg-gi{font-size:34px;width:56px;height:56px;border-radius:16px;background:var(--cream);display:flex;align-items:center;justify-content:center;flex:none}
+.eg-gm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.eg-gt{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eg-gt b{font-size:17px}
+.eg-gt em{font-style:normal;font-size:11.5px;font-weight:800;border-radius:8px;padding:2px 8px}
+.eg-l1{background:#dcfce7;color:#15803d}.eg-l2{background:#fef3c7;color:#b45309}.eg-l3{background:#fee2e2;color:#b91c1c}
+.eg-gb{font-size:12px;font-weight:900;color:#b7791f}
+.eg-gd{font-size:13px;color:var(--ink-soft);line-height:1.5}
+.eg-gs{font-size:11.5px;color:var(--ink-soft);display:flex;flex-wrap:wrap;align-items:center;gap:2px 0}
+.eg-gs i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;box-shadow:0 0 0 1.5px #000}
+.eg-gp{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--purple);flex:none}
+.eg-stim .eg-hud{background:#1b1430;color:#eee}
+.eg-pad-t{grid-template-columns:repeat(5,58px);grid-template-rows:58px}
+@media (max-width:900px){.eg-banner{grid-template-columns:auto minmax(0,1fr)}.eg-bsets{grid-column:1/-1}.st-wrap{grid-template-columns:1fr}}
+
 @media (max-width:760px){.eg-intro{grid-template-columns:1fr}}
 .dk-full{position:fixed;inset:0;z-index:55;background:var(--cream);display:flex;flex-direction:column;gap:10px;box-sizing:border-box;
   padding:calc(10px + env(safe-area-inset-top,0px)) 14px calc(10px + env(safe-area-inset-bottom,0px))}
@@ -5594,7 +5639,7 @@ function grtPanel(refresh){
       +'<p class="grt-note" style="font-size:12px">参考方案：研究中弱视眼保持 100%，健眼起始约 20–60%，每次训练后提高 10%；FDA 批准的同类产品为每天 1 小时、每周 6 天。请按医生建议设置。</p>';
   } else if(_grtTab==='stereo'){
     var st = S.stereo || {};
-    h += '<p class="grt-note">戴上<b>红蓝眼镜</b>，在随机点图里找出藏着的图形（圆、方、三角、星）。答对会逐步变难（视差越来越小），答错会变容易，用来练习立体视。</p>'
+    h += '<p class="grt-note">戴上<b>红蓝眼镜</b>，在随机点图里找出藏着的图形或小动物（圆、星、爱心、小兔、小鱼、蝴蝶……）。答对会逐步变难（视差越来越小），答错会变容易，用来练习立体视。</p>'
       +(st.best ? '<div class="grt-run">目前最好成绩：视差 '+st.best+' 像素（约 '+stArc(st.best)+'″）</div>' : '')
       +'<button class="big p grt-go" onclick="stereoOpen()">▶ 开始立体视训练</button>'
       +'<div class="grt-lb">眼镜设置与「双眼分视」共用：红色镜片在'+(c.redEye==='L'?'左':'右')+'眼，另一片为'+(c.glass==='rc'?'青色':'蓝色')+'</div>';
@@ -5799,7 +5844,12 @@ function grtLoop(now){
 
 /* ══════════ 立体视训练：红蓝随机点立体图（阶梯法） ══════════ */
 var ST_LV = [12, 9, 7, 5, 4, 3, 2, 1];           // 视差（CSS 像素）
-var ST_SHAPES = [['circle','⭕ 圆形'],['square','⬛ 方形'],['tri','🔺 三角'],['star','⭐ 星星']];
+var ST_SHAPES = [['circle','⭕','圆形','s'],['square','⬛','方形','s'],['tri','🔺','三角','s'],['star','⭐','星星','s'],
+  ['heart','❤️','爱心','s'],['diamond','🔷','菱形','s'],['cross','➕','十字','s'],['house','🏠','房子','s'],
+  ['rabbit','🐰','小兔','a'],['cat','🐱','小猫','a'],['bear','🐻','小熊','a'],['fish','🐟','小鱼','a'],
+  ['bird','🐦','小鸟','a'],['butterfly','🦋','蝴蝶','a'],['turtle','🐢','乌龟','a'],['dog','🐶','小狗','a']];
+function stPool(){ var set = (S.stereo && S.stereo.set) || 'all'; return ST_SHAPES.filter(function(o){ return set === 'all' || (set === 'shape' ? o[3] === 's' : o[3] === 'a'); }); }
+function stName(k){ var o = ST_SHAPES.find(function(x){ return x[0] === k; }); return o ? o[1]+' '+o[2] : ''; }
 var _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false};
 function stArc(px){ return Math.round(px * 0.2646 / 400 * 206265); }   // 按 40cm 观看距离估算
 function stereoOpen(){
@@ -5810,17 +5860,39 @@ function stereoOpen(){
     +'<div id="stInfo" style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-bottom:8px"></div>'
     +'<canvas id="stCv" style="width:'+S0+'px;height:'+S0+'px;border-radius:14px;background:#000;display:block;margin:0 auto;image-rendering:pixelated"></canvas>'
     +'<div style="font-size:14px;font-weight:700;margin:10px 0 6px">戴上红蓝眼镜，图里藏着什么？</div>'
-    +'<div class="grt-row" id="stBtns">'+ST_SHAPES.map(function(o){ return '<button style="font-size:17px;padding:12px 14px" onclick="stereoPick(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')+'</div>'
+    +'<div class="grt-row st-btns" id="stBtns"></div>'
     +'<div style="display:flex;gap:8px;margin-top:6px"><button class="big" style="flex:1;padding:11px;color:var(--ink)" onclick="stereoNext()">👀 看不出来，换一张</button>'
     +'<button class="big" style="flex:1;padding:11px;color:var(--ink)" onclick="closeModal()">结束</button></div></div>');
   stereoNext();
 }
 function stShapePath(g, shape, cx, cy, r){
   g.beginPath();
-  if(shape==='circle'){ g.arc(cx, cy, r, 0, Math.PI*2); }
-  else if(shape==='square'){ g.rect(cx-r*0.85, cy-r*0.85, r*1.7, r*1.7); }
-  else if(shape==='tri'){ g.moveTo(cx, cy-r); g.lineTo(cx+r*0.95, cy+r*0.75); g.lineTo(cx-r*0.95, cy+r*0.75); g.closePath(); }
-  else { for(var i=0;i<10;i++){ var a = -Math.PI/2 + i*Math.PI/5, rr = (i%2)? r*0.45 : r*1.05; g.lineTo(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr); } g.closePath(); }
+  function C(x, y, rr){ g.moveTo(cx + (x+rr)*r, cy + y*r); g.arc(cx + x*r, cy + y*r, rr*r, 0, Math.PI*2); }
+  function E(x, y, rx, ry, a){ a = a || 0; g.moveTo(cx + x*r + Math.cos(a)*rx*r, cy + y*r + Math.sin(a)*rx*r); g.ellipse(cx + x*r, cy + y*r, rx*r, ry*r, a, 0, Math.PI*2); }
+  function P(pts){
+    var ar = 0; for(var i=0;i<pts.length;i++){ var q = pts[(i+1)%pts.length]; ar += pts[i][0]*q[1] - q[0]*pts[i][1]; }
+    if(ar < 0) pts = pts.slice().reverse();                 // 统一顺时针，叠加时取并集
+    g.moveTo(cx + pts[0][0]*r, cy + pts[0][1]*r); for(var j=1;j<pts.length;j++) g.lineTo(cx + pts[j][0]*r, cy + pts[j][1]*r); g.closePath();
+  }
+  switch(shape){
+    case 'circle': C(0, 0, 1); break;
+    case 'square': P([[-.85,-.85],[.85,-.85],[.85,.85],[-.85,.85]]); break;
+    case 'tri': P([[0,-1],[.95,.75],[-.95,.75]]); break;
+    case 'star': var st = []; for(var i=0;i<10;i++){ var a = -Math.PI/2 + i*Math.PI/5, rr = (i%2) ? .45 : 1.05; st.push([Math.cos(a)*rr, Math.sin(a)*rr]); } P(st); break;
+    case 'heart': C(-.46, -.3, .5); C(.46, -.3, .5); P([[-.93,-.12],[.93,-.12],[0,.98]]); break;
+    case 'diamond': P([[0,-1.05],[.75,0],[0,1.05],[-.75,0]]); break;
+    case 'cross': P([[-.3,-.95],[.3,-.95],[.3,-.3],[.95,-.3],[.95,.3],[.3,.3],[.3,.95],[-.3,.95],[-.3,.3],[-.95,.3],[-.95,-.3],[-.3,-.3]]); break;
+    case 'house': P([[-.8,-.08],[0,-.95],[.8,-.08],[.8,.88],[-.8,.88]]); break;
+    case 'rabbit': C(0, .3, .58); E(-.28, -.5, .17, .5, -.15); E(.28, -.5, .17, .5, .15); break;
+    case 'cat': C(0, .15, .7); P([[-.7,-.05],[-.6,-.9],[-.12,-.5]]); P([[.12,-.5],[.6,-.9],[.7,-.05]]); break;
+    case 'bear': C(0, .12, .7); C(-.58, -.5, .3); C(.58, -.5, .3); break;
+    case 'fish': E(-.18, 0, .72, .45); P([[.38,0],[1.02,-.55],[1.02,.55]]); break;
+    case 'bird': E(-.05, .15, .62, .45); C(.45, -.35, .3); P([[.7,-.45],[1.02,-.32],[.7,-.22]]); P([[-.55,.05],[-1.02,-.3],[-.98,.4]]); break;
+    case 'butterfly': E(-.45, -.35, .42, .46, -.4); E(.45, -.35, .42, .46, .4); E(-.36, .45, .3, .36, .4); E(.36, .45, .3, .36, -.4); E(0, 0, .1, .75); break;
+    case 'turtle': E(0, .05, .68, .52); C(.88, -.05, .22); C(-.45, .55, .17); C(.45, .55, .17); C(-.45, -.45, .17); C(.45, -.45, .17); break;
+    case 'dog': C(0, .05, .6); E(-.62, .08, .22, .52, .2); E(.62, .08, .22, .52, -.2); E(0, .48, .32, .24); break;
+    default: C(0, 0, 1);
+  }
 }
 function stereoNext(){
   var cv = document.getElementById('stCv'); if(!cv) return;
@@ -5829,13 +5901,16 @@ function stereoNext(){
   var css = cv.getBoundingClientRect().width || parseFloat(cv.style.width), W = Math.round(css*dpr);
   cv.width = W; cv.height = W;
   var dot = Math.max(1, Math.round(3*dpr)), d = Math.round(ST_LV[_st.lv]*dpr);
-  var shape = ST_SHAPES[Math.floor(Math.random()*4)][0]; _st.shape = shape;
+  var pool = stPool(), pick = pool[Math.floor(Math.random()*pool.length)], shape = pick[0]; _st.shape = shape;
+  var opts = [pick].concat(pool.filter(function(o){ return o !== pick; }).sort(function(){ return Math.random() - .5; }).slice(0, 3)).sort(function(){ return Math.random() - .5; });
+  var bt = document.getElementById('stBtns');
+  if(bt) bt.innerHTML = opts.map(function(o){ return '<button onclick="stereoPick(\''+o[0]+'\')"><span>'+o[1]+'</span>'+o[2]+'</button>'; }).join('');
   // 随机点底图：右眼整体错开 D0（避免不戴眼镜时看出图形），图形区域再额外错开 d
   var D0 = dot*2;
   var base = document.createElement('canvas'); base.width = W + D0 + d + dot*2; base.height = W;
   var bg = base.getContext('2d'); bg.fillStyle = '#000'; bg.fillRect(0,0,base.width,W); bg.fillStyle = '#fff';
   for(var y=0; y<W; y+=dot) for(var x=0; x<base.width; x+=dot) if(Math.random()<0.35) bg.fillRect(x,y,dot,dot);
-  var r = W*0.26, cx = W/2 + (Math.random()-.5)*W*0.12, cy = W/2 + (Math.random()-.5)*W*0.12;
+  var r = W*0.28, cx = W/2 + (Math.random()-.5)*W*0.1, cy = W/2 + (Math.random()-.5)*W*0.1;
   function eyeImg(isRight){
     var e = document.createElement('canvas'); e.width = W; e.height = W;
     var g = e.getContext('2d'); g.drawImage(base, isRight ? -D0 : 0, 0);
@@ -5873,8 +5948,7 @@ function stereoPick(shape){
     }
     toast('✅ 答对啦！');
   } else {
-    var nm = (ST_SHAPES.find(function(o){ return o[0]===_st.shape; })||[])[1] || '';
-    toast('再看看，刚才是 '+nm); _st.streak = 0; if(_st.lv > 0) _st.lv--;
+    toast('再看看，刚才是 '+stName(_st.shape)); _st.streak = 0; if(_st.lv > 0) _st.lv--;
   }
   if(!S.stereo) S.stereo = {};
   S.stereo.last = today(); S.stereo.trials = (S.stereo.trials||0) + 1;
@@ -15894,18 +15968,27 @@ function renderYtChannelGrid(){
 }
 
 /* 层1：频道列表 */
-/* ══════════ 视力：视觉测试（开源视觉 Oraen View，github.com/oraen/oraenView，免费、禁止商用）+ 红蓝眼镜小游戏 ══════════ */
-var EYE_TABS = [['test','🔍 视觉测试'],['bug','🐞 抓虫子'],['brick','🧱 打砖块'],['snake','🐍 贪吃蛇'],['maze','🌀 迷宫'],['set','👓 眼镜设置']];
+/* ══════════ 视力：视觉测试（开源视觉 Oraen View，github.com/oraen/oraenView，免费、禁止商用）+ 立体视 + 视觉刺激游戏 + 红蓝眼镜游戏 ══════════ */
+var EYE_TABS = [['test','🔍 视觉测试'],['stereo','🧊 立体视'],['stim','⚡ 视觉刺激游戏'],['rb','👓 红蓝眼镜游戏'],['set','⚙️ 设置']];
 var _eyeTab = null;
+var EG_LV = {1:'简单', 2:'中等', 3:'困难'};
 var EG_INFO = {
-  bug:  {n:'抓虫子', e:'🐞', d:'小瓢虫会在黑色草地上到处爬，赶在它飞走之前点住它！抓得越多，虫子越小、越快。',
-         see:[['weak','🐞 小瓢虫'],['strong','🍃 树叶']], ctl:'用手指点 / 鼠标点击虫子'},
-  brick:{n:'打砖块', e:'🧱', d:'用挡板接住小球，把上面的砖块全部打掉就过关，一关比一关快。',
-         see:[['weak','⚪ 小球'],['strong','🧱 砖块'],['both','▬ 挡板和边框']], ctl:'手指左右拖 / 鼠标移动 / ← → 键；点一下或空格发球'},
-  snake:{n:'贪吃蛇', e:'🐍', d:'控制小蛇去吃胡萝卜，吃一根长一节。别撞墙，也别咬到自己。',
-         see:[['weak','🐍 小蛇'],['strong','🥕 胡萝卜'],['both','▭ 围墙']], ctl:'在屏幕上滑动 / 方向按钮 / 方向键'},
-  maze: {n:'迷宫', e:'🌀', d:'帮小兔子走出迷宫，找到右下角的胡萝卜。每过一关迷宫变大一点。',
-         see:[['weak','🧱 迷宫墙'],['strong','🐰 小兔子'],['both','🥕 胡萝卜']], ctl:'在屏幕上滑动 / 方向按钮 / 方向键'}
+  odd:   {cat:'stim', lv:1, n:'火眼金睛', e:'👀', d:'找出那个不一样的图案！'},
+  fruit: {cat:'stim', lv:2, n:'寻找水果', e:'🍎', d:'在一大堆水果里，找到底下要的那一个'},
+  hide:  {cat:'stim', lv:2, n:'谁藏起来了', e:'🙈', d:'记住小动物，猜猜谁躲到卡片后面了'},
+  bean:  {cat:'stim', lv:3, n:'找红豆', e:'🫘', d:'一堆红豆里有一颗不一样，要看得很仔细'},
+  sort:  {cat:'stim', lv:2, n:'色彩饮品店', e:'🧃', d:'把同样颜色的饮料倒进同一个杯子'},
+  tetris:{cat:'stim', lv:3, n:'俄罗斯方块', e:'🟦', d:'旋转、移动方块，排满一行就消掉'},
+  merge: {cat:'stim', lv:3, n:'合成大西瓜', e:'🍉', d:'两个一样的水果碰在一起，变成更大的水果'},
+  plane: {cat:'stim', lv:3, n:'雷霆战机', e:'🚀', d:'驾驶飞机，打掉飞来的小怪物'},
+  bug:   {cat:'rb', lv:1, n:'抓虫子', e:'🐞', d:'小瓢虫到处爬，赶在它飞走前点住它',
+          see:[['weak','🐞 小瓢虫'],['strong','🍃 树叶']]},
+  maze:  {cat:'rb', lv:1, n:'迷宫', e:'🌀', d:'帮小兔子走出迷宫，找到胡萝卜',
+          see:[['weak','迷宫墙'],['strong','🐰 小兔子'],['both','🥕 胡萝卜']]},
+  brick: {cat:'rb', lv:2, n:'打砖块', e:'🧱', d:'用挡板接住小球，把砖块全部打掉',
+          see:[['weak','⚪ 小球'],['strong','🧱 砖块'],['both','挡板']]},
+  snake: {cat:'rb', lv:2, n:'贪吃蛇', e:'🐍', d:'控制小蛇吃胡萝卜，别撞墙也别咬到自己',
+          see:[['weak','🐍 小蛇'],['strong','🥕 胡萝卜'],['both','围墙']]}
 };
 function egCfg(){
   if(!S.eg || typeof S.eg !== 'object') S.eg = {};
@@ -15913,6 +15996,9 @@ function egCfg(){
   if(e.strong == null) e.strong = 40;
   if(!e.speed) e.speed = 'm';
   if(!e.min) e.min = 10;
+  if(!e.va) e.va = 'mh';
+  if(!e.bg) e.bg = 'stripe';
+  if(e.bgHz == null) e.bgHz = 0;
   if(!e.best || typeof e.best !== 'object') e.best = {};
   return e;
 }
@@ -15926,13 +16012,15 @@ function egCols(full){
 }
 function pgEye(){
   if(!_eyeTab) _eyeTab = S.eyeTab || 'test';
+  if(EG_INFO[_eyeTab]) _eyeTab = EG_INFO[_eyeTab].cat;            // 旧版本记住的是单个游戏
   if(!EYE_TABS.some(function(t){ return t[0] === _eyeTab; })) _eyeTab = 'test';
   var tabs = '<div class="eye-tabs">' + EYE_TABS.map(function(t){
     return '<button class="eye-tab'+(t[0]===_eyeTab?' on':'')+'" onclick="eyeTab(\''+t[0]+'\')">'+t[1]+'</button>';
   }).join('') + '</div>';
-  var body = _eyeTab === 'test' ? eyeTestHtml() : _eyeTab === 'set' ? egSetHtml() : egIntroHtml(_eyeTab);
+  var body = _eyeTab === 'test' ? eyeTestHtml() : _eyeTab === 'stereo' ? eyeStereoHtml() : _eyeTab === 'set' ? egSetHtml() : egListHtml(_eyeTab);
   $('page').innerHTML = '<div class="eye-pg'+(_eyeTab==='test'?' eye-pg-test':'')+'">' + tabs + body + '</div>';
-  if(_eyeTab !== 'test') egPreview();
+  if(_eyeTab === 'stereo') stereoStart();
+  if(_eyeTab === 'set') egCalDraw();
 }
 function eyeTab(k){ _eyeTab = k; S.eyeTab = k; save(); pgEye(); }
 
@@ -15956,51 +16044,60 @@ function eyeTestEmbed(f){
   }catch(e){}
 }
 
-/* —— 游戏介绍页 —— */
-function egIntroHtml(k){
-  var I = EG_INFO[k], C = egCols(), e = egCfg(), c = grtCfg();
-  var nm = {weak:'弱视眼（'+(c.amb==='L'?'左':'右')+'眼）', strong:'健眼（暗一点）', both:'两只眼都能看到'};
-  var see = I.see.map(function(s){ return '<li><i style="background:'+C[s[0]]+'"></i>'+s[1]+' → '+nm[s[0]]+'</li>'; }).join('');
-  var best = e.best[k] || 0;
-  return '<div class="eg-intro">'
-    + '<div class="eg-info"><h3>'+I.e+' '+I.n+'</h3><p>'+I.d+'</p>'
-    + '<div class="eg-lb">戴上红蓝眼镜后</div><ul class="eg-see">'+see+'</ul>'
-    + '<div class="eg-lb">怎么玩</div><p>'+I.ctl+'</p>'
-    + '<div class="eg-meta">每次 '+e.min+' 分钟 · 速度'+({s:'慢',m:'中',f:'快'})[e.speed]+' · 健眼亮度 '+e.strong+'%'
-    + ' · <a href="javascript:void 0" onclick="eyeTab(\'set\')">改设置</a></div>'
-    + '<div class="eg-go"><button class="dk-btn p" onclick="egStart(\''+k+'\')">▶ 开始游戏</button>'
-    + (best ? '<span class="eg-best">🏆 最好成绩 '+best+'</span>' : '') + '</div></div>'
-    + '<canvas class="eg-prev" id="egPrev" data-g="'+k+'"></canvas></div>';
+/* —— 立体视（页面版，和「视力训练」弹窗里的立体视共用同一套题目和成绩）—— */
+function eyeStereoHtml(){
+  var st = S.stereo || {}, set = st.set || 'all';
+  return '<div class="st-wrap">'
+    + '<div class="st-left"><canvas id="stCv" class="st-cv"></canvas></div>'
+    + '<div class="eg-card st-right"><h3>🧊 立体视</h3>'
+    + '<p class="eg-note">戴上红蓝眼镜，在随机点图里找出藏着的<b>图形或小动物</b>。连续答对 2 次会变难（视差变小），答错会变容易。不戴眼镜是看不出来的哦。</p>'
+    + '<div id="stInfo" class="st-info"></div>'
+    + '<div class="st-btns" id="stBtns"></div>'
+    + '<button class="dk-btn st-skip" onclick="stereoNext()">👀 看不出来，换一张</button>'
+    + '<div class="eg-row"><span class="eg-lb">题目</span><div class="eg-opts">'
+    + [['all','全部'],['shape','图形'],['animal','小动物']].map(function(o){ return '<button class="eg-opt'+(set===o[0]?' on':'')+'" onclick="stSet(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')
+    + '</div></div>'
+    + '<div class="eg-meta">最好成绩：'+(st.best ? '视差 '+st.best+' 像素（约 '+stArc(st.best)+'″）' : '还没有')+' · 共练习 '+(st.trials||0)+' 次 · 眼镜设置在「⚙️ 设置」里</div>'
+    + '</div></div>';
 }
-function egPreview(){
-  var cv = document.getElementById('egPrev'); if(!cv) return;
-  var dpr = Math.min(3, window.devicePixelRatio || 1), W = cv.clientWidth || 320, H = cv.clientHeight || 200;
-  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
-  var g = cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
-  g.fillStyle = '#000'; g.fillRect(0,0,W,H);
-  var k = cv.getAttribute('data-g'), C = egCols(), u = Math.min(W,H)/10;
-  if(k === 'bug'){
-    [[.15,.3,0],[.7,.2,1.2],[.35,.75,2],[.85,.7,.6],[.55,.45,2.6]].forEach(function(p){ egLeaf(g, p[0]*W, p[1]*H, u*.7, p[2], C.strong); });
-    egBug(g, W*.3, H*.42, u*.8, .5, C.weak); egBug(g, W*.68, H*.62, u*.6, 2.2, C.weak);
-  } else if(k === 'brick'){
-    for(var r=0;r<3;r++) for(var q=0;q<6;q++){ g.fillStyle = C.strong; egRR(g, W*.08 + q*W*.14, H*.12 + r*H*.11, W*.12, H*.08, 4); g.fill(); }
-    g.fillStyle = C.weak; g.beginPath(); g.arc(W*.55, H*.62, u*.35, 0, 7); g.fill();
-    g.fillStyle = C.both; egRR(g, W*.4, H*.85, W*.22, H*.05, 5); g.fill();
-  } else if(k === 'snake'){
-    var cs = u*.9;
-    g.strokeStyle = C.both; g.lineWidth = 2; g.strokeRect(W*.08, H*.1, W*.84, H*.8);
-    [[3,3],[4,3],[5,3],[5,4],[6,4]].forEach(function(p, i){ g.fillStyle = C.weak; egRR(g, W*.08 + p[0]*cs, H*.1 + p[1]*cs, cs*.9, cs*.9, cs*.25); g.fill(); });
-    egCarrot(g, W*.08 + 9.5*cs, H*.1 + 2.5*cs, cs*.5, C.strong);
-  } else if(k === 'maze'){
-    var mz = egMazeGen(7, 4), cw = W*.84/7, ch = H*.8/4;
-    egMazeDraw(g, mz, W*.08, H*.1, cw, ch, C.weak, Math.max(2, cw*.1));
-    egBunny(g, W*.08 + cw*.5, H*.1 + ch*.5, Math.min(cw,ch)*.32, C.strong);
-    egCarrot(g, W*.08 + cw*6.5, H*.1 + ch*3.5, Math.min(cw,ch)*.32, C.both);
+function stSet(v){ if(!S.stereo) S.stereo = {}; S.stereo.set = v; save(); pgEye(); }
+function stereoStart(){ _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false}; stereoNext(); }
+
+/* —— 游戏列表 —— */
+function egListHtml(cat){
+  var e = egCfg(), c = grtCfg(), C = egCols();
+  var head;
+  function sel(lb, key, opts){
+    return '<div class="eg-bsel"><span>'+lb+'</span><div>' + opts.map(function(o){
+      return '<button class="'+(String(e[key])===String(o[0])?'on':'')+'" onclick="egSet(\''+key+'\',\''+o[0]+'\',0)">'+o[1]+'</button>';
+    }).join('') + '</div></div>';
   }
-  g.strokeStyle = C.both; g.lineWidth = 3; g.strokeRect(1.5,1.5,W-3,H-3);
+  if(cat === 'stim'){
+    head = '<div class="eg-banner eg-banner-stim"><div class="eg-bi">⚡</div><div class="eg-bt"><h3>视觉刺激</h3>'
+      + '<p>在高对比度的条纹、棋盘背景上玩小游戏，唤醒沉睡的视觉细胞。不用戴红蓝眼镜；需要遮盖眼睛时请按医生的建议。</p></div>'
+      + '<div class="eg-bsets">'
+      + sel('视力水平', 'va', [['low','低 0.0–0.1'],['ml','中低 0.2–0.4'],['mh','中高 0.5–0.6'],['high','高 0.7–0.9']])
+      + sel('刺激背景', 'bg', [['stripe','红黄条纹'],['check','红黄棋盘'],['spin','旋转棋盘'],['bw','黑白条纹'],['mix','轮流'],['off','关闭']])
+      + sel('背景闪烁', 'bgHz', [['0','不闪'],['1','1 次/秒'],['2','2 次/秒']])
+      + '<small>视力越低，图案越大、背景条纹越粗。这些设置对所有视觉刺激游戏都有效。</small></div></div>';
+  } else {
+    head = '<div class="eg-banner eg-banner-rb"><div class="eg-bi">👓</div><div class="eg-bt"><h3>红蓝眼镜游戏</h3>'
+      + '<p>戴上红蓝眼镜玩：重要的东西只有<b>弱视眼（'+(c.amb==='L'?'左':'右')+'眼）</b>能看到，健眼只看到暗一点的东西，两只眼睛要一起合作才能玩好。</p></div>'
+      + '<div class="eg-bsets"><div class="eg-bsel"><span>健眼亮度</span><div><input type="range" min="10" max="100" step="5" value="'+e.strong+'" oninput="egSet(\'strong\',this.value,0,1);this.nextElementSibling.textContent=this.value+\'%\'"><b>'+e.strong+'%</b></div></div>'
+      + '<small>弱视眼看 <b>'+C.weakName+'</b>，健眼看 <b>'+C.strongName+'</b>。镜片、左右眼在 <a href="javascript:void 0" onclick="eyeTab(\'set\')">⚙️ 设置</a> 里改。</small></div></div>';
+  }
+  var nm = {weak:'弱视眼', strong:'健眼', both:'两眼'};
+  var cards = Object.keys(EG_INFO).filter(function(k){ return EG_INFO[k].cat === cat; }).map(function(k){
+    var I = EG_INFO[k], best = e.best[k] || 0;
+    var see = I.see ? '<span class="eg-gs">' + I.see.map(function(s){ return '<i style="background:'+C[s[0]]+'"></i>'+s[1]+'→'+nm[s[0]]; }).join('　') + '</span>' : '';
+    return '<button class="eg-gcard" onclick="egStart(\''+k+'\')"><span class="eg-gi">'+I.e+'</span>'
+      + '<span class="eg-gm"><span class="eg-gt"><b>'+I.n+'</b><em class="eg-l'+I.lv+'">'+EG_LV[I.lv]+'</em>'+(best?'<span class="eg-gb">🏆 '+best+'</span>':'')+'</span>'
+      + '<span class="eg-gd">'+I.d+'</span>'+see+'</span><span class="eg-gp">▶</span></button>';
+  }).join('');
+  return head + '<div class="eg-sec">🎮 选择游戏 <small>每次 '+e.min+' 分钟 · 速度'+({s:'慢',m:'中',f:'快'})[e.speed]+'</small></div><div class="eg-cards">' + cards + '</div>';
 }
 
-/* —— 眼镜设置（和「视力训练 · 双眼分视」共用左右眼、镜片设置）—— */
+/* —— 设置（左右眼、镜片和「视力训练 · 双眼分视」共用）—— */
 function egSetHtml(){
   var c = grtCfg(), e = egCfg(), C = egCols();
   function row(lb, key, opts, grt){
@@ -16011,23 +16108,24 @@ function egSetHtml(){
   }
   var leftLens = c.redEye === 'L' ? '红色' : (c.glass==='rc'?'青色':'蓝色'), rightLens = c.redEye === 'L' ? (c.glass==='rc'?'青色':'蓝色') : '红色';
   return '<div class="eg-set">'
-    + '<div class="eg-card"><h3>👓 眼镜设置</h3><p class="eg-note">这里的左右眼和镜片设置，和「视力训练 · 双眼分视」是同一套，改一处两边都变。</p>'
+    + '<div class="eg-card"><h3>👓 眼镜设置</h3><p class="eg-note">左右眼和镜片设置与「视力训练 · 双眼分视」是同一套，改一处两边都变。立体视和红蓝眼镜游戏都用它。</p>'
     + row('弱视眼', 'amb', [['L','左眼'],['R','右眼']], 1)
     + row('红色镜片在', 'redEye', [['L','左眼'],['R','右眼']], 1)
     + row('另一片镜片', 'glass', [['rb','蓝色'],['rc','青色（蓝绿）']], 1)
     + '<div class="eg-row"><span class="eg-lb">健眼亮度</span><div class="eg-opts"><input type="range" min="10" max="100" step="5" value="'+e.strong+'" oninput="egSet(\'strong\',this.value,0,1);this.nextElementSibling.textContent=this.value+\'%\'"><b>'+e.strong+'%</b></div></div>'
     + '<p class="eg-note">健眼亮度越低，弱视眼越要出力。先从 30–50% 开始，玩得轻松了再慢慢调高，最后到 100%。</p>'
+    + '<h3 style="margin-top:14px">🎮 游戏设置</h3>'
     + row('游戏速度', 'speed', [['s','慢'],['m','中'],['f','快']], 0)
     + row('每次时长', 'min', [['5','5 分钟'],['10','10 分钟'],['15','15 分钟'],['20','20 分钟']], 0)
     + '</div>'
     + '<div class="eg-card"><h3>🔎 检查眼镜</h3><p class="eg-note">戴好眼镜，先<b>闭上右眼</b>：左眼（'+leftLens+'镜片）应该只看到一个圆；再<b>闭上左眼</b>：右眼（'+rightLens+'镜片）应该只看到另一个圆。如果两个都看得到，换成另一种镜片颜色试试。</p>'
     + '<canvas class="eg-prev" id="egCal"></canvas>'
-    + '<p class="eg-note">现在：弱视眼看 <b>'+C.weakName+'</b>，健眼看 <b>'+C.strongName+'</b>（亮度 '+e.strong+'%）。</p></div>'
+    + '<p class="eg-note">现在：弱视眼看 <b>'+C.weakName+'</b>，健眼看 <b>'+C.strongName+'</b>。</p></div>'
     + '</div>';
 }
 function egSet(k, v, grt, noRender){
   if(grt){ var c = grtCfg(); c[k] = v; save(); try{ grtApply(); }catch(e){} }
-  else { var e = egCfg(); e[k] = (k === 'strong' || k === 'min') ? Number(v) : v; save(); }
+  else { var e = egCfg(); e[k] = (k === 'strong' || k === 'min' || k === 'bgHz') ? Number(v) : v; save(); }
   if(noRender){ egCalDraw(); return; }
   pgEye();
 }
@@ -16042,8 +16140,6 @@ function egCalDraw(){
   g.fillStyle = '#000'; g.font = '800 '+Math.round(r*.32)+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.fillText('弱视眼', W*.3, H*.5); g.fillText('健眼', W*.7, H*.5);
 }
-var _egPrevOld = egPreview;
-egPreview = function(){ _egPrevOld(); egCalDraw(); };
 
 /* —— 画图小工具 —— */
 function egRR(g, x, y, w, h, r){ r = Math.min(r, w/2, h/2); g.beginPath(); g.moveTo(x+r, y); g.arcTo(x+w, y, x+w, y+h, r); g.arcTo(x+w, y+h, x, y+h, r); g.arcTo(x, y+h, x, y, r); g.arcTo(x, y, x+w, y, r); g.closePath(); }
@@ -16101,27 +16197,63 @@ function egMazeDraw(g, mz, ox, oy, cw, ch, col, lw){
   g.stroke();
 }
 
+function egEmo(g, ch, x, y, size){
+  g.font = Math.round(size)+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#000'; g.fillText(ch, x, y + size*.06);
+}
+function egTile(g, x, y, w, h, a, border){
+  g.fillStyle = 'rgba(255,255,255,'+(a == null ? .6 : a)+')'; egRR(g, x, y, w, h, Math.min(w,h)*.18); g.fill();
+  if(border){ g.strokeStyle = border; g.lineWidth = Math.max(3, Math.min(w,h)*.06); g.stroke(); }
+}
+function egPill(g, text, x, y, size){
+  g.font = '900 '+Math.round(size)+'px sans-serif';
+  var w = g.measureText(text).width + size*1.6, h = size*2;
+  g.fillStyle = 'rgba(255,255,255,.92)'; egRR(g, x - w/2, y - h/2, w, h, h/2); g.fill();
+  g.fillStyle = '#333'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, x, y + size*.05);
+}
+function egRnd(n){ return Math.floor(Math.random()*n); }
+function egShuffle(a){ for(var i=a.length-1;i>0;i--){ var j = egRnd(i+1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+/* 视觉刺激背景：红黄条纹 / 棋盘 / 旋转棋盘 / 黑白条纹 */
+function egBg(E, g){
+  var e = egCfg(), ty = e.bg, t = E.tt;
+  if(ty === 'mix') ty = ['stripe','check','spin','bw'][Math.floor(t/30) % 4];
+  if(ty === 'off'){ g.fillStyle = '#efeaff'; g.fillRect(0, 0, E.W, E.H); return; }
+  var s = Math.max(6, Math.round(E.base*({low:.085, ml:.064, mh:.048, high:.034})[e.va]));
+  var P = ty === 'bw' ? ['#000000','#ffffff'] : ['#ff1e1e','#fff200'];
+  var ph = e.bgHz ? Math.floor(t*e.bgHz*2) % 2 : 0, A = P[ph], B = P[1-ph];
+  g.fillStyle = B; g.fillRect(0, 0, E.W, E.H); g.fillStyle = A;
+  if(ty === 'stripe' || ty === 'bw'){ for(var x=0;x<E.W;x+=s*2) g.fillRect(x, 0, s, E.H); }
+  else if(ty === 'check'){ for(var y=0, r=0; y<E.H; y+=s, r++) for(var x2=(r%2)*s; x2<E.W; x2+=s*2) g.fillRect(x2, y, s, s); }
+  else {
+    var D = Math.hypot(E.W, E.H), n = Math.ceil(D/2/s)+1;
+    g.save(); g.translate(E.W/2, E.H/2); g.rotate(t*.22);
+    for(var yy=-n; yy<n; yy++) for(var xx=-n + ((yy+n)&1); xx<n; xx+=2) g.fillRect(xx*s, yy*s, s, s);
+    g.restore();
+  }
+}
+
 /* —— 游戏引擎 —— */
 var EG = null;
 function egStart(game){
   egStop(true);
-  var e = egCfg(), touch = window.matchMedia && matchMedia('(pointer:coarse)').matches;
-  var pad = (game === 'snake' || game === 'maze') && touch
-    ? '<div class="eg-pad"><span></span><button onpointerdown="egDir(0,-1);event.preventDefault()">▲</button><span></span>'
-      + '<button onpointerdown="egDir(-1,0);event.preventDefault()">◀</button><span></span><button onpointerdown="egDir(1,0);event.preventDefault()">▶</button>'
-      + '<span></span><button onpointerdown="egDir(0,1);event.preventDefault()">▼</button><span></span></div>' : '';
-  var w = document.createElement('div'); w.className = 'eg-full'; w.id = 'egFull';
+  var e = egCfg(), gm = EG_GAMES[game], touch = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  var B = function(lb, js){ return '<button onpointerdown="'+js+';event.preventDefault()">'+lb+'</button>'; };
+  var pad = '';
+  if(touch && gm.pad === 'dir') pad = '<div class="eg-pad"><span></span>'+B('▲','egDir(0,-1)')+'<span></span>'+B('◀','egDir(-1,0)')+'<span></span>'+B('▶','egDir(1,0)')+'<span></span>'+B('▼','egDir(0,1)')+'<span></span></div>';
+  if(touch && gm.pad === 'tetris') pad = '<div class="eg-pad eg-pad-t">'+B('◀','egDir(-1,0)')+B('⟳','egDir(0,-1)')+B('▶','egDir(1,0)')+B('▼','egDir(0,1)')+B('⤓','egDir(0,1,\'swipe\')')+'</div>';
+  var w = document.createElement('div'); w.className = 'eg-full'+(gm.stim?' eg-stim':''); w.id = 'egFull';
   w.innerHTML = '<div class="eg-hud"><b>'+EG_INFO[game].e+' '+EG_INFO[game].n+'</b><span id="egScore"></span><span id="egTime"></span>'
+    + (gm.restart ? '<button onclick="egRestart()">🔄 换一关</button>' : '')
     + '<button id="egPauseBtn" onclick="egPause()">⏸ 暂停</button><button onclick="egStop()">✕ 退出</button></div>'
     + '<div class="eg-stage" id="egStage"><canvas id="egCv"></canvas><div class="eg-msg" id="egMsg"></div>'+pad+'</div>';
   document.body.appendChild(w);
   document.documentElement.classList.add('eg-play');
   try{ var rq = w.requestFullscreen || w.webkitRequestFullscreen; if(rq){ var p = rq.call(w); if(p && p.catch) p.catch(function(){}); } }catch(err){}
   var cv = document.getElementById('egCv');
-  EG = {game:game, cv:cv, g:cv.getContext('2d'), score:0, left:e.min*60, paused:false, over:false, last:0,
-        sp:({s:.7, m:1, f:1.35})[e.speed] || 1, col:egCols(), keys:{}, hud:''};
+  EG = {game:game, cv:cv, g:cv.getContext('2d'), score:0, left:e.min*60, paused:false, over:false, last:0, tt:0,
+        sp:({s:.7, m:1, f:1.35})[e.speed] || 1, vs:({low:1.45, ml:1.2, mh:1, high:.82})[e.va] || 1, col:egCols(), keys:{}, hud:''};
   egResize();
-  EG_GAMES[game].init(EG);
+  gm.init(EG); EG.ready = 1;
   cv.addEventListener('pointerdown', egPtrDown);
   cv.addEventListener('pointermove', egPtrMove);
   cv.addEventListener('pointerup', egPtrUp);
@@ -16131,6 +16263,7 @@ function egStart(game){
   document.addEventListener('visibilitychange', egVis);
   EG.raf = requestAnimationFrame(egLoop);
 }
+function egRestart(){ if(!EG || EG.over) return; var gm = EG_GAMES[EG.game]; EG.later = null; if(gm.restart) gm.restart(EG); egPause(false); }
 function egResize(){
   if(!EG) return;
   var st = document.getElementById('egStage'); if(!st) return;
@@ -16145,14 +16278,19 @@ function egLoop(t){
   var dt = EG.last ? Math.min(.05, (t - EG.last)/1000) : 0; EG.last = t;
   var gm = EG_GAMES[EG.game];
   if(!EG.paused && !EG.over){
-    EG.left -= dt;
+    EG.tt += dt; EG.left -= dt;
     if(EG.left <= 0){ EG.left = 0; egEnd(); }
-    else gm.step(EG, dt);
+    else {
+      if(EG.later){ EG.later.t -= dt; if(EG.later.t <= 0){ var f = EG.later.fn; EG.later = null; f(); } }
+      if(EG) gm.step(EG, dt);
+    }
   }
+  if(!EG) return;
   var g = EG.g; g.setTransform(EG.dpr,0,0,EG.dpr,0,0);
-  g.fillStyle = '#000'; g.fillRect(0, 0, EG.W, EG.H);
+  if(gm.stim) egBg(EG, g); else { g.fillStyle = '#000'; g.fillRect(0, 0, EG.W, EG.H); }
   gm.draw(EG, g);
-  g.strokeStyle = EG.col.both; g.lineWidth = 3; g.strokeRect(1.5, 1.5, EG.W-3, EG.H-3);   // 两眼都能看到的边框，帮助双眼融合
+  if(!gm.stim){ g.strokeStyle = EG.col.both; g.lineWidth = 3; g.strokeRect(1.5, 1.5, EG.W-3, EG.H-3); }   // 两眼都能看到的边框，帮助双眼融合
+  egFlashDraw(EG, g, dt);
   var hud = gm.text(EG), m = Math.floor(EG.left/60), s = Math.floor(EG.left%60), tm = '⏱ '+m+':'+(s<10?'0':'')+s;
   if(hud + tm !== EG.hud){ EG.hud = hud + tm; $('egScore').textContent = hud; $('egTime').textContent = tm; }
 }
@@ -16173,7 +16311,6 @@ function egEnd(){
     + '<button onclick="egStart(\''+EG.game+'\')">再玩一次</button><button onclick="egStop()">退出</button>');
 }
 function egStop(silent){
-  if(!EG){ if(silent) return; }
   if(EG){
     cancelAnimationFrame(EG.raf);
     var e = egCfg();
@@ -16183,7 +16320,7 @@ function egStop(silent){
     window.removeEventListener('resize', egResize);
     document.removeEventListener('visibilitychange', egVis);
     EG = null;
-  }
+  } else if(silent) return;
   var w = document.getElementById('egFull'); if(w) w.remove();
   document.documentElement.classList.remove('eg-play');
   try{ if(document.fullscreenElement) document.exitFullscreen(); else if(document.webkitFullscreenElement) document.webkitExitFullscreen(); }catch(err){}
@@ -16195,7 +16332,7 @@ function egPtrDown(ev){
   var p = egPos(ev); EG.ptr = {x:p[0], y:p[1], t:performance.now()};
   try{ EG.cv.setPointerCapture(ev.pointerId); }catch(err){}
   if(EG.paused || EG.over) return;
-  var gm = EG_GAMES[EG.game]; if(gm.tap) gm.tap(EG, p[0], p[1]);
+  var gm = EG_GAMES[EG.game]; if(gm.tap && !gm.tapOnUp) gm.tap(EG, p[0], p[1]);
 }
 function egPtrMove(ev){
   if(!EG || EG.paused || EG.over) return;
@@ -16205,23 +16342,37 @@ function egPtrUp(ev){
   if(!EG || !EG.ptr) return;
   var p = egPos(ev), dx = p[0] - EG.ptr.x, dy = p[1] - EG.ptr.y; EG.ptr = null;
   if(EG.paused || EG.over) return;
-  if(Math.max(Math.abs(dx), Math.abs(dy)) > 22){ if(Math.abs(dx) > Math.abs(dy)) egDir(dx > 0 ? 1 : -1, 0); else egDir(0, dy > 0 ? 1 : -1); }
+  var gm = EG_GAMES[EG.game];
+  if(Math.max(Math.abs(dx), Math.abs(dy)) > 22){
+    if(!gm.dir) return;
+    if(Math.abs(dx) > Math.abs(dy)) egDir(dx > 0 ? 1 : -1, 0, 'swipe'); else egDir(0, dy > 0 ? 1 : -1, 'swipe');
+  } else if(gm.tap && gm.tapOnUp) gm.tap(EG, p[0], p[1]);
 }
-function egDir(dx, dy){ if(!EG || EG.paused || EG.over) return; var gm = EG_GAMES[EG.game]; if(gm.dir) gm.dir(EG, dx, dy); }
+function egDir(dx, dy, src){ if(!EG || EG.paused || EG.over) return; var gm = EG_GAMES[EG.game]; if(gm.dir) gm.dir(EG, dx, dy, src); }
 function egKey(ev){
   if(!EG) return;
   var k = ev.key;
   if(k === 'Escape'){ ev.preventDefault(); egStop(); return; }
   if(k === 'p' || k === 'P'){ egPause(); return; }
-  var D = {ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0], w:[0,-1], s:[0,1], a:[-1,0], d:[1,0]};
+  var D = {ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0]};
   if(D[k] || k === ' '){ ev.preventDefault(); ev.stopPropagation(); }
   EG.keys[k] = true;
   if(EG.paused || EG.over) return;
   var gm = EG_GAMES[EG.game];
-  if(D[k]) egDir(D[k][0], D[k][1]);
-  if(k === ' ' && gm.tap) gm.tap(EG, null, null);
+  if(D[k]) egDir(D[k][0], D[k][1], 'key');
+  if(k === ' '){ if(gm.space) gm.space(EG); else if(gm.tap) gm.tap(EG, null, null); }
 }
 function egKeyUp(ev){ if(EG) EG.keys[ev.key] = false; }
+function egFlash(t){ if(EG){ EG.flash = t; EG.flashT = 1.6; } }
+function egFlashDraw(E, g, dt){
+  if(!E.flash || !(E.flashT > 0)) return;
+  E.flashT -= dt || 1/60;
+  var sz = Math.round(Math.max(18, E.base*.05));
+  g.globalAlpha = Math.max(0, Math.min(1, E.flashT*2));
+  if(EG_GAMES[E.game].stim) egPill(g, E.flash, E.W/2, E.H*.5, sz);
+  else { g.fillStyle = E.col.both; g.font = '800 '+sz+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(E.flash, E.W/2, E.H*.5); }
+  g.globalAlpha = 1;
+}
 
 var EG_GAMES = {
   /* 🐞 抓虫子：虫子给弱视眼，树叶给健眼 */
@@ -16329,7 +16480,6 @@ var EG_GAMES = {
       E.bricks.forEach(function(k){ if(!k.on) return; var r = self.rect(E, k); egRR(g, r[0], r[1], r[2], r[3], 4); g.fill(); });
       g.fillStyle = E.col.both; egRR(g, E.px - E.pw/2, E.py, E.pw, E.ph, E.ph/2); g.fill();
       g.fillStyle = E.col.weak; g.beginPath(); g.arc(E.ball.x, E.ball.y, E.br, 0, 7); g.fill();
-      egFlashDraw(E, g);
     },
     text: function(E){ return '🧱 '+E.score+' 块 · 第'+E.level+'关 · '+'❤'.repeat(Math.max(0,E.lives)); }
   },
@@ -16379,7 +16529,6 @@ var EG_GAMES = {
         if(i === 0){ g.fillStyle = '#000'; var ex = E.dx, ey = E.dy, cx = ox + (s.x+.5)*cs, cy = oy + (s.y+.5)*cs;
           g.beginPath(); g.arc(cx + ex*cs*.18 - ey*cs*.2, cy + ey*cs*.18 + ex*cs*.2, cs*.09, 0, 7); g.arc(cx + ex*cs*.18 + ey*cs*.2, cy + ey*cs*.18 - ex*cs*.2, cs*.09, 0, 7); g.fill(); }
       });
-      egFlashDraw(E, g);
     },
     text: function(E){ return '🥕 吃到 '+E.score+' · 长度 '+E.sn.length; }
   },
@@ -16409,18 +16558,412 @@ var EG_GAMES = {
       egMazeDraw(g, mz, ox, oy, c, c, E.col.weak, Math.max(2.5, c*.12));
       egCarrot(g, ox + (mz.cols - .5)*c, oy + (mz.rows - .5)*c, c*.3, E.col.both);
       egBunny(g, ox + (E.pl.x + .5)*c, oy + (E.pl.y + .58)*c, c*.3, E.col.strong);
-      egFlashDraw(E, g);
     },
     text: function(E){ return '🌀 第'+E.level+'关 · 🥕 '+E.score; }
   }
 };
-function egFlash(t){ if(EG){ EG.flash = t; EG.flashT = 1.6; } }
-function egFlashDraw(E, g){
-  if(!E.flash || !(E.flashT > 0)) return;
-  E.flashT -= 1/60;
-  g.globalAlpha = Math.min(1, E.flashT*2); g.fillStyle = E.col.both; g.font = '800 '+Math.round(Math.max(18, E.base*.05))+'px sans-serif';
-  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(E.flash, E.W/2, E.H*.5); g.globalAlpha = 1;
+
+/* —— 视觉刺激游戏（背景是高对比度条纹/棋盘，图案放在半透明白底上）—— */
+EG_GAMES.snake.pad = 'dir'; EG_GAMES.maze.pad = 'dir';
+var EG_PAIRS = [['📕','📖'],['⚒️','⚔️'],['⏯️','⏸️'],['🍎','🍅'],['🐱','🐯'],['😀','😃'],['🐶','🐺'],['🚗','🚕'],['🌸','🌺'],['⭐','🌟'],
+  ['🍓','🍒'],['🐭','🐹'],['🎈','🎀'],['🐸','🐢'],['🌲','🌳'],['🐥','🐤'],['🍋','🍌'],['🍩','🍪'],['☁️','⛅'],['🔔','🔕'],['😺','😸'],['🏠','🏡'],['🌙','🌛'],['🐄','🐂']];
+var EG_FRUITS = ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍒','🍑','🥭','🍍','🥝','🍅','🥥','🫐'];
+var EG_ANIMALS = ['🐯','🦊','🦁','🐰','🐼','🐨','🐸','🐵','🐷','🐮','🐔','🐧','🐶','🐱','🐻','🦒','🐘','🦓','🐹','🦉'];
+function egGridHit(G, n, cols, x, y){
+  var cx = Math.floor((x - G.ox)/G.c), cy = Math.floor((y - G.oy)/G.c);
+  if(cx < 0 || cy < 0 || cx >= cols || cy >= n/cols) return -1;
+  return cy*cols + cx;
 }
+Object.assign(EG_GAMES, {
+  /* 👀 火眼金睛：一格不一样 */
+  odd: {stim:1,
+    init: function(E){ this.next(E); },
+    next: function(E){
+      E.n = Math.min(7, 3 + Math.floor(E.score/3));
+      var p = EG_PAIRS[egRnd(EG_PAIRS.length)]; if(Math.random() < .5) p = [p[1], p[0]];
+      E.pair = p; E.odd = egRnd(E.n*E.n); E.wr = null; E.hit = 0;
+    },
+    geo: function(E){ var c = Math.min(E.base*.17*E.vs, E.W*.94/E.n, E.H*.92/E.n); return {c:c, ox:(E.W - c*E.n)/2, oy:(E.H - c*E.n)/2}; },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var i = egGridHit(this.geo(E), E.n*E.n, E.n, x, y); if(i < 0) return;
+      if(i === E.odd){ E.score++; E.hit = 1; var self = this; E.later = {t:.4, fn:function(){ self.next(E); }}; }
+      else E.wr = {i:i, t:.45};
+    },
+    step: function(E, dt){ if(E.wr){ E.wr.t -= dt; if(E.wr.t <= 0) E.wr = null; } },
+    draw: function(E, g){
+      var G = this.geo(E), c = G.c, p = c*.07;
+      for(var i=0;i<E.n*E.n;i++){
+        var x = G.ox + (i % E.n)*c, y = G.oy + Math.floor(i/E.n)*c;
+        if(E.wr && E.wr.i === i) x += Math.sin(E.wr.t*60)*c*.06;
+        egTile(g, x+p, y+p, c-2*p, c-2*p, .6, (E.hit && i === E.odd) ? '#22c55e' : (E.wr && E.wr.i === i) ? '#ef4444' : null);
+        egEmo(g, i === E.odd ? E.pair[1] : E.pair[0], x + c/2, y + c/2, c*.58);
+      }
+    },
+    text: function(E){ return '👀 找到 '+E.score+' 个'; }
+  },
+
+  /* 🫘 找红豆：形状、角度或颜色有一点点不一样 */
+  bean: {stim:1,
+    init: function(E){ this.next(E); },
+    next: function(E){
+      var L = E.score;
+      E.cols = Math.min(8, 3 + Math.floor(L/2)); E.rows = Math.min(7, 3 + Math.floor(L/3));
+      E.odd = egRnd(E.cols*E.rows); E.dif = Math.max(.07, .34 - L*.018); E.kind = egRnd(3); E.wr = null; E.hit = 0;
+      E.rot = []; for(var i=0;i<E.cols*E.rows;i++) E.rot.push((Math.random()-.5)*.25);
+    },
+    geo: function(E){ var c = Math.min(E.W*.95/E.cols, E.H*.92/E.rows, E.base*.21*E.vs); return {c:c, ox:(E.W - c*E.cols)/2, oy:(E.H - c*E.rows)/2}; },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var i = egGridHit(this.geo(E), E.cols*E.rows, E.cols, x, y); if(i < 0) return;
+      if(i === E.odd){ E.score++; E.hit = 1; var self = this; E.later = {t:.45, fn:function(){ self.next(E); }}; }
+      else E.wr = {i:i, t:.45};
+    },
+    step: function(E, dt){ if(E.wr){ E.wr.t -= dt; if(E.wr.t <= 0) E.wr = null; } },
+    draw: function(E, g){
+      var G = this.geo(E), c = G.c, p = c*.06;
+      for(var i=0;i<E.cols*E.rows;i++){
+        var x = G.ox + (i % E.cols)*c, y = G.oy + Math.floor(i/E.cols)*c;
+        if(E.wr && E.wr.i === i) x += Math.sin(E.wr.t*60)*c*.06;
+        egTile(g, x+p, y+p, c-2*p, c-2*p, .7, (E.hit && i === E.odd) ? '#22c55e' : (E.wr && E.wr.i === i) ? '#ef4444' : null);
+        var rx = c*.36, ry = c*.21, a = E.rot[i], col = '#a83232';
+        if(i === E.odd){
+          if(E.kind === 0) ry *= 1 + E.dif*1.6;
+          else if(E.kind === 1) a += (E.dif*2.4) * (E.rot[i] > 0 ? 1 : -1) + .35;
+          else { var k = Math.min(1, E.dif*2.2); col = 'rgb('+Math.round(168+(225-168)*k)+','+Math.round(50+(110-50)*k)+','+Math.round(50+(110-50)*k)+')'; }
+        }
+        g.save(); g.translate(x + c/2, y + c/2); g.rotate(a);
+        g.fillStyle = col; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, 7); g.fill();
+        g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = Math.max(1.5, c*.025); g.beginPath(); g.ellipse(0, -ry*.15, rx*.7, ry*.6, 0, Math.PI*1.15, Math.PI*1.85); g.stroke();
+        g.restore();
+      }
+    },
+    text: function(E){ return '🫘 找到 '+E.score+' 颗'; }
+  },
+
+  /* 🍎 寻找水果：找到底部要的水果 */
+  fruit: {stim:1,
+    init: function(E){ this.next(E); },
+    resize: function(E){ this.next(E); },
+    next: function(E){
+      var n = Math.min(42, 8 + E.score*2), t = EG_FRUITS[egRnd(EG_FRUITS.length)];
+      var bh = Math.min(E.H*.2, E.base*.15*E.vs + 20), ax = E.W*.04, aw = E.W*.92, ay = E.H*.04, ah = E.H - bh - ay - 14;
+      var cols = Math.max(2, Math.ceil(Math.sqrt(n*aw/ah))), rows = Math.ceil(n/cols), cw = aw/cols, ch = ah/rows;
+      var cells = egShuffle(Array.from({length:cols*rows}, function(_, i){ return i; })).slice(0, n);
+      var others = EG_FRUITS.filter(function(f){ return f !== t; });
+      E.items = cells.map(function(ci){
+        return {x: ax + (ci % cols + .5 + (Math.random()-.5)*.3)*cw, y: ay + (Math.floor(ci/cols) + .5 + (Math.random()-.5)*.3)*ch, e: others[egRnd(others.length)]};
+      });
+      E.items[egRnd(n)].e = t;
+      E.tg = t; E.bh = bh; E.isz = Math.min(cw, ch, E.base*.16*E.vs)*.74; E.wr = null; E.hit = null;
+    },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var best = null, bd = 1e9;
+      E.items.forEach(function(it){ var d = Math.hypot(it.x - x, it.y - y); if(d < bd){ bd = d; best = it; } });
+      if(!best || bd > E.isz*.65) return;
+      if(best.e === E.tg){ E.score++; E.hit = best; var self = this; E.later = {t:.45, fn:function(){ self.next(E); }}; }
+      else E.wr = {it:best, t:.45};
+    },
+    step: function(E, dt){ if(E.wr){ E.wr.t -= dt; if(E.wr.t <= 0) E.wr = null; } },
+    draw: function(E, g){
+      var s = E.isz;
+      E.items.forEach(function(it){
+        var x = it.x + ((E.wr && E.wr.it === it) ? Math.sin(E.wr.t*60)*s*.08 : 0);
+        g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.arc(x, it.y, s*.56, 0, 7); g.fill();
+        if(E.hit === it || (E.wr && E.wr.it === it)){ g.strokeStyle = E.hit === it ? '#22c55e' : '#ef4444'; g.lineWidth = 4; g.stroke(); }
+        egEmo(g, it.e, x, it.y, s*.78);
+      });
+      var bw = Math.min(E.W*.7, E.bh*3.6), bx = (E.W - bw)/2, by = E.H - E.bh - 8;
+      egTile(g, bx, by, bw, E.bh, .92, '#7c5cff');
+      g.fillStyle = '#4b3a99'; g.font = '900 '+Math.round(E.bh*.26)+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('找到它 →', bx + bw*.36, by + E.bh/2);
+      egEmo(g, E.tg, bx + bw*.76, by + E.bh/2, E.bh*.62);
+    },
+    text: function(E){ return '🍎 找到 '+E.score+' 个'; }
+  },
+
+  /* 🙈 谁藏起来了：记忆 */
+  hide: {stim:1,
+    init: function(E){ this.next(E); },
+    next: function(E){
+      var k = Math.min(4, 2 + Math.floor(E.score/4)), pool = egShuffle(EG_ANIMALS.slice());
+      E.cards = pool.slice(0, k); E.hid = egRnd(k);
+      E.opts = egShuffle([E.cards[E.hid], pool[k], pool[k+1]]);
+      E.phase = 'show'; E.pt = (2.2 + k*.7)/Math.max(.8, E.sp); E.res = null; E.pick = -1;
+    },
+    geo: function(E){
+      var k = E.cards.length, gap = E.base*.05, cs = Math.min(E.base*.3*E.vs, (E.W*.9 - gap*(k-1))/k, E.H*.38);
+      var os = Math.min(E.base*.17*E.vs, (E.W*.8 - gap*2)/3, E.H*.2);
+      return {k:k, gap:gap, cs:cs, cx:(E.W - (k*cs + (k-1)*gap))/2, cy:E.H*.1, os:os, ox:(E.W - (3*os + 2*gap))/2, oy:E.H*.92 - os, qy:E.H*.1 + cs + (E.H*.92 - os - E.H*.1 - cs)/2};
+    },
+    step: function(E, dt){ if(E.phase === 'show'){ E.pt -= dt; if(E.pt <= 0) E.phase = 'ask'; } },
+    tap: function(E, x, y){
+      if(x == null || E.phase !== 'ask' || E.later) return;
+      var G = this.geo(E);
+      for(var i=0;i<3;i++){
+        var ox = G.ox + i*(G.os + G.gap);
+        if(x >= ox && x <= ox + G.os && y >= G.oy && y <= G.oy + G.os){
+          var ok = E.opts[i] === E.cards[E.hid], self = this;
+          E.pick = i; E.res = ok ? 'ok' : 'no';
+          if(ok) E.score++;
+          E.later = {t: ok ? .8 : 1.6, fn:function(){ self.next(E); }};
+          return;
+        }
+      }
+    },
+    draw: function(E, g){
+      var G = this.geo(E);
+      for(var i=0;i<G.k;i++){
+        var x = G.cx + i*(G.cs + G.gap), y = G.cy;
+        var cover = E.phase === 'ask' && i === E.hid && E.res !== 'no' && E.res !== 'ok';
+        if(cover){
+          g.fillStyle = '#fca5a5'; egRR(g, x, y, G.cs, G.cs, G.cs*.12); g.fill();
+          g.save(); g.clip(); g.strokeStyle = '#ef4444'; g.lineWidth = 2; for(var yy=y; yy<y+G.cs; yy+=G.cs/12){ g.beginPath(); g.moveTo(x, yy); g.lineTo(x+G.cs, yy); g.stroke(); } g.restore();
+          g.strokeStyle = '#3b82f6'; g.lineWidth = Math.max(4, G.cs*.03); egRR(g, x, y, G.cs, G.cs, G.cs*.12); g.stroke();
+          g.fillStyle = '#fff'; g.font = '900 '+Math.round(G.cs*.5)+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', x + G.cs/2, y + G.cs/2);
+        } else {
+          egTile(g, x, y, G.cs, G.cs, .95, '#3b82f6');
+          egEmo(g, E.cards[i], x + G.cs/2, y + G.cs/2, G.cs*.6);
+        }
+      }
+      var fs = Math.max(16, E.base*.04);
+      if(E.phase === 'show') egPill(g, '记住它们！'+Math.ceil(E.pt)+' 秒', E.W/2, G.qy, fs);
+      else {
+        egPill(g, E.res === 'ok' ? '答对啦！🎉' : E.res === 'no' ? '是它藏起来了哦' : '谁藏起来了？', E.W/2, G.qy, fs);
+        for(var j=0;j<3;j++){
+          var ox = G.ox + j*(G.os + G.gap), right = E.opts[j] === E.cards[E.hid];
+          egTile(g, ox, G.oy, G.os, G.os, .95, E.pick === j ? (E.res === 'ok' ? '#22c55e' : '#ef4444') : (E.res === 'no' && right ? '#22c55e' : null));
+          egEmo(g, E.opts[j], ox + G.os/2, G.oy + G.os/2, G.os*.6);
+        }
+      }
+    },
+    text: function(E){ return '🙈 答对 '+E.score+' 次'; }
+  },
+
+  /* 🧃 色彩饮品店：倒水排序 */
+  sort: {stim:1,
+    COL: ['#ff2020','#1d4ed8','#facc15','#16a34a','#9333ea','#f97316'],
+    init: function(E){ E.lvl = 1; this.newLv(E); },
+    restart: function(E){ this.newLv(E); },
+    newLv: function(E){
+      var nc = Math.min(6, 1 + E.lvl), layers = [], tubes, i;
+      do {
+        layers = []; for(i=0;i<nc;i++) for(var j=0;j<4;j++) layers.push(i);
+        egShuffle(layers); tubes = [];
+        for(i=0;i<nc;i++) tubes.push(layers.slice(i*4, i*4+4));
+      } while(this.solved(tubes));
+      tubes.push([]); tubes.push([]);
+      E.tubes = tubes; E.sel = -1;
+    },
+    solved: function(T){ return T.every(function(t){ return t.length === 0 || (t.length === 4 && t.every(function(v){ return v === t[0]; })); }); },
+    geo: function(E){
+      var n = E.tubes.length, tw = Math.min(E.base*.11*E.vs, E.W*.9/(n*1.6)), gap = tw*.6, th = Math.min(tw*3.6, E.H*.62);
+      return {n:n, tw:tw, gap:gap, th:th, ox:(E.W - (n*tw + (n-1)*gap))/2, oy:(E.H - th)/2 + tw*.3};
+    },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var G = this.geo(E), hit = -1;
+      for(var i=0;i<G.n;i++){ var tx = G.ox + i*(G.tw + G.gap); if(x >= tx - G.gap/2 && x <= tx + G.tw + G.gap/2 && y >= G.oy - G.tw && y <= G.oy + G.th + G.tw*.5) hit = i; }
+      if(hit < 0){ E.sel = -1; return; }
+      if(E.sel < 0){ if(E.tubes[hit].length) E.sel = hit; return; }
+      if(E.sel === hit){ E.sel = -1; return; }
+      var A = E.tubes[E.sel], B = E.tubes[hit], c = A[A.length-1];
+      if(!B.length || B[B.length-1] === c){ while(A.length && A[A.length-1] === c && B.length < 4) B.push(A.pop()); }
+      E.sel = -1;
+      if(this.solved(E.tubes)){ E.score++; E.lvl++; egFlash('🎉 完成！第 '+E.lvl+' 关'); var self = this; E.later = {t:1.1, fn:function(){ self.newLv(E); }}; }
+    },
+    step: function(){},
+    draw: function(E, g){
+      var G = this.geo(E), lh = G.th/4, self = this;
+      E.tubes.forEach(function(t, i){
+        var x = G.ox + i*(G.tw + G.gap), y = G.oy - (E.sel === i ? G.tw*.6 : 0);
+        g.fillStyle = 'rgba(255,255,255,.55)'; egRR(g, x, y, G.tw, G.th, G.tw*.45); g.fill();
+        g.save(); egRR(g, x, y, G.tw, G.th, G.tw*.45); g.clip();
+        t.forEach(function(v, j){ g.fillStyle = self.COL[v]; g.fillRect(x, y + G.th - (j+1)*lh, G.tw, lh + .5); });
+        g.restore();
+        g.strokeStyle = E.sel === i ? '#7c3aed' : '#ffffff'; g.lineWidth = Math.max(3, G.tw*.07); egRR(g, x, y, G.tw, G.th, G.tw*.45); g.stroke();
+      });
+    },
+    text: function(E){ return '🧃 第 '+E.lvl+' 关'; }
+  },
+
+  /* 🟦 俄罗斯方块 */
+  tetris: {stim:1, pad:'tetris', tapOnUp:1,
+    P: [[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]],
+    COL: ['#22d3ee','#facc15','#a855f7','#3b82f6','#f97316','#22c55e','#ef4444'],
+    init: function(E){ E.lines = 0; this.clear(E); E.nextP = egRnd(7); this.spawn(E); },
+    clear: function(E){ E.bd = []; for(var r=0;r<20;r++){ E.bd.push([0,0,0,0,0,0,0,0,0,0]); } E.acc = 0; },
+    spawn: function(E){
+      var k = E.nextP, m = this.P[k].map(function(r){ return r.slice(); });
+      E.nextP = egRnd(7); E.pc = {k:k, m:m, x:Math.floor((10 - m[0].length)/2), y:0};
+      if(!this.fits(E, m, E.pc.x, 0)){ this.clear(E); egFlash('满啦！重新开始'); }
+    },
+    fits: function(E, m, x, y){
+      for(var r=0;r<m.length;r++) for(var c=0;c<m[r].length;c++) if(m[r][c]){
+        var X = x + c, Y = y + r; if(X < 0 || X >= 10 || Y >= 20) return false; if(Y >= 0 && E.bd[Y][X]) return false;
+      }
+      return true;
+    },
+    rotate: function(E){
+      var m = E.pc.m, R = m[0].map(function(_, i){ return m.map(function(row){ return row[i]; }).reverse(); });
+      var kicks = [0,-1,1,-2,2];
+      for(var i=0;i<kicks.length;i++) if(this.fits(E, R, E.pc.x + kicks[i], E.pc.y)){ E.pc.m = R; E.pc.x += kicks[i]; return; }
+    },
+    lock: function(E){
+      var p = E.pc, self = this;
+      p.m.forEach(function(row, r){ row.forEach(function(v, c){ if(v && p.y + r >= 0) E.bd[p.y + r][p.x + c] = p.k + 1; }); });
+      var keep = E.bd.filter(function(row){ return row.some(function(v){ return !v; }); }), n = 20 - keep.length;
+      while(keep.length < 20) keep.unshift([0,0,0,0,0,0,0,0,0,0]);
+      E.bd = keep;
+      if(n){ E.lines += n; E.score = E.lines; if(n >= 2) egFlash('一次消了 '+n+' 行！'); }
+      self.spawn(E);
+    },
+    dir: function(E, dx, dy, src){
+      if(dy === -1){ this.rotate(E); return; }
+      if(dy === 1){
+        if(src === 'swipe'){ while(this.fits(E, E.pc.m, E.pc.x, E.pc.y + 1)) E.pc.y++; this.lock(E); }
+        else if(this.fits(E, E.pc.m, E.pc.x, E.pc.y + 1)) E.pc.y++; else this.lock(E);
+        E.acc = 0; return;
+      }
+      if(this.fits(E, E.pc.m, E.pc.x + dx, E.pc.y)) E.pc.x += dx;
+    },
+    tap: function(E){ this.rotate(E); },
+    space: function(E){ this.dir(E, 0, 1, 'swipe'); },
+    step: function(E, dt){
+      var iv = Math.max(.1, .8 - E.lines*.02)/E.sp; E.acc += dt;
+      if(E.acc >= iv){ E.acc = 0; if(this.fits(E, E.pc.m, E.pc.x, E.pc.y + 1)) E.pc.y++; else this.lock(E); }
+    },
+    draw: function(E, g){
+      var c = Math.floor(Math.min(E.H*.92/20, E.W*.92/16.4)), bw = c*10, bh = c*20, ox = Math.round((E.W - c*16.2)/2), oy = Math.round((E.H - bh)/2), self = this;
+      g.fillStyle = '#111827'; g.fillRect(ox - 4, oy - 4, bw + 8, bh + 8);
+      g.strokeStyle = '#fff'; g.lineWidth = 3; g.strokeRect(ox - 4, oy - 4, bw + 8, bh + 8);
+      function cell(x, y, col, ghost){
+        if(ghost){ g.strokeStyle = col; g.lineWidth = 2; g.strokeRect(ox + x*c + 2, oy + y*c + 2, c - 4, c - 4); return; }
+        g.fillStyle = col; g.fillRect(ox + x*c + 1, oy + y*c + 1, c - 2, c - 2);
+        g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(ox + x*c + 1, oy + y*c + 1, c - 2, c*.18);
+      }
+      E.bd.forEach(function(row, y){ row.forEach(function(v, x){ if(v) cell(x, y, self.COL[v-1]); }); });
+      var p = E.pc, gy = p.y; while(this.fits(E, p.m, p.x, gy + 1)) gy++;
+      p.m.forEach(function(row, r){ row.forEach(function(v, cc){ if(v) cell(p.x + cc, gy + r, self.COL[p.k], true); }); });
+      p.m.forEach(function(row, r){ row.forEach(function(v, cc){ if(v && p.y + r >= 0) cell(p.x + cc, p.y + r, self.COL[p.k]); }); });
+      var nx = ox + bw + c*1.2, nm = this.P[E.nextP];
+      egTile(g, nx, oy, c*5, c*4.4, .9);
+      g.fillStyle = '#333'; g.font = '800 '+Math.round(c*.6)+'px sans-serif'; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText('下一个', nx + c*.5, oy + c*.4);
+      nm.forEach(function(row, r){ row.forEach(function(v, cc){ if(v){ g.fillStyle = self.COL[E.nextP]; g.fillRect(nx + c*.6 + cc*c*.8, oy + c*1.6 + r*c*.8, c*.8 - 2, c*.8 - 2); } }); });
+    },
+    text: function(E){ return '🟦 消了 '+E.lines+' 行'; }
+  },
+
+  /* 🍉 合成大西瓜 */
+  merge: {stim:1,
+    FR: [['🍇','#8e44ad',.05],['🍒','#d62839',.063],['🍊','#f97316',.078],['🍋','#eab308',.094],['🥝','#65a30d',.11],['🍅','#ef4444',.128],
+         ['🍑','#fb923c',.146],['🍍','#f59e0b',.165],['🥥','#92400e',.186],['🍈','#a3e635',.208],['🍉','#16a34a',.235]],
+    init: function(E){ E.bodies = []; E.nx = E.W/2; E.cd = 0; E.nextLv = egRnd(4); E.fullT = 0; },
+    box: function(E){ var bw = Math.min(E.W*.9, E.H*.82), bh = E.H*.9; return {x:(E.W - bw)/2, y:E.H*.06, w:bw, h:bh, top:E.H*.06 + bh*.17}; },
+    rad: function(E, lv){ return this.box(E).w * this.FR[lv][2]; },
+    move: function(E, x){ E.nx = x; },
+    tap: function(E, x){
+      if(x != null) E.nx = x;
+      if(E.cd > 0) return;
+      var B = this.box(E), r = this.rad(E, E.nextLv), px = Math.max(B.x + r, Math.min(B.x + B.w - r, E.nx));
+      E.bodies.push({x:px, y:B.y + r + 2, vx:0, vy:0, lv:E.nextLv, r:r, age:0});
+      E.nextLv = egRnd(E.score > 40 ? 5 : 4); E.cd = .5;
+    },
+    step: function(E, dt){
+      E.cd -= dt;
+      var B = this.box(E), G = B.h*2.4, self = this, N = 6, h = dt/N, born = [];
+      for(var s=0;s<N;s++){
+        E.bodies.forEach(function(b){
+          b.vy += G*h; b.x += b.vx*h; b.y += b.vy*h; b.vx *= .998;
+          if(b.x - b.r < B.x){ b.x = B.x + b.r; b.vx = -b.vx*.3; }
+          if(b.x + b.r > B.x + B.w){ b.x = B.x + B.w - b.r; b.vx = -b.vx*.3; }
+          if(b.y + b.r > B.y + B.h){ b.y = B.y + B.h - b.r; b.vy = -b.vy*.15; b.vx *= .92; }
+        });
+        for(var i=0;i<E.bodies.length;i++) for(var j=i+1;j<E.bodies.length;j++){
+          var a = E.bodies[i], c = E.bodies[j]; if(a.dead || c.dead) continue;
+          var dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy), mn = a.r + c.r;
+          if(d >= mn || d === 0) continue;
+          if(a.lv === c.lv && a.lv < self.FR.length - 1){
+            a.dead = c.dead = true;
+            var lv = a.lv + 1; born.push({x:(a.x + c.x)/2, y:(a.y + c.y)/2, vx:0, vy:0, lv:lv, r:self.rad(E, lv), age:0});
+            E.score += lv; continue;
+          }
+          var nx = dx/d, ny = dy/d, ov = mn - d, ma = a.r*a.r, mc = c.r*c.r, tot = ma + mc;
+          a.x -= nx*ov*mc/tot; a.y -= ny*ov*mc/tot; c.x += nx*ov*ma/tot; c.y += ny*ov*ma/tot;
+          var vn = (c.vx - a.vx)*nx + (c.vy - a.vy)*ny;
+          if(vn < 0){ var imp = -1.1*vn/(1/ma + 1/mc); a.vx -= imp/ma*nx; a.vy -= imp/ma*ny; c.vx += imp/mc*nx; c.vy += imp/mc*ny; }
+        }
+        if(born.length || E.bodies.some(function(b){ return b.dead; })){ E.bodies = E.bodies.filter(function(b){ return !b.dead; }).concat(born); born = []; }
+      }
+      var over = false;
+      E.bodies.forEach(function(b){ b.age += dt; if(b.age > 1.5 && b.y - b.r < B.top && Math.abs(b.vy) < 60) over = true; });
+      E.fullT = over ? E.fullT + dt : 0;
+      if(E.fullT > 1.8){ E.bodies = []; E.fullT = 0; egFlash('装满啦！重新开始'); }
+    },
+    draw: function(E, g){
+      var B = this.box(E), self = this;
+      g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(B.x, B.y, B.w, B.h);
+      g.strokeStyle = '#fff'; g.lineWidth = 4; g.strokeRect(B.x, B.y, B.w, B.h);
+      g.setLineDash([10, 8]); g.strokeStyle = E.fullT > 0 ? '#ef4444' : 'rgba(120,0,0,.6)'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(B.x, B.top); g.lineTo(B.x + B.w, B.top); g.stroke(); g.setLineDash([]);
+      function fruit(x, y, lv, a){
+        var r = self.rad(E, lv); g.globalAlpha = a || 1;
+        g.fillStyle = self.FR[lv][1]; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+        g.strokeStyle = '#fff'; g.lineWidth = Math.max(2, r*.06); g.stroke();
+        egEmo(g, self.FR[lv][0], x, y, r*1.15); g.globalAlpha = 1;
+      }
+      E.bodies.forEach(function(b){ fruit(b.x, b.y, b.lv); });
+      var r = this.rad(E, E.nextLv), px = Math.max(B.x + r, Math.min(B.x + B.w - r, E.nx));
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2; g.beginPath(); g.moveTo(px, B.y + r*2); g.lineTo(px, B.y + B.h); g.stroke();
+      fruit(px, B.y + r + 2, E.nextLv, E.cd > 0 ? .35 : .85);
+    },
+    text: function(E){ return '🍉 '+E.score+' 分'; }
+  },
+
+  /* 🚀 雷霆战机 */
+  plane: {stim:1,
+    EN: ['👾','🛸','👻','🐙','🦇'],
+    init: function(E){ E.sx = E.W/2; E.bul = []; E.ens = []; E.pops = []; E.lives = 3; E.fire = 0; E.spawn = .8; },
+    move: function(E, x){ E.sx = Math.max(20, Math.min(E.W - 20, x)); },
+    tap: function(E, x){ if(x != null) this.move(E, x); },
+    step: function(E, dt){
+      var self = this, sr = E.base*.05*E.vs;
+      if(E.keys.ArrowLeft) E.sx = Math.max(20, E.sx - E.W*.8*dt);
+      if(E.keys.ArrowRight) E.sx = Math.min(E.W - 20, E.sx + E.W*.8*dt);
+      E.sy = E.H - sr*1.6;
+      E.fire -= dt; if(E.fire <= 0){ E.bul.push({x:E.sx, y:E.sy - sr}); E.fire = .22; }
+      E.bul.forEach(function(b){ b.y -= E.H*1.25*dt; }); E.bul = E.bul.filter(function(b){ return b.y > -20 && !b.dead; });
+      E.spawn -= dt;
+      if(E.spawn <= 0){
+        var r = E.base*.048*E.vs;
+        E.ens.push({x0: r + Math.random()*(E.W - 2*r), y:-r, r:r, e:self.EN[egRnd(self.EN.length)], vy:E.H*(.1 + Math.min(.16, E.score*.004))*E.sp, ph:Math.random()*6, sw:Math.random()*E.base*.07});
+        E.spawn = Math.max(.35, 1.1 - E.score*.012)/E.sp;
+      }
+      E.ens.forEach(function(en){
+        en.y += en.vy*dt; en.x = en.x0 + Math.sin(E.tt*1.6 + en.ph)*en.sw;
+        E.bul.forEach(function(b){ if(!b.dead && !en.dead && Math.hypot(b.x - en.x, b.y - en.y) < en.r*1.05){ b.dead = en.dead = true; E.score++; E.pops.push({x:en.x, y:en.y, r:en.r, t:0}); } });
+        if(!en.dead && Math.hypot(en.x - E.sx, en.y - E.sy) < en.r + sr*.7){ en.dead = true; E.lives--; egFlash('被撞到啦！'); }
+        if(!en.dead && en.y - en.r > E.H){ en.dead = true; E.lives--; }
+      });
+      E.ens = E.ens.filter(function(en){ return !en.dead; });
+      E.pops = E.pops.filter(function(p){ p.t += dt; return p.t < .4; });
+      if(E.lives <= 0){ E.lives = 3; E.ens = []; egFlash('飞机坏了，重新出发！'); }
+    },
+    draw: function(E, g){
+      var sr = E.base*.05*E.vs;
+      E.bul.forEach(function(b){ g.fillStyle = '#ffffff'; egRR(g, b.x - 3, b.y - 10, 6, 20, 3); g.fill(); g.strokeStyle = '#1e3a8a'; g.lineWidth = 2; g.stroke(); });
+      E.ens.forEach(function(en){
+        g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(en.x, en.y, en.r, 0, 7); g.fill();
+        egEmo(g, en.e, en.x, en.y, en.r*1.5);
+      });
+      E.pops.forEach(function(p){ g.strokeStyle = '#ffffff'; g.lineWidth = 4; g.globalAlpha = 1 - p.t/.4; g.beginPath(); g.arc(p.x, p.y, p.r*(1 + p.t*3), 0, 7); g.stroke(); g.globalAlpha = 1; });
+      g.fillStyle = 'rgba(255,255,255,.65)'; g.beginPath(); g.arc(E.sx, E.sy, sr*1.15, 0, 7); g.fill();
+      g.save(); g.translate(E.sx, E.sy); g.rotate(-Math.PI/4); egEmo(g, '🚀', 0, 0, sr*1.7); g.restore();
+    },
+    text: function(E){ return '🚀 打掉 '+E.score+' · '+'❤'.repeat(Math.max(0, E.lives)); }
+  }
+});
 
 function pgCartoon(){
   var totalVids=VIDEO_LIBRARY.reduce(function(s,c){return s+(c.totalVids||0);},0);
