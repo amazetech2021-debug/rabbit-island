@@ -5610,8 +5610,6 @@ var GRT_TYPES = [
   {k:'red',   n:'红黄闪烁', e:'🔴'},
   {k:'bw',    n:'黑白闪烁', e:'⚫'},
   {k:'rgb',   n:'三色刺激', e:'🎨'},
-  {k:'sine',  n:'正弦光栅', e:'〰️'},
-  {k:'drift', n:'平移条纹', e:'➡️'},
   {k:'redk',  n:'红光闪烁', e:'🟥'}
 ];
 var GRT_PAL = {ry:['#ff1e1e','#fff200','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff1e1e','#2a6bff','红蓝'], rg:['#ff1e1e','#1fd01f','红绿'], by:['#2a6bff','#fff200','蓝黄']};
@@ -5624,6 +5622,7 @@ function grtCfg(){
   if(!c.v4){ c.v4 = 1; c.op = 55; if(!c.lv) c.lv = 'm1'; c.size = ({low:150,m1:75,m2:36,hi:18})[c.lv] || 75; }
   if(!c.v3){ c.v3 = 1; c.mode = c.mode || 'grating'; c.amb = c.amb || 'L'; c.redEye = c.redEye || 'L'; c.glass = c.glass || 'rb'; c.fc = c.fc || 40; if(c.auto==null) c.auto = true; }
   if(c.on==null) c.on = false;
+  if(c.type === 'sine' || c.type === 'drift') c.type = 'stripe';
   if(c.pal!=='mix' && !GRT_PAL[c.pal]) c.pal = 'ry';
   if(c.hz>5) c.hz = 5;            // 闪烁最多每秒 5 次
   if(!c.min) c.min = 20;
@@ -5816,7 +5815,7 @@ function grtLoop(now){
     var slot = Math.floor(t / 20);
     if(_grt.mixSlot !== slot){
       _grt.mixSlot = slot;
-      var TL = ['stripe','check','rotate','pin','tri','ring','sine','drift'], PL = Object.keys(GRT_PAL), a, b;
+      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
       do { a = TL[Math.floor(Math.random()*TL.length)]; } while(a === _grt.mixT && TL.length > 1);
       do { b = PL[Math.floor(Math.random()*PL.length)]; } while(b === _grt.mixP && PL.length > 1);
       _grt.mixT = a; _grt.mixP = b;
@@ -16127,6 +16126,7 @@ function egCfg(){
   if(!e.bg) e.bg = 'stripe';
   if(!e.pal) e.pal = 'ry';
   if(e.bg === 'spin') e.bg = 'pin';
+  if(e.bg === 'sine' || e.bg === 'drift') e.bg = 'stripe';
   if(e.bg === 'bw'){ e.bg = 'stripe'; e.pal = 'bw'; }
   if(e.bgHz == null) e.bgHz = 0;
   if(!e.best || typeof e.best !== 'object') e.best = {};
@@ -16453,7 +16453,7 @@ function egBg(E, g){
     var slot = Math.floor(t/20);
     if(E.mixSlot !== slot){
       E.mixSlot = slot;
-      var TL = ['stripe','check','rotate','pin','tri','ring','sine','drift'], PL = Object.keys(GRT_PAL), a, b;
+      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
       do { a = TL[egRnd(TL.length)]; } while(a === E.mixT);
       do { b = PL[egRnd(PL.length)]; } while(b === E.mixP);
       E.mixT = a; E.mixP = b;
