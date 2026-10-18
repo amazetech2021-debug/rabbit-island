@@ -16153,7 +16153,11 @@ function eyeTouch(){ return (window.matchMedia && matchMedia('(pointer:coarse)')
 function eyeFrameKind(tab){ return tab === 'gabor' ? ((S.eyeGab || 'train') === 'rec' ? 'rec' : 'gabor') : tab; }
 var EYE_FRAMES = {
   test:  {route:'#/testing', note:'八方向 Landolt C：大小、深浅、拥挤测试，依次测左眼、右眼、双眼。建议每 1–2 周测一次，结果在「🎯 Gabor训练 → 训练数据」里看曲线。'},
-  kids:  {route:'#/mobile', css:'.topbar,#childHubBack{display:none!important}#mobilePage > :not(#childGameHub):not(#childTutorial):not(#childGlassesSetup):not(#childGamePanel){display:none!important}',
+  kids:  {route:'#/mobile', css:'.topbar,#childHubBack{display:none!important}#mobilePage > :not(#childGameHub):not(#childTutorial):not(#childGlassesSetup):not(#childGamePanel){display:none!important}'
+            + '#mobilePage:has(#childGameHub:not(.hidden)){max-width:none!important}.child-hub-heading{display:none!important}.child-game-hub{margin:0 0 20px!important}'
+            + '.child-game-cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))!important;gap:12px!important;margin:0!important}'
+            + '.child-game-card{border:none!important;border-radius:20px!important;padding:16px 18px!important;box-shadow:0 3px 12px rgba(100,80,160,.1)!important;grid-template-columns:56px 1fr auto!important;gap:14px!important}'
+            + '.child-game-card > i{width:56px!important;height:56px!important;border-radius:16px!important}.child-game-card strong{font-size:17px!important}.child-game-card small{font-size:13px!important}.child-game-card em{font-size:11.5px!important}',
           note:'开源视觉的十二个弱视小游戏：低对比、方向、拥挤、位置、运动、轮廓、记忆、追踪、深度等。每局 24 题，连续答对两题升一级，答错一题降一级。红蓝合环、红蓝寻宝、红蓝深度球要戴红青眼镜。'},
   gabor: {css:'#childTrainingEntry{display:none!important}',
           note:'Gabor 感知学习：单图、三图、清晰图、移图四种，难度自动调整（提升对比敏感度和分辨力）。电脑上点开始后会全屏，按 Esc 结束。'},
