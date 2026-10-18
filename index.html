@@ -842,7 +842,7 @@ body{
 .hw-chars button.on{background:var(--purple);color:#fff;border-color:var(--purple)}
 @media(min-width:1000px){
   .hw-layout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start}
-  .hw-right{order:1}.hw-left{order:2}
+  .hw-right{order:1;scrollbar-width:none}.hw-right::-webkit-scrollbar{display:none}.hw-left{order:2}
   .hw-right{margin-top:0;background:var(--paper);border-radius:22px;padding:18px 20px;box-shadow:var(--shadow);
     max-height:calc(100vh - 210px);overflow-y:auto}
 }
@@ -5861,7 +5861,7 @@ var ST_SHAPES = [['circle','⭕','圆形','s'],['square','⬛','方形','s'],['t
 function stPool(){ var set = (S.stereo && S.stereo.set) || 'all', m = {shape:'s', animal:'a', object:'o'}; return ST_SHAPES.filter(function(o){ return set === 'all' || o[3] === m[set]; }); }
 function stMode(){ return (S.stereo && S.stereo.mode) || 'easy'; }
 /* 简单模式（彩色分视图）：图案只用弱视眼那片镜片的颜色画，健眼只看到满屏的噪点，图案越来越小、越来越稀 */
-var ST_EASY_LV = [{sz:.36, d:.85},{sz:.33, d:.78},{sz:.3, d:.7},{sz:.27, d:.62},{sz:.24, d:.55},{sz:.21, d:.48},{sz:.19, d:.42},{sz:.17, d:.36}];
+var ST_EASY_LV = [{sz:.36, d:.85, px:24},{sz:.34, d:.78, px:20},{sz:.32, d:.7, px:17},{sz:.3, d:.62, px:14},{sz:.28, d:.55, px:12},{sz:.26, d:.48, px:10},{sz:.24, d:.42, px:8},{sz:.22, d:.36, px:6}];
 function stName(k){ var o = ST_SHAPES.find(function(x){ return x[0] === k; }); return o ? o[1]+' '+o[2] : ''; }
 var _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false};
 function stArc(px){ return Math.round(px * 0.2646 / 400 * 206265); }   // 按 40cm 观看距离估算
@@ -5963,18 +5963,30 @@ function stereoNext(){
   _st.busy = false;
 }
 function stEasyDraw(cv, W, shape){
-  var C = egCols(), L = ST_EASY_LV[_st.lv], g = cv.getContext('2d'), u = Math.max(2, Math.round(W/140)), x, y;
-  g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0, 0, W, W);
-  g.fillStyle = C.strong;                                   // 健眼：满屏一样的噪点，看不出图案
-  for(y=0; y<W; y+=u) for(x=0; x<W; x+=u){ var q = Math.random(); if(q < .5) g.fillRect(x, y, q < .14 ? u*2 : u, q < .07 ? u*2 : u); }
-  var r = W*L.sz, cx = W/2 + (Math.random()-.5)*W*.14, cy = W/2 + (Math.random()-.5)*W*.14;
-  g.save(); stShapePath(g, shape, cx, cy, r); g.clip();
-  g.globalCompositeOperation = 'lighter'; g.fillStyle = C.weak;   // 弱视眼：图案用它那片镜片的颜色
-  var x0 = Math.max(0, Math.floor((cx - r*1.15)/u)*u), y0 = Math.max(0, Math.floor((cy - r*1.15)/u)*u);
-  for(y=y0; y<Math.min(W, cy + r*1.15); y+=u) for(x=x0; x<Math.min(W, cx + r*1.15); x+=u){ var q2 = Math.random(); if(q2 < L.d) g.fillRect(x, y, q2 < .18 ? u*2 : u, u); }
-  g.restore(); g.globalCompositeOperation = 'source-over';
+  /* 彩色立体图：图案比背景的点更密、更大，左右眼之间有较大的视差，戴上眼镜后图案会浮出来；级别越高，视差越小、图案越接近背景 */
+  var c = grtCfg(), L = ST_EASY_LV[_st.lv], dpr = window.devicePixelRatio || 1, u = Math.max(2, Math.round(W/140)), d = Math.round(L.px*dpr);
+  var r = W*L.sz, cx = W/2 + (Math.random()-.5)*W*.1, cy = W/2 + (Math.random()-.5)*W*.1;
+  function noise(dens, big){
+    var cn = document.createElement('canvas'); cn.width = W; cn.height = W; var g = cn.getContext('2d'); g.fillStyle = '#fff';
+    for(var y=0; y<W; y+=u) for(var x=0; x<W; x+=u){ var q = Math.random(); if(q < dens) g.fillRect(x, y, big && q < dens*.35 ? u*2 : u, big && q < dens*.2 ? u*2 : u); }
+    return cn;
+  }
+  var bgN = noise(.3, false), shN = noise(L.d, true);
+  function eye(shift){
+    var e = document.createElement('canvas'); e.width = W; e.height = W; var g = e.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, W); g.drawImage(bgN, 0, 0);
+    g.save(); stShapePath(g, shape, cx + shift, cy, r); g.clip(); g.fillStyle = '#000'; g.fillRect(0, 0, W, W); g.drawImage(shN, shift, 0); g.restore();
+    return e;
+  }
+  var left = eye(d/2), right = eye(-d/2);                   // 左眼图右移、右眼图左移 → 图案浮在屏幕前面
+  var redImg = c.redEye === 'L' ? left : right, othImg = c.redEye === 'L' ? right : left;
+  var otherCol = c.glass === 'rc' ? [0,255,255] : [0,0,255];
+  function tint(img, rgb){ var t = document.createElement('canvas'); t.width = W; t.height = W; var tg = t.getContext('2d'); tg.drawImage(img, 0, 0); tg.globalCompositeOperation = 'multiply'; tg.fillStyle = 'rgb('+rgb.join(',')+')'; tg.fillRect(0, 0, W, W); return t; }
+  var g = cv.getContext('2d'); g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0, 0, W, W);
+  g.globalCompositeOperation = 'lighter'; g.drawImage(tint(redImg, [255,0,0]), 0, 0); g.drawImage(tint(othImg, otherCol), 0, 0);
+  g.globalCompositeOperation = 'source-over';
   var info = document.getElementById('stInfo');
-  if(info) info.innerHTML = '简单模式 · 第 '+(_st.lv+1)+' / '+ST_EASY_LV.length+' 级 · 答对 '+_st.ok+'/'+_st.n;
+  if(info) info.innerHTML = '简单模式 · 第 '+(_st.lv+1)+' / '+ST_EASY_LV.length+' 级 · 视差 '+L.px+' 像素 · 答对 '+_st.ok+'/'+_st.n;
 }
 function stereoPick(shape){
   if(_st.busy || !_st.shape) return;
@@ -16132,7 +16144,7 @@ function eyeStereoHtml(){
     + '<div class="st-left"><canvas id="stCv" class="st-cv"></canvas></div>'
     + '<div class="eg-card st-right"><h3>🧊 立体视</h3>'
     + (stMode() === 'easy'
-      ? '<p class="eg-note">戴上红蓝眼镜，用<b>弱视眼</b>找出藏在噪点里的图案（图形、物品、小动物）。健眼只看到满屏的噪点，所以要靠弱视眼去看。连续答对 2 次图案变小、变淡，答错变容易。会了再换「立体图」。</p>'
+      ? '<p class="eg-note">戴上红蓝眼镜，图案会<b>浮出来</b>，看看是什么（图形、物品、小动物）。简单模式的图案又大又亮，浮得也高；连续答对 2 次，图案变淡、浮得低一点，答错变容易。会了再换「立体图」。</p>'
       : '<p class="eg-note">戴上红蓝眼镜，在随机点图里找出藏着的图案。两只眼睛要一起看才会“浮”出来，比简单模式难。连续答对 2 次会变难（视差变小），答错会变容易。</p>')
     + '<div class="eg-row"><span class="eg-lb">模式</span><div class="eg-opts">'
     + [['easy','🎨 彩色图（简单）'],['stereo','🧊 立体图（进阶）']].map(function(o){ return '<button class="eg-opt'+(stMode()===o[0]?' on':'')+'" onclick="stSetMode(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')
