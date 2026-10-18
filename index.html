@@ -15976,7 +15976,7 @@ function renderYtChannelGrid(){
 
 /* 层1：频道列表 */
 /* ══════════ 视力：视觉测试（开源视觉 Oraen View，github.com/oraen/oraenView，免费、禁止商用）+ 立体视 + 视觉刺激游戏 + 红蓝眼镜游戏 ══════════ */
-var EYE_TABS = [['test','🔍 视觉测试'],['stereo','🧊 立体视'],['stim','⚡ 视觉刺激游戏'],['rb','👓 红蓝眼镜游戏'],['set','⚙️ 设置']];
+var EYE_TABS = [['test','🔍 视觉测试'],['stereo','🧊 立体视'],['kids','🧸 弱视小游戏'],['stim','⚡ 视觉刺激游戏'],['rb','👓 红蓝眼镜游戏'],['set','⚙️ 设置']];
 var _eyeTab = null;
 var EG_LV = {1:'简单', 2:'中等', 3:'困难'};
 var EG_INFO = {
@@ -16027,8 +16027,8 @@ function pgEye(){
   var tabs = '<div class="eye-tabs">' + EYE_TABS.map(function(t){
     return '<button class="eye-tab'+(t[0]===_eyeTab?' on':'')+'" onclick="eyeTab(\''+t[0]+'\')">'+t[1]+'</button>';
   }).join('') + '</div>';
-  var body = _eyeTab === 'test' ? eyeTestHtml() : _eyeTab === 'stereo' ? eyeStereoHtml() : _eyeTab === 'set' ? egSetHtml() : egListHtml(_eyeTab);
-  $('page').innerHTML = '<div class="eye-pg'+(_eyeTab==='test'?' eye-pg-test':'')+'">' + tabs + body + '</div>';
+  var body = _eyeTab === 'test' ? eyeTestHtml() : _eyeTab === 'kids' ? eyeKidsHtml() : _eyeTab === 'stereo' ? eyeStereoHtml() : _eyeTab === 'set' ? egSetHtml() : egListHtml(_eyeTab);
+  $('page').innerHTML = '<div class="eye-pg'+(_eyeTab==='test'||_eyeTab==='kids'?' eye-pg-test':'')+'">' + tabs + body + '</div>';
   if(_eyeTab === 'stereo') stereoStart();
   if(_eyeTab === 'set') egCalDraw();
 }
@@ -16051,6 +16051,35 @@ function eyeTestEmbed(f){
     var fix = function(){ if(!/^#\/testing/.test(w.location.hash)) w.location.hash = '#/testing'; };
     if(!w._khFix){ w._khFix = 1; w.addEventListener('hashchange', fix); }
     fix();
+  }catch(e){}
+}
+
+/* —— 弱视小游戏：开源视觉里的十二个小游戏（只显示小游戏板块）—— */
+function eyeKidsHtml(){
+  return '<div class="eye-bar"><small>开源视觉的十二个弱视小游戏：低对比、方向、拥挤、位置、运动、轮廓、记忆、追踪、深度等。每局 24 题，连续答对两题升一级，答错一题降一级。其中红蓝合环、红蓝寻宝、红蓝深度球要戴红青眼镜。记录只存在这台设备的浏览器里。</small>'
+    + '<button class="dk-btn" onclick="var f=document.querySelector(\'.eye-frame\');if(f)f.src=f.src">↻ 刷新</button></div>'
+    + '<iframe class="eye-frame" src="oraen/index.html#/mobile" onload="eyeKidsEmbed(this)" allow="fullscreen" allowfullscreen title="弱视小游戏"></iframe>';
+}
+function eyeKidsEmbed(f){
+  try{
+    var d = f.contentDocument, w = f.contentWindow; if(!d || !w) return;
+    if(!d.getElementById('khEmbed')){
+      var st = d.createElement('style'); st.id = 'khEmbed';
+      st.textContent = '.sidebar,#menuButton,.topbar,#childHubBack{display:none!important}.app-shell{grid-template-columns:1fr!important}.main-column{grid-column:1!important}'
+        + '#mobilePage > :not(#childGameHub):not(#childTutorial):not(#childGlassesSetup):not(#childGamePanel){display:none!important}';
+      (d.head || d.documentElement).appendChild(st);
+    }
+    var fix = function(){ if(!/^#\/mobile/.test(w.location.hash)) w.location.hash = '#/mobile'; };
+    if(!w._khFix){ w._khFix = 1; w.addEventListener('hashchange', fix); }
+    fix();
+    var n = 0, tm = setInterval(function(){                      // 同意协议、页面准备好以后，自动打开小游戏列表
+      n++;
+      try{
+        var shell = d.querySelector('.app-shell'), entry = d.getElementById('childTrainingEntry'), hub = d.getElementById('childGameHub');
+        if(shell && !shell.inert && entry && hub && hub.classList.contains('hidden')) entry.click();
+        if((hub && !hub.classList.contains('hidden')) || n > 600 || !document.body.contains(f)) clearInterval(tm);
+      }catch(e){ clearInterval(tm); }
+    }, 300);
   }catch(e){}
 }
 
