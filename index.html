@@ -5664,7 +5664,7 @@ function grtPanel(refresh){
   var running = c.on ? '<div class="grt-run">正在进行：'+(c.mode==='dich'?'双眼分视':'光栅刺激')+' · <a href="javascript:void 0" onclick="grtSet(\'on\',false)">结束</a></div>' : '';
   if(_grtTab==='dich'){
     h += running
-      +'<p class="grt-note">戴上<b>红蓝眼镜</b>后使用。网页会被分成许多不断变化的斑块：一部分只有弱视眼能看到（100% 对比度），另一部分只有健眼能看到（对比度降低），孩子必须两只眼睛一起用才能看全内容。可以配合看视频、认字、读绘本。</p>'
+      +'<p class="grt-note">戴上<b>红蓝眼镜</b>后使用。网页会被分成许多不断变化的斑块：一部分只有弱视眼能看到（100% 对比度），另一部分只有健眼能看到（对比度降低），孩子必须两只眼睛一起用才能看全内容。可以配合看视频、认字、读绘本。<br><span style="font-size:13px;opacity:.85">提示：每只眼只看得到一半的斑块，所以画面会比平时暗、有斑驳感，这是正常的。如果蓝色镜片其实偏蓝绿，选「青色」会亮很多；先用「眼镜校准」确认每只眼只看到一种颜色。</span></p>'
       +'<button class="big p grt-go" onclick="grtStart(\'dich\')">'+(c.on&&c.mode==='dich'?'🔄 重新开始计时':'▶ 开始双眼分视')+'</button>'
       +'<div class="grt-lb">弱视眼（按医生诊断选择）</div>'+row('amb', [['L','左眼'],['R','右眼']])
       +'<div class="grt-lb">红色镜片戴在</div>'+row('redEye', [['L','左眼（常见）'],['R','右眼']])
@@ -5722,7 +5722,7 @@ function grtChip(){
 }
 /* —— 双眼分视：三层叠加（弱视眼颜色 / 健眼颜色 / 健眼降对比度），斑块蒙版每 10 秒更换 —— */
 function dchColors(c){
-  var red = '#ff0000', other = c.glass==='rc' ? '#00ffff' : '#0000ff', otherMid = c.glass==='rc' ? '#008080' : '#000080';
+  var red = '#ff0000', other = c.glass==='rc' ? '#00ffff' : '#0050ff', otherMid = c.glass==='rc' ? '#008080' : '#002880';
   var ambRed = (c.amb === c.redEye);
   return {A: ambRed?red:other, F: ambRed?other:red, Fmid: ambRed?otherMid:'#800000'};
 }
@@ -5731,7 +5731,6 @@ function dchMasks(){
   var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   var g = cv.getContext('2d');
   var cell = Math.max(10, Math.round(Math.min(w,h)/4));
-  try{ g.filter = 'blur('+Math.max(2, Math.round(cell/8))+'px)'; }catch(e){}
   g.fillStyle = '#fff';
   for(var y=-cell/2; y<h+cell; y+=cell){
     for(var x=-cell/2; x<w+cell; x+=cell){
