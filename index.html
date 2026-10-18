@@ -5854,8 +5854,13 @@ var ST_LV = [12, 9, 7, 5, 4, 3, 2, 1];           // 视差（CSS 像素）
 var ST_SHAPES = [['circle','⭕','圆形','s'],['square','⬛','方形','s'],['tri','🔺','三角','s'],['star','⭐','星星','s'],
   ['heart','❤️','爱心','s'],['diamond','🔷','菱形','s'],['cross','➕','十字','s'],['house','🏠','房子','s'],
   ['rabbit','🐰','小兔','a'],['cat','🐱','小猫','a'],['bear','🐻','小熊','a'],['fish','🐟','小鱼','a'],
-  ['bird','🐦','小鸟','a'],['butterfly','🦋','蝴蝶','a'],['turtle','🐢','乌龟','a'],['dog','🐶','小狗','a']];
-function stPool(){ var set = (S.stereo && S.stereo.set) || 'all'; return ST_SHAPES.filter(function(o){ return set === 'all' || (set === 'shape' ? o[3] === 's' : o[3] === 'a'); }); }
+  ['bird','🐦','小鸟','a'],['butterfly','🦋','蝴蝶','a'],['turtle','🐢','乌龟','a'],['dog','🐶','小狗','a'],['dino','🦕','小恐龙','a'],
+  ['apple','🍎','苹果','o'],['car','🚗','小汽车','o'],['icecream','🍦','冰淇淋','o'],['balloon','🎈','气球','o'],['umbrella','☂️','雨伞','o'],['moon','🌙','月亮','o'],
+  ['flower','🌸','花朵','o'],['rocket','🚀','火箭','o'],['mushroom','🍄','蘑菇','o'],['boat','⛵','小船','o'],['crown','👑','皇冠','o'],['castle','🏰','城堡','o']];
+function stPool(){ var set = (S.stereo && S.stereo.set) || 'all', m = {shape:'s', animal:'a', object:'o'}; return ST_SHAPES.filter(function(o){ return set === 'all' || o[3] === m[set]; }); }
+function stMode(){ return (S.stereo && S.stereo.mode) || 'easy'; }
+/* 简单模式（彩色分视图）：图案只用弱视眼那片镜片的颜色画，健眼只看到满屏的噪点，图案越来越小、越来越稀 */
+var ST_EASY_LV = [{sz:.36, d:.85},{sz:.33, d:.78},{sz:.3, d:.7},{sz:.27, d:.62},{sz:.24, d:.55},{sz:.21, d:.48},{sz:.19, d:.42},{sz:.17, d:.36}];
 function stName(k){ var o = ST_SHAPES.find(function(x){ return x[0] === k; }); return o ? o[1]+' '+o[2] : ''; }
 var _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false};
 function stArc(px){ return Math.round(px * 0.2646 / 400 * 206265); }   // 按 40cm 观看距离估算
@@ -5898,6 +5903,19 @@ function stShapePath(g, shape, cx, cy, r){
     case 'butterfly': E(-.45, -.35, .42, .46, -.4); E(.45, -.35, .42, .46, .4); E(-.36, .45, .3, .36, .4); E(.36, .45, .3, .36, -.4); E(0, 0, .1, .75); break;
     case 'turtle': E(0, .05, .68, .52); C(.88, -.05, .22); C(-.45, .55, .17); C(.45, .55, .17); C(-.45, -.45, .17); C(.45, -.45, .17); break;
     case 'dog': C(0, .05, .6); E(-.62, .08, .22, .52, .2); E(.62, .08, .22, .52, -.2); E(0, .48, .32, .24); break;
+    case 'dino': E(-.05, .15, .6, .4); E(.52, -.35, .17, .42, .45); C(.75, -.72, .24); P([[-.5,0],[-1.05,.38],[-.42,.4]]); P([[-.38,.4],[-.15,.4],[-.15,.88],[-.38,.88]]); P([[.12,.4],[.35,.4],[.35,.88],[.12,.88]]); break;
+    case 'apple': C(-.3, .18, .6); C(.3, .18, .6); E(0, .45, .5, .42); E(.22, -.72, .13, .28, .7); P([[-.05,-.82],[.05,-.82],[.05,-.38],[-.05,-.38]]); break;
+    case 'car': P([[-1,0],[-.58,-.06],[-.36,-.48],[.36,-.48],[.6,-.06],[1,0],[1,.42],[-1,.42]]); C(-.55, .45, .26); C(.55, .45, .26); break;
+    case 'icecream': C(0, -.45, .48); C(-.32, -.25, .32); C(.32, -.25, .32); P([[-.5,-.12],[.5,-.12],[0,1.05]]); break;
+    case 'balloon': E(0, -.25, .62, .74); P([[-.12,.48],[.12,.48],[0,.62]]); P([[-.035,.6],[.035,.6],[.035,1.05],[-.035,1.05]]); break;
+    case 'umbrella': var um = []; for(var ui=0; ui<=24; ui++){ var ua = Math.PI + ui*Math.PI/24; um.push([Math.cos(ua)*1.02, Math.sin(ua)*.85 + .05]); } P(um); P([[-.06,0],[.06,0],[.06,.82],[-.06,.82]]); C(-.14, .82, .14); break;
+    case 'moon': var mo = [], mi; for(mi=0; mi<=30; mi++){ var ma = -Math.PI/3 - mi*(4*Math.PI/3)/30; mo.push([Math.cos(ma), Math.sin(ma)]); } for(mi=0; mi<=30; mi++){ var mb = -4.28 + mi*(2.28)/30; mo.push([.42 + Math.cos(mb)*.8, Math.sin(mb)*.8]); } P(mo); break;
+    case 'flower': for(var fi=0; fi<5; fi++){ var fa = -Math.PI/2 + fi*2*Math.PI/5; C(Math.cos(fa)*.55, Math.sin(fa)*.55, .42); } C(0, 0, .35); break;
+    case 'rocket': E(0, -.12, .34, .85); P([[-.28,.2],[-.72,.85],[-.22,.62]]); P([[.28,.2],[.72,.85],[.22,.62]]); P([[-.15,.68],[.15,.68],[0,1.05]]); break;
+    case 'mushroom': var mu = []; for(var mk=0; mk<=24; mk++){ var mt = Math.PI + mk*Math.PI/24; mu.push([Math.cos(mt), Math.sin(mt)*.75 - .1]); } P(mu); P([[-.3,-.12],[.3,-.12],[.36,.88],[-.36,.88]]); break;
+    case 'boat': P([[-1,.32],[1,.32],[.66,.82],[-.66,.82]]); P([[.02,-.98],[.02,.22],[.76,.22]]); P([[-.1,-.7],[-.1,.22],[-.7,.22]]); P([[-.04,-.98],[.04,-.98],[.04,.34],[-.04,.34]]); break;
+    case 'crown': P([[-.95,.62],[-.95,-.58],[-.48,-.05],[0,-.8],[.48,-.05],[.95,-.58],[.95,.62]]); break;
+    case 'castle': P([[-.95,.88],[-.95,-.45],[-.75,-.45],[-.75,-.68],[-.55,-.68],[-.55,-.45],[-.35,-.45],[-.35,-.05],[-.2,-.05],[-.2,-.8],[0,-1.02],[.2,-.8],[.2,-.05],[.35,-.05],[.35,-.45],[.55,-.45],[.55,-.68],[.75,-.68],[.75,-.45],[.95,-.45],[.95,.88]]); break;
     default: C(0, 0, 1);
   }
 }
@@ -5907,11 +5925,14 @@ function stereoNext(){
   /* 按屏幕真实像素绘制：弹窗在大屏上有放大（zoom），所以用实际显示尺寸 × 设备像素比 */
   var css = cv.getBoundingClientRect().width || parseFloat(cv.style.width), W = Math.round(css*dpr);
   cv.width = W; cv.height = W;
-  var dot = Math.max(1, Math.round(3*dpr)), d = Math.round(ST_LV[_st.lv]*dpr);
+  var easy = stMode() === 'easy';
+  if(easy && _st.lv >= ST_EASY_LV.length) _st.lv = ST_EASY_LV.length - 1;
+  var dot = Math.max(1, Math.round(3*dpr)), d = Math.round(ST_LV[Math.min(_st.lv, ST_LV.length-1)]*dpr);
   var pool = stPool(), pick = pool[Math.floor(Math.random()*pool.length)], shape = pick[0]; _st.shape = shape;
   var opts = [pick].concat(pool.filter(function(o){ return o !== pick; }).sort(function(){ return Math.random() - .5; }).slice(0, 3)).sort(function(){ return Math.random() - .5; });
   var bt = document.getElementById('stBtns');
   if(bt) bt.innerHTML = opts.map(function(o){ return '<button onclick="stereoPick(\''+o[0]+'\')"><span>'+o[1]+'</span>'+o[2]+'</button>'; }).join('');
+  if(easy){ stEasyDraw(cv, W, shape); _st.busy = false; return; }
   // 随机点底图：右眼整体错开 D0（避免不戴眼镜时看出图形），图形区域再额外错开 d
   var D0 = dot*2;
   var base = document.createElement('canvas'); base.width = W + D0 + d + dot*2; base.height = W;
@@ -5940,6 +5961,20 @@ function stereoNext(){
   if(info) info.innerHTML = '第 '+(_st.lv+1)+' 级 · 视差 '+ST_LV[_st.lv]+' 像素（约 '+stArc(ST_LV[_st.lv])+'″）· 答对 '+_st.ok+'/'+_st.n;
   _st.busy = false;
 }
+function stEasyDraw(cv, W, shape){
+  var C = egCols(), L = ST_EASY_LV[_st.lv], g = cv.getContext('2d'), u = Math.max(2, Math.round(W/140)), x, y;
+  g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0, 0, W, W);
+  g.fillStyle = C.strong;                                   // 健眼：满屏一样的噪点，看不出图案
+  for(y=0; y<W; y+=u) for(x=0; x<W; x+=u){ var q = Math.random(); if(q < .5) g.fillRect(x, y, q < .14 ? u*2 : u, q < .07 ? u*2 : u); }
+  var r = W*L.sz, cx = W/2 + (Math.random()-.5)*W*.14, cy = W/2 + (Math.random()-.5)*W*.14;
+  g.save(); stShapePath(g, shape, cx, cy, r); g.clip();
+  g.globalCompositeOperation = 'lighter'; g.fillStyle = C.weak;   // 弱视眼：图案用它那片镜片的颜色
+  var x0 = Math.max(0, Math.floor((cx - r*1.15)/u)*u), y0 = Math.max(0, Math.floor((cy - r*1.15)/u)*u);
+  for(y=y0; y<Math.min(W, cy + r*1.15); y+=u) for(x=x0; x<Math.min(W, cx + r*1.15); x+=u){ var q2 = Math.random(); if(q2 < L.d) g.fillRect(x, y, q2 < .18 ? u*2 : u, u); }
+  g.restore(); g.globalCompositeOperation = 'source-over';
+  var info = document.getElementById('stInfo');
+  if(info) info.innerHTML = '简单模式 · 第 '+(_st.lv+1)+' / '+ST_EASY_LV.length+' 级 · 答对 '+_st.ok+'/'+_st.n;
+}
 function stereoPick(shape){
   if(_st.busy || !_st.shape) return;
   _st.busy = true; _st.n++;
@@ -5948,9 +5983,14 @@ function stereoPick(shape){
     _st.ok++; _st.streak++;
     if(_st.streak >= 2){
       if(!S.stereo) S.stereo = {};
-      var px = ST_LV[_st.lv];
-      if(!S.stereo.best || px < S.stereo.best){ S.stereo.best = px; }
-      if(_st.lv < ST_LV.length-1) _st.lv++;
+      if(stMode() === 'easy'){
+        if(!S.stereo.bestEasy || _st.lv + 1 > S.stereo.bestEasy) S.stereo.bestEasy = _st.lv + 1;
+        if(_st.lv < ST_EASY_LV.length-1) _st.lv++;
+      } else {
+        var px = ST_LV[_st.lv];
+        if(!S.stereo.best || px < S.stereo.best){ S.stereo.best = px; }
+        if(_st.lv < ST_LV.length-1) _st.lv++;
+      }
       _st.streak = 0;
     }
     toast('✅ 答对啦！');
@@ -16089,17 +16129,23 @@ function eyeStereoHtml(){
   return '<div class="st-wrap">'
     + '<div class="st-left"><canvas id="stCv" class="st-cv"></canvas></div>'
     + '<div class="eg-card st-right"><h3>🧊 立体视</h3>'
-    + '<p class="eg-note">戴上红蓝眼镜，在随机点图里找出藏着的<b>图形或小动物</b>。连续答对 2 次会变难（视差变小），答错会变容易。不戴眼镜是看不出来的哦。</p>'
+    + (stMode() === 'easy'
+      ? '<p class="eg-note">戴上红蓝眼镜，用<b>弱视眼</b>找出藏在噪点里的图案（图形、物品、小动物）。健眼只看到满屏的噪点，所以要靠弱视眼去看。连续答对 2 次图案变小、变淡，答错变容易。会了再换「立体图」。</p>'
+      : '<p class="eg-note">戴上红蓝眼镜，在随机点图里找出藏着的图案。两只眼睛要一起看才会“浮”出来，比简单模式难。连续答对 2 次会变难（视差变小），答错会变容易。</p>')
+    + '<div class="eg-row"><span class="eg-lb">模式</span><div class="eg-opts">'
+    + [['easy','🎨 彩色图（简单）'],['stereo','🧊 立体图（进阶）']].map(function(o){ return '<button class="eg-opt'+(stMode()===o[0]?' on':'')+'" onclick="stSetMode(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')
+    + '</div></div>'
     + '<div id="stInfo" class="st-info"></div>'
     + '<div class="st-btns" id="stBtns"></div>'
     + '<button class="dk-btn st-skip" onclick="stereoNext()">👀 看不出来，换一张</button>'
     + '<div class="eg-row"><span class="eg-lb">题目</span><div class="eg-opts">'
-    + [['all','全部'],['shape','图形'],['animal','小动物']].map(function(o){ return '<button class="eg-opt'+(set===o[0]?' on':'')+'" onclick="stSet(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')
+    + [['all','全部'],['shape','图形'],['object','物品'],['animal','小动物']].map(function(o){ return '<button class="eg-opt'+(set===o[0]?' on':'')+'" onclick="stSet(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('')
     + '</div></div>'
-    + '<div class="eg-meta">最好成绩：'+(st.best ? '视差 '+st.best+' 像素（约 '+stArc(st.best)+'″）' : '还没有')+' · 共练习 '+(st.trials||0)+' 次 · 眼镜设置在「⚙️ 设置」里</div>'
+    + '<div class="eg-meta">最好成绩：简单模式 '+(st.bestEasy ? '第 '+st.bestEasy+' 级' : '还没有')+' · 立体图 '+(st.best ? '视差 '+st.best+' 像素（约 '+stArc(st.best)+'″）' : '还没有')+' · 共练习 '+(st.trials||0)+' 次 · 眼镜设置在「⚙️ 设置」里</div>'
     + '</div></div>';
 }
 function stSet(v){ if(!S.stereo) S.stereo = {}; S.stereo.set = v; save(); pgEye(); }
+function stSetMode(v){ if(!S.stereo) S.stereo = {}; S.stereo.mode = v; save(); pgEye(); }
 function stereoStart(){ _st = {lv:0, streak:0, n:0, ok:0, shape:null, busy:false}; stereoNext(); }
 
 /* —— 游戏列表 —— */
