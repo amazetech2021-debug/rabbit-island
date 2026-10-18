@@ -5888,23 +5888,23 @@ function grtDraw(g, W, H, t, ty, pk, s, hz, phase){
     g.fillStyle = phase ? '#000000' : '#ff1e1e'; g.fillRect(0,0,W,H);             /* 红光闪烁：红黑交替 */
   } else if(ty === 'drift'){
     /* 平移条纹：边缘清楚的条纹，整体向右平移（约 1 秒移动一条条纹的宽度×3） */
-    var offd = (t * s * 3) % (s*2);
+    var dprd = (g.getTransform ? g.getTransform().a : 1) || 1, offd = Math.round(((t * s * 3) % (s*2)) * dprd) / dprd;
     g.fillStyle = A;
     for(var xd = offd - s*2; xd < W; xd += s*2) g.fillRect(xd, 0, s, H);
   } else if(ty === 'sine'){
     /* 正弦光栅：亮度按正弦平滑渐变（专业弱视软件常用），没有清楚的边 */
-    var per = Math.max(4, Math.round(s*2)), pk2 = per+'|'+A+'|'+B;
+    var dprs = (g.getTransform ? g.getTransform().a : 1) || 1, per = Math.max(4, Math.round(s*2*dprs)), pk2 = per+'|'+A+'|'+B;
     if(!grtDraw._sc || grtDraw._sk !== pk2){
       var pc = document.createElement('canvas'); pc.width = per; pc.height = 1; var pg2 = pc.getContext('2d');
       var ca = parseInt(A.slice(1), 16), cb = parseInt(B.slice(1), 16);
       for(var xi=0; xi<per; xi++){
-        var k = .5 + .5*Math.cos(2*Math.PI*xi/per), mix = function(sh){ return Math.round(((ca>>sh)&255)*k + ((cb>>sh)&255)*(1-k)); };
+        var k = .5 + .5*Math.max(-1, Math.min(1, 2.4*Math.cos(2*Math.PI*xi/per))), mix = function(sh){ return Math.round(((ca>>sh)&255)*k + ((cb>>sh)&255)*(1-k)); };
         pg2.fillStyle = 'rgb('+mix(16)+','+mix(8)+','+mix(0)+')'; pg2.fillRect(xi, 0, 1, 1);
       }
       grtDraw._sc = pc; grtDraw._sk = pk2;
     }
     var off = 0;
-    g.save(); g.translate(off, 0); g.fillStyle = g.createPattern(grtDraw._sc, 'repeat'); g.fillRect(-off, 0, W + per, H); g.restore();
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = g.createPattern(grtDraw._sc, 'repeat'); g.fillRect(0, 0, Math.ceil(W*dprs), Math.ceil(H*dprs)); g.restore();
   }
 }
 
