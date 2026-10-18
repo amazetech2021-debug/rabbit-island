@@ -841,7 +841,8 @@ body{
   background:var(--cream-1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--ink)}
 .hw-chars button.on{background:var(--purple);color:#fff;border-color:var(--purple)}
 @media(min-width:1000px){
-  .hw-layout{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:start}
+  .hw-layout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start}
+  .hw-right{order:1}.hw-left{order:2}
   .hw-right{margin-top:0;background:var(--paper);border-radius:22px;padding:18px 20px;box-shadow:var(--shadow);
     max-height:calc(100vh - 210px);overflow-y:auto}
 }
@@ -9128,7 +9129,8 @@ function pgHanziWrite(units){
   var learnedChars = learned.map(function(k){ return k.includes('-')?k.split('-').pop():k; });
 
   // 已学汉字：按年级归类
-  var HWS = (window.innerWidth>=1100) ? 440 : 300;
+  var _vw = window.innerWidth, _vh = window.innerHeight;   // 写字框尽量大：横屏按高度，竖屏按宽度
+  var HWS = Math.round(_vw >= 1000 ? Math.max(400, Math.min(700, _vh - 320, _vw*0.48)) : Math.max(300, Math.min(620, _vw - 48, _vh - 330)));
   var _grp = {}, _ord = [];
   learned.forEach(function(k){
     var p = String(k).split('-');
@@ -9180,7 +9182,7 @@ function pgHanziWrite(units){
         +'<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#e8e0f8;pointer-events:none"></div>'
         +'<div id="hw-canvas"></div>'
         +'<div id="hw-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;'
-          +'font-size:14px;color:#aaa;pointer-events:none">← 输入一个汉字开始</div>'
+          +'font-size:14px;color:#aaa;pointer-events:none">↑ 输入一个汉字，或点旁边的字开始</div>'
       +'</div>'
       +'<div style="width:'+HWS+'px;border:1px solid #ddd;border-top:none;padding:12px 16px;background:#fafafa;'
         +'box-sizing:border-box;border-radius:0 0 4px 4px;display:flex;align-items:center;justify-content:space-between">'
@@ -9596,7 +9598,7 @@ function hwLoadChar(ch){
       strokeColor:'#555',
       outlineColor:'#ddd',
       drawingColor:'#333',
-      drawingWidth:10,
+      drawingWidth:Math.max(10, Math.round(_sz/34)),
       strokeAnimationSpeed:1,
       delayBetweenStrokes:400,
       charDataLoader:function(char,onLoad,onError){
