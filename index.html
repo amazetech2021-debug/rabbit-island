@@ -1139,6 +1139,30 @@ html.grt-on .dk-words,html.grt-on .dk-stage,html.grt-on .dk-cmd,html.grt-on .dk-
 .eg-pad{position:absolute;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px;opacity:.5;z-index:1}
 .eg-pad button{background:#2a2a2a;color:#ccc;border:1px solid #555;border-radius:16px;font-size:22px;touch-action:none}
 html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
+.eg-banner-skill{background:linear-gradient(120deg,#34d399,#0d9488);box-shadow:0 8px 24px rgba(13,148,136,.2)}
+.eg-banner-skill .eg-bsel button.on{color:#0f766e}
+.ep-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;align-items:start}
+.ep-today{font-size:15px;color:var(--ink);margin:4px 0 8px}
+.ep-today b{font-size:38px;font-weight:900;color:var(--purple)}
+.ep-today small{display:block;font-size:12.5px;color:var(--ink-soft)}
+.ep-prog{height:10px;border-radius:6px;background:var(--cream-2);overflow:hidden;margin-bottom:10px}
+.ep-prog i{display:block;height:100%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:6px}
+.ep-li{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px dashed var(--cream-2);font-size:14px;color:var(--ink)}
+.ep-li b{color:var(--ink-soft);font-size:13px}
+.ep-bars{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;height:120px;align-items:end}
+.ep-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px}
+.ep-bar i{display:block;width:100%;min-height:2px;border-radius:4px 4px 0 0;background:#c4b5fd}
+.ep-bar.on i{background:#7c3aed}
+.ep-bar b{font-size:10px;color:var(--ink-soft);font-weight:800;order:-1}
+.ep-bar span{font-size:9.5px;color:var(--ink-soft)}
+.ep-stages{margin:4px 0 6px}
+.ep-stage{font-size:14px;color:var(--ink);line-height:1.6;background:var(--cream);border-radius:12px;padding:8px 12px;margin-bottom:8px}
+.ep-gos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.ep-go{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;border:2px solid var(--cream-2);background:#fff;border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;font-weight:800;color:var(--ink);cursor:pointer}
+.ep-go em{font-style:normal;color:var(--purple)}
+.ep-go:active{transform:scale(.98)}
+@media (max-width:900px){.ep-wrap{grid-template-columns:1fr}}
+
 #page > .eye-pg{zoom:1!important}
 .st-wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
 .st-left{background:#000;border-radius:20px;padding:12px;box-shadow:0 4px 16px rgba(100,80,160,.15)}
@@ -5585,7 +5609,10 @@ var GRT_TYPES = [
   {k:'ring',  n:'圆形光栅', e:'⭕'},
   {k:'red',   n:'红黄闪烁', e:'🔴'},
   {k:'bw',    n:'黑白闪烁', e:'⚫'},
-  {k:'rgb',   n:'三色刺激', e:'🎨'}
+  {k:'rgb',   n:'三色刺激', e:'🎨'},
+  {k:'sine',  n:'正弦光栅', e:'〰️'},
+  {k:'drift', n:'平移条纹', e:'➡️'},
+  {k:'redk',  n:'红光闪烁', e:'🟥'}
 ];
 var GRT_PAL = {ry:['#ff1e1e','#fff200','红黄'], bw:['#000000','#ffffff','黑白'], rb:['#ff1e1e','#2a6bff','红蓝'], rg:['#ff1e1e','#1fd01f','红绿'], by:['#2a6bff','#fff200','蓝黄']};
 var _grt = {cv:null, raf:0, t0:0, last:'', start:0, maskT:0};
@@ -5787,7 +5814,7 @@ function grtLoop(now){
     var slot = Math.floor(t / 20);
     if(_grt.mixSlot !== slot){
       _grt.mixSlot = slot;
-      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
+      var TL = ['stripe','check','rotate','pin','tri','ring','sine','drift'], PL = Object.keys(GRT_PAL), a, b;
       do { a = TL[Math.floor(Math.random()*TL.length)]; } while(a === _grt.mixT && TL.length > 1);
       do { b = PL[Math.floor(Math.random()*PL.length)]; } while(b === _grt.mixP && PL.length > 1);
       _grt.mixT = a; _grt.mixP = b;
@@ -5798,6 +5825,7 @@ function grtLoop(now){
   var phase = c.hz ? Math.floor(t * c.hz * 2) % 2 : 0;   // 每秒反转 hz 次
   var key;
   if(ty === 'pin') key = 'a' + Math.floor(t * 60);
+  else if(ty === 'drift') key = 'a' + Math.floor(t * 30);
   else if(ty === 'rotate') key = 'a' + Math.floor(t * 30);
   else if(ty === 'rgb') key = 'c' + (c.hz ? Math.floor(t * c.hz) % 3 : 0);
   else key = 'p' + phase;
@@ -5854,6 +5882,22 @@ function grtDraw(g, W, H, t, ty, pk, s, hz, phase){
     g.fillStyle = phase ? GRT_PAL.ry[1] : GRT_PAL.ry[0]; g.fillRect(0,0,W,H);
   } else if(ty === 'rgb'){
     g.fillStyle = ['#ff0000','#00c000','#0044ff'][c.hz ? Math.floor(t * c.hz) % 3 : 0]; g.fillRect(0,0,W,H);
+  } else if(ty === 'redk'){
+    g.fillStyle = phase ? '#000000' : '#ff1e1e'; g.fillRect(0,0,W,H);             /* 红光闪烁：红黑交替 */
+  } else if(ty === 'sine' || ty === 'drift'){
+    /* 正弦光栅（亮度按正弦渐变）；平移条纹：正弦光栅向右平移 */
+    var per = Math.max(4, Math.round(s*2)), pk2 = per+'|'+A+'|'+B;
+    if(!grtDraw._sc || grtDraw._sk !== pk2){
+      var pc = document.createElement('canvas'); pc.width = per; pc.height = 1; var pg2 = pc.getContext('2d');
+      var ca = parseInt(A.slice(1), 16), cb = parseInt(B.slice(1), 16);
+      for(var xi=0; xi<per; xi++){
+        var k = .5 + .5*Math.cos(2*Math.PI*xi/per), mix = function(sh){ return Math.round(((ca>>sh)&255)*k + ((cb>>sh)&255)*(1-k)); };
+        pg2.fillStyle = 'rgb('+mix(16)+','+mix(8)+','+mix(0)+')'; pg2.fillRect(xi, 0, 1, 1);
+      }
+      grtDraw._sc = pc; grtDraw._sk = pk2;
+    }
+    var off = ty === 'drift' ? (t * s * 1.2) % per : 0;
+    g.save(); g.translate(off, 0); g.fillStyle = g.createPattern(grtDraw._sc, 'repeat'); g.fillRect(-off, 0, W + per, H); g.restore();
   }
 }
 
@@ -16037,7 +16081,7 @@ function renderYtChannelGrid(){
 
 /* 层1：频道列表 */
 /* ══════════ 视力：视觉测试（开源视觉 Oraen View，github.com/oraen/oraenView，免费、禁止商用）+ 立体视 + 视觉刺激游戏 + 红蓝眼镜游戏 ══════════ */
-var EYE_TABS = [['test','🔍 视觉测试'],['stereo','🧊 立体视'],['kids','🧸 弱视小游戏'],['stim','⚡ 视觉刺激游戏'],['rb','👓 红蓝眼镜游戏'],['set','⚙️ 设置']];
+var EYE_TABS = [['plan','📋 训练方案'],['test','🔍 视觉测试'],['gabor','🎯 Gabor训练'],['stereo','🧊 立体视'],['kids','🧸 弱视小游戏'],['stim','⚡ 视觉刺激游戏'],['skill','🧠 视觉技巧'],['rb','👓 红蓝眼镜游戏'],['set','⚙️ 设置']];
 var _eyeTab = null;
 var EG_LV = {1:'简单', 2:'中等', 3:'困难'};
 var EG_INFO = {
@@ -16049,6 +16093,14 @@ var EG_INFO = {
   tetris:{cat:'stim', lv:3, n:'俄罗斯方块', e:'🟦', d:'旋转、移动方块，排满一行就消掉'},
   merge: {cat:'stim', lv:3, n:'合成大西瓜', e:'🍉', d:'两个一样的水果碰在一起，变成更大的水果'},
   plane: {cat:'stim', lv:3, n:'雷霆战机', e:'🚀', d:'驾驶飞机，打掉飞来的小怪物'},
+  schulte:{cat:'skill', lv:1, n:'舒尔特方格', e:'🔢', d:'按 1、2、3……的顺序，尽快点完所有数字（视觉广度、注意力）'},
+  jump:  {cat:'skill', lv:1, n:'跳跳星', e:'⭐', d:'星星在左右两边跳来跳去，眼睛跟上，快点它（扫视训练）'},
+  crowd: {cat:'skill', lv:2, n:'拥挤认字', e:'🀄', d:'一排挤在一起的字里，认出箭头指着的那个（改善拥挤现象）'},
+  dots:  {cat:'skill', lv:2, n:'描点连线', e:'✏️', d:'按数字顺序把小点连起来，点会越来越小（精细手眼）'},
+  cage:  {cat:'rb', lv:1, n:'捕鸟入笼', e:'🐦', d:'把小鸟送进笼子里（同时视）',
+          see:[['weak','笼子'],['strong','🐦 小鸟']]},
+  verge: {cat:'rb', lv:2, n:'融合集合/散开', e:'🎯', d:'两个圆圈慢慢拉开，还看成一个就继续，变成两个时点一下（融合视）',
+          see:[['weak','左上小点'],['strong','右下小点'],['both','圆圈']]},
   bug:   {cat:'rb', lv:1, n:'抓虫子', e:'🐞', d:'小瓢虫到处爬，赶在它飞走前点住它',
           see:[['weak','🐞 小瓢虫'],['strong','🍃 树叶']]},
   maze:  {cat:'rb', lv:1, n:'迷宫', e:'🌀', d:'帮小兔子走出迷宫，找到胡萝卜',
@@ -16082,66 +16134,123 @@ function egCols(full){
     weakName: weakIsRed ? '红色' : othName, strongName: weakIsRed ? othName : '红色'};
 }
 function pgEye(){
-  if(!_eyeTab) _eyeTab = S.eyeTab || 'test';
+  if(!_eyeTab) _eyeTab = S.eyeTab || 'plan';
   if(EG_INFO[_eyeTab]) _eyeTab = EG_INFO[_eyeTab].cat;            // 旧版本记住的是单个游戏
-  if(!EYE_TABS.some(function(t){ return t[0] === _eyeTab; })) _eyeTab = 'test';
+  if(!EYE_TABS.some(function(t){ return t[0] === _eyeTab; })) _eyeTab = 'plan';
   var tabs = '<div class="eye-tabs">' + EYE_TABS.map(function(t){
     return '<button class="eye-tab'+(t[0]===_eyeTab?' on':'')+'" onclick="eyeTab(\''+t[0]+'\')">'+t[1]+'</button>';
   }).join('') + '</div>';
-  var body = _eyeTab === 'test' ? eyeTestHtml() : _eyeTab === 'kids' ? eyeKidsHtml() : _eyeTab === 'stereo' ? eyeStereoHtml() : _eyeTab === 'set' ? egSetHtml() : egListHtml(_eyeTab);
-  $('page').innerHTML = '<div class="eye-pg'+(_eyeTab==='test'||_eyeTab==='kids'?' eye-pg-test':'')+'">' + tabs + body + '</div>';
+  var isFrame = _eyeTab === 'test' || _eyeTab === 'kids' || _eyeTab === 'gabor';
+  var body = _eyeTab === 'plan' ? eyePlanHtml() : isFrame ? eyeFrameHtml(_eyeTab) : _eyeTab === 'stereo' ? eyeStereoHtml() : _eyeTab === 'set' ? egSetHtml() : egListHtml(_eyeTab);
+  $('page').innerHTML = '<div class="eye-pg'+(isFrame?' eye-pg-test':'')+'">' + tabs + body + '</div>';
   if(_eyeTab === 'stereo') stereoStart();
   if(_eyeTab === 'set') egCalDraw();
 }
 function eyeTab(k){ _eyeTab = k; S.eyeTab = k; save(); pgEye(); }
 
-/* —— 视觉测试：只保留开源视觉的「视觉测试」板块 —— */
-function eyeTestHtml(){
-  return '<div class="eye-bar"><small>八方向 Landolt C：大小、深浅、拥挤测试，依次测左眼、右眼、双眼。记录只存在这台设备的浏览器里。</small>'
+/* —— 开源视觉（github.com/oraen/oraenView）的视觉测试 / Gabor 训练 / 弱视小游戏 / 训练数据，只显示需要的板块 —— */
+function eyeTouch(){ return (window.matchMedia && matchMedia('(pointer:coarse)').matches) || /iPad|iPhone|Android/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+function eyeFrameKind(tab){ return tab === 'gabor' ? ((S.eyeGab || 'train') === 'rec' ? 'rec' : 'gabor') : tab; }
+var EYE_FRAMES = {
+  test:  {route:'#/testing', note:'八方向 Landolt C：大小、深浅、拥挤测试，依次测左眼、右眼、双眼。建议每 1–2 周测一次，结果在「🎯 Gabor训练 → 训练数据」里看曲线。'},
+  kids:  {route:'#/mobile', css:'.topbar,#childHubBack{display:none!important}#mobilePage > :not(#childGameHub):not(#childTutorial):not(#childGlassesSetup):not(#childGamePanel){display:none!important}',
+          note:'开源视觉的十二个弱视小游戏：低对比、方向、拥挤、位置、运动、轮廓、记忆、追踪、深度等。每局 24 题，连续答对两题升一级，答错一题降一级。红蓝合环、红蓝寻宝、红蓝深度球要戴红青眼镜。'},
+  gabor: {css:'#childTrainingEntry{display:none!important}',
+          note:'Gabor 感知学习：单图、三图、清晰图、移图四种，难度自动调整（提升对比敏感度和分辨力）。电脑上点开始后会全屏，按 Esc 结束。'},
+  rec:   {route:'#/records', note:'Gabor 训练、弱视小游戏的难度曲线，以及视觉测试的趋势图，都在这里。'}
+};
+function eyeFrameHtml(tab){
+  var kind = eyeFrameKind(tab), F = EYE_FRAMES[kind], route = F.route || (eyeTouch() ? '#/mobile' : '#/training');
+  var sub = tab === 'gabor' ? '<div class="eg-opts" style="flex:none">' + [['train','🎯 训练'],['rec','📈 训练数据']].map(function(o){
+      return '<button class="eg-opt'+((S.eyeGab||'train')===o[0]?' on':'')+'" onclick="S.eyeGab=\''+o[0]+'\';save();pgEye()">'+o[1]+'</button>'; }).join('') + '</div>' : '';
+  return '<div class="eye-bar">'+sub+'<small>'+F.note+' 记录只存在这台设备的浏览器里。</small>'
     + '<button class="dk-btn" onclick="var f=document.querySelector(\'.eye-frame\');if(f)f.src=f.src">↻ 刷新</button></div>'
-    + '<iframe class="eye-frame" src="oraen/index.html#/testing" onload="eyeTestEmbed(this)" allow="fullscreen" allowfullscreen title="视觉测试"></iframe>';
+    + '<iframe class="eye-frame" data-kind="'+kind+'" data-route="'+route+'" src="oraen/index.html'+route+'" onload="eyeFrameEmbed(this)" allow="fullscreen" allowfullscreen title="开源视觉"></iframe>';
 }
-function eyeTestEmbed(f){
+function eyeFrameEmbed(f){
   try{
-    var d = f.contentDocument, w = f.contentWindow; if(!d || !w) return;
+    var d = f.contentDocument, w = f.contentWindow, kind = f.getAttribute('data-kind'), route = f.getAttribute('data-route'), F = EYE_FRAMES[kind] || {};
+    if(!d || !w) return;
     if(!d.getElementById('khEmbed')){
       var st = d.createElement('style'); st.id = 'khEmbed';
-      st.textContent = '.sidebar,#menuButton{display:none!important}.app-shell{grid-template-columns:1fr!important}.main-column{grid-column:1!important}';
+      st.textContent = '.sidebar,#menuButton{display:none!important}.app-shell{grid-template-columns:1fr!important}.main-column{grid-column:1!important}' + (F.css || '');
       (d.head || d.documentElement).appendChild(st);
     }
-    var fix = function(){ if(!/^#\/testing/.test(w.location.hash)) w.location.hash = '#/testing'; };
+    var re = new RegExp('^' + route.replace(/[\/#]/g, '\\$&'));
+    var fix = function(){ if(!re.test(w.location.hash)) w.location.hash = route; };
     if(!w._khFix){ w._khFix = 1; w.addEventListener('hashchange', fix); }
     fix();
+    if(kind === 'kids'){                                         // 同意协议、页面准备好以后，自动打开小游戏列表
+      var n = 0, tm = setInterval(function(){
+        n++;
+        try{
+          var shell = d.querySelector('.app-shell'), entry = d.getElementById('childTrainingEntry'), hub = d.getElementById('childGameHub');
+          if(shell && !shell.inert && entry && hub && hub.classList.contains('hidden')) entry.click();
+          if((hub && !hub.classList.contains('hidden')) || n > 600 || !document.body.contains(f)) clearInterval(tm);
+        }catch(e){ clearInterval(tm); }
+      }, 300);
+    }
   }catch(e){}
 }
 
-/* —— 弱视小游戏：开源视觉里的十二个小游戏（只显示小游戏板块）—— */
-function eyeKidsHtml(){
-  return '<div class="eye-bar"><small>开源视觉的十二个弱视小游戏：低对比、方向、拥挤、位置、运动、轮廓、记忆、追踪、深度等。每局 24 题，连续答对两题升一级，答错一题降一级。其中红蓝合环、红蓝寻宝、红蓝深度球要戴红青眼镜。记录只存在这台设备的浏览器里。</small>'
-    + '<button class="dk-btn" onclick="var f=document.querySelector(\'.eye-frame\');if(f)f.src=f.src">↻ 刷新</button></div>'
-    + '<iframe class="eye-frame" src="oraen/index.html#/mobile" onload="eyeKidsEmbed(this)" allow="fullscreen" allowfullscreen title="弱视小游戏"></iframe>';
-}
-function eyeKidsEmbed(f){
+/* —— 训练记录：每 5 秒记一次正在做的训练（游戏、开源视觉页面、立体视、光栅/双眼分视）—— */
+var EYE_LOG_NAMES = {'tab:test':'🔍 视觉测试','tab:gabor':'🎯 Gabor训练','tab:kids':'🧸 弱视小游戏','tab:stereo':'🧊 立体视','grt:grating':'▥ 光栅刺激','grt:dich':'👓 双眼分视'};
+var _eyeLogN = 0;
+function eyeLog(){ if(!S.eyeLog || typeof S.eyeLog !== 'object') S.eyeLog = {}; return S.eyeLog; }
+function eyeLogTick(){
   try{
-    var d = f.contentDocument, w = f.contentWindow; if(!d || !w) return;
-    if(!d.getElementById('khEmbed')){
-      var st = d.createElement('style'); st.id = 'khEmbed';
-      st.textContent = '.sidebar,#menuButton,.topbar,#childHubBack{display:none!important}.app-shell{grid-template-columns:1fr!important}.main-column{grid-column:1!important}'
-        + '#mobilePage > :not(#childGameHub):not(#childTutorial):not(#childGlassesSetup):not(#childGamePanel){display:none!important}';
-      (d.head || d.documentElement).appendChild(st);
-    }
-    var fix = function(){ if(!/^#\/mobile/.test(w.location.hash)) w.location.hash = '#/mobile'; };
-    if(!w._khFix){ w._khFix = 1; w.addEventListener('hashchange', fix); }
-    fix();
-    var n = 0, tm = setInterval(function(){                      // 同意协议、页面准备好以后，自动打开小游戏列表
-      n++;
-      try{
-        var shell = d.querySelector('.app-shell'), entry = d.getElementById('childTrainingEntry'), hub = d.getElementById('childGameHub');
-        if(shell && !shell.inert && entry && hub && hub.classList.contains('hidden')) entry.click();
-        if((hub && !hub.classList.contains('hidden')) || n > 600 || !document.body.contains(f)) clearInterval(tm);
-      }catch(e){ clearInterval(tm); }
-    }, 300);
+    if(document.hidden || typeof S === 'undefined') return;
+    var keys = [];
+    if(EG && !EG.paused && !EG.over) keys.push(EG.game);
+    else if(cur === 'eye' && ['test','gabor','kids','stereo'].indexOf(_eyeTab) >= 0) keys.push('tab:' + _eyeTab);
+    var c = grtCfg(); if(c.on) keys.push(c.mode === 'dich' ? 'grt:dich' : 'grt:grating');
+    if(!keys.length) return;
+    var L = eyeLog(), td = today(), dd = L[td] || (L[td] = {sec:0, items:{}});
+    dd.sec += 5; keys.forEach(function(k){ dd.items[k] = (dd.items[k] || 0) + 5; });
+    var ds = Object.keys(L).sort(); while(ds.length > 90) delete L[ds.shift()];
+    if(++_eyeLogN % 6 === 0) save();
   }catch(e){}
+}
+setInterval(eyeLogTick, 5000);
+function eyeLogName(k){ return EYE_LOG_NAMES[k] || (EG_INFO[k] ? EG_INFO[k].e+' '+EG_INFO[k].n : k); }
+
+/* —— 训练方案：按临床常规顺序分四个阶段，阶段由家长根据复查结果切换 —— */
+var EYE_STAGES = [
+  {n:'① 增视期', d:'提升弱视眼视力（配合遮盖治疗）。以精细刺激、Gabor、对比敏感度、拥挤为主。', items:[
+    ['▥ 光栅刺激（视力训练）', "_grtTab='grating';grtPanel()"], ['🎯 Gabor 训练', "eyeTab('gabor')"], ['🧸 弱视小游戏：星光捕手、方向森林、缺口侦探', "eyeTab('kids')"],
+    ['⚡ 视觉刺激游戏（任选 1–2 个）', "eyeTab('stim')"], ['🀄 拥挤认字', "egStart('crowd')"], ['✏️ 描点连线', "egStart('dots')"]]},
+  {n:'② 同时视', d:'视力上来后，让两只眼睛同时接收画面（戴红蓝眼镜）。', items:[
+    ['🐦 捕鸟入笼', "egStart('cage')"], ['🐞 抓虫子', "egStart('bug')"], ['👓 双眼分视（看视频、看页面时用）', "_grtTab='dich';grtPanel()"],
+    ['🧸 弱视小游戏：红蓝寻宝', "eyeTab('kids')"], ['🧱 打砖块 / 🐍 贪吃蛇', "eyeTab('rb')"]]},
+  {n:'③ 融合视', d:'把两只眼睛看到的像融合成一个。', items:[
+    ['🎯 融合集合/散开', "egStart('verge')"], ['🧸 弱视小游戏：红蓝合环', "eyeTab('kids')"], ['🧊 立体视：彩色图（简单）', "S.stereo=S.stereo||{};S.stereo.mode='easy';eyeTab('stereo')"], ['🌀 迷宫', "egStart('maze')"]]},
+  {n:'④ 立体视', d:'建立深度感知，防止复发。', items:[
+    ['🧊 立体视：立体图（进阶）', "S.stereo=S.stereo||{};S.stereo.mode='stereo';eyeTab('stereo')"], ['🧸 弱视小游戏：红蓝深度球', "eyeTab('kids')"], ['🎯 融合集合/散开（巩固）', "egStart('verge')"]]}
+];
+var EYE_DAILY = [['🔢 舒尔特方格', "egStart('schulte')"], ['⭐ 跳跳星（扫视）', "egStart('jump')"], ['🔍 视觉测试（每 1–2 周一次）', "eyeTab('test')"]];
+function eyePlanHtml(){
+  var L = eyeLog(), td = today(), dd = L[td] || {sec:0, items:{}}, min = Math.round(dd.sec/60), stage = S.eyeStage || 0, st = EYE_STAGES[stage];
+  var pct = Math.min(100, Math.round(min/20*100));
+  var items = Object.keys(dd.items).sort(function(a, b){ return dd.items[b] - dd.items[a]; }).map(function(k){
+    return '<div class="ep-li"><span>'+eyeLogName(k)+'</span><b>'+Math.max(1, Math.round(dd.items[k]/60))+' 分钟</b></div>'; }).join('') || '<div class="eg-note">今天还没有训练记录。</div>';
+  var days = [], mx = 20;
+  for(var i=13; i>=0; i--){ var k = new Date(Date.now() - i*864e5).toISOString().slice(0,10); var m = L[k] ? Math.round(L[k].sec/60) : 0; mx = Math.max(mx, m); days.push([(+k.slice(5,7))+'/'+(+k.slice(8,10)), m, k === td]); }
+  var bars = days.map(function(x){ return '<div class="ep-bar'+(x[2]?' on':'')+'"><i style="height:'+Math.round(x[1]/mx*100)+'%"></i><b>'+(x[1]||'')+'</b><span>'+x[0]+'</span></div>'; }).join('');
+  var go = function(o){ return '<button class="ep-go" onclick="'+o[1].replace(/"/g,'&quot;')+'">'+o[0]+' <em>▶</em></button>'; };
+  return '<div class="ep-wrap">'
+    + '<div class="eg-card"><h3>📅 今天的训练</h3>'
+    + '<div class="ep-today"><b>'+min+'</b> 分钟 <small>建议每次 15–20 分钟，每天 1–2 次，练完休息眼睛、多去户外</small></div>'
+    + '<div class="ep-prog"><i style="width:'+pct+'%"></i></div>' + items
+    + '<h3 style="margin-top:16px">📊 最近两周（分钟）</h3><div class="ep-bars">'+bars+'</div>'
+    + '<p class="eg-note">视力测试的变化曲线在 <a href="javascript:void 0" onclick="S.eyeGab=\'rec\';eyeTab(\'gabor\')">🎯 Gabor训练 → 📈 训练数据</a> 里。</p></div>'
+    + '<div class="eg-card"><h3>🗺️ 训练方案</h3>'
+    + '<div class="eg-opts ep-stages">'+EYE_STAGES.map(function(x, i){ return '<button class="eg-opt'+(i===stage?' on':'')+'" onclick="S.eyeStage='+i+';save();pgEye()">'+x.n+'</button>'; }).join('')+'</div>'
+    + '<p class="eg-note">临床常规顺序：先 ① 增视期（精细刺激 + Gabor，配合遮盖），视力达标后再依次 ② 同时视 → ③ 融合视 → ④ 立体视。<b>现在处在哪个阶段，请按医生复查的结果来切换。</b></p>'
+    + '<div class="ep-stage"><b>'+st.n+'</b>：'+st.d+'</div>'
+    + '<div class="ep-gos">'+st.items.map(go).join('')+'</div>'
+    + '<div class="ep-stage" style="margin-top:12px"><b>每天都可以做</b>：视觉技巧和定期测视力</div><div class="ep-gos">'+EYE_DAILY.map(go).join('')+'</div>'
+    + '<p class="eg-note" style="margin-top:12px">⚠️ 训练时要戴矫正眼镜；红蓝项目要戴红蓝眼镜。开心兔只是家用辅助，不能代替散瞳验光、配镜、遮盖和定期复查；斜视、旁中心注视的训练方案不一样，请遵医嘱。</p></div>'
+    + '</div>';
 }
 
 /* —— 立体视（页面版，和「视力训练」弹窗里的立体视共用同一套题目和成绩）—— */
@@ -16187,6 +16296,11 @@ function egListHtml(cat){
       + sel('颜色', 'pal', [['mix','🔀 轮流随机']].concat(Object.keys(GRT_PAL).map(function(k){ return [k, GRT_PAL[k][2]]; })))
       + sel('背景闪烁', 'bgHz', [['0','不闪'],['1','1 次/秒'],['2','2 次/秒'],['3','3 次/秒']])
       + '<small>和「视力训练 · 光栅刺激」是同一套光栅。视力越低，图案越大、条纹越粗；红黄闪烁、黑白闪烁、三色刺激不受颜色影响。设置对所有视觉刺激游戏有效。</small></div></div>';
+  } else if(cat === 'skill'){
+    head = '<div class="eg-banner eg-banner-skill"><div class="eg-bi">🧠</div><div class="eg-bt"><h3>视觉技巧</h3>'
+      + '<p>练眼球运动、扫视、视觉广度、精细手眼和拥挤识别（很多弱视孩子认单个字清楚，一排字就看不清）。浅色背景，不用戴红蓝眼镜。</p></div>'
+      + '<div class="eg-bsets">' + sel('视力水平', 'va', [['low','低 0.0–0.1'],['ml','中低 0.2–0.4'],['mh','中高 0.5–0.6'],['high','高 0.7–0.9']])
+      + '<small>视力越低，数字、星星、字和小点越大。拥挤认字优先用「识字」里已经学过的字。</small></div></div>';
   } else {
     head = '<div class="eg-banner eg-banner-rb"><div class="eg-bi">👓</div><div class="eg-bt"><h3>红蓝眼镜游戏</h3>'
       + '<p>戴上红蓝眼镜玩：重要的东西只有<b>弱视眼（'+(c.amb==='L'?'左':'右')+'眼）</b>能看到，健眼只看到暗一点的东西，两只眼睛要一起合作才能玩好。</p></div>'
@@ -16328,7 +16442,7 @@ function egBg(E, g){
     var slot = Math.floor(t/20);
     if(E.mixSlot !== slot){
       E.mixSlot = slot;
-      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
+      var TL = ['stripe','check','rotate','pin','tri','ring','sine','drift'], PL = Object.keys(GRT_PAL), a, b;
       do { a = TL[egRnd(TL.length)]; } while(a === E.mixT);
       do { b = PL[egRnd(PL.length)]; } while(b === E.mixP);
       E.mixT = a; E.mixP = b;
@@ -16350,7 +16464,7 @@ function egStart(game){
   var pad = '';
   if(touch && gm.pad === 'dir') pad = '<div class="eg-pad"><span></span>'+B('▲','egDir(0,-1)')+'<span></span>'+B('◀','egDir(-1,0)')+'<span></span>'+B('▶','egDir(1,0)')+'<span></span>'+B('▼','egDir(0,1)')+'<span></span></div>';
   if(touch && gm.pad === 'tetris') pad = '<div class="eg-pad eg-pad-t">'+B('◀','egDir(-1,0)')+B('⟳','egDir(0,-1)')+B('▶','egDir(1,0)')+B('▼','egDir(0,1)')+B('⤓','egDir(0,1,\'swipe\')')+'</div>';
-  var w = document.createElement('div'); w.className = 'eg-full'+(gm.stim?' eg-stim':''); w.id = 'egFull';
+  var w = document.createElement('div'); w.className = 'eg-full'+(gm.stim||gm.plain?' eg-stim':''); w.id = 'egFull';
   w.innerHTML = '<div class="eg-hud"><b>'+EG_INFO[game].e+' '+EG_INFO[game].n+'</b><span id="egScore"></span><span id="egTime"></span>'
     + (gm.restart ? '<button onclick="egRestart()">🔄 换一关</button>' : '')
     + '<button id="egPauseBtn" onclick="egPause()">⏸ 暂停</button><button onclick="egStop()">✕ 退出</button></div>'
@@ -16396,9 +16510,9 @@ function egLoop(t){
   }
   if(!EG) return;
   var g = EG.g; g.setTransform(EG.dpr,0,0,EG.dpr,0,0);
-  if(gm.stim) egBg(EG, g); else { g.fillStyle = '#000'; g.fillRect(0, 0, EG.W, EG.H); }
+  if(gm.stim) egBg(EG, g); else if(gm.plain){ g.fillStyle = '#f6f3ff'; g.fillRect(0, 0, EG.W, EG.H); } else { g.fillStyle = '#000'; g.fillRect(0, 0, EG.W, EG.H); }
   gm.draw(EG, g);
-  if(!gm.stim){ g.strokeStyle = EG.col.both; g.lineWidth = 3; g.strokeRect(1.5, 1.5, EG.W-3, EG.H-3); }   // 两眼都能看到的边框，帮助双眼融合
+  if(!gm.stim && !gm.plain){ g.strokeStyle = EG.col.both; g.lineWidth = 3; g.strokeRect(1.5, 1.5, EG.W-3, EG.H-3); }   // 两眼都能看到的边框，帮助双眼融合
   egFlashDraw(EG, g, dt);
   var hud = gm.text(EG), m = Math.floor(EG.left/60), s = Math.floor(EG.left%60), tm = '⏱ '+m+':'+(s<10?'0':'')+s;
   if(hud + tm !== EG.hud){ EG.hud = hud + tm; $('egScore').textContent = hud; $('egTime').textContent = tm; }
@@ -16478,7 +16592,7 @@ function egFlashDraw(E, g, dt){
   E.flashT -= dt || 1/60;
   var sz = Math.round(Math.max(18, E.base*.05));
   g.globalAlpha = Math.max(0, Math.min(1, E.flashT*2));
-  if(EG_GAMES[E.game].stim) egPill(g, E.flash, E.W/2, E.H*.5, sz);
+  if(EG_GAMES[E.game].stim || EG_GAMES[E.game].plain) egPill(g, E.flash, E.W/2, E.H*.5, sz);
   else { g.fillStyle = E.col.both; g.font = '800 '+sz+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(E.flash, E.W/2, E.H*.5); }
   g.globalAlpha = 1;
 }
@@ -16671,6 +16785,226 @@ var EG_GAMES = {
     text: function(E){ return '🌀 第'+E.level+'关 · 🥕 '+E.score; }
   }
 };
+
+/* —— 视觉技巧（浅色背景）和新增红蓝眼镜游戏 —— */
+function eyeHzPool(){
+  var ks = Object.keys(S.learnedHz || {}).map(function(k){ var p = String(k).split('-'); return p[p.length-1]; }).filter(function(c){ return c && c.length === 1; });
+  ks = ks.filter(function(c, i){ return ks.indexOf(c) === i; });
+  return ks.length >= 12 ? ks : '山日月水火木土人口手大小上下中天地云雨风花草鸟鱼虫马牛羊米田目耳石竹门'.split('');
+}
+function egStar(g, x, y, r, fill){ g.save(); stShapePath(g, 'star', x, y, r); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r*.08); g.strokeStyle = '#7c2d12'; g.stroke(); g.restore(); }
+Object.assign(EG_GAMES, {
+  /* 🔢 舒尔特方格：按顺序点数字 */
+  schulte: {plain:1,
+    init: function(E){ E.times = []; this.next(E); },
+    next: function(E){
+      E.n = Math.min(5, 3 + Math.floor(E.score/3)); var N = E.n*E.n, a = [];
+      for(var i=1;i<=N;i++) a.push(i);
+      E.nums = egShuffle(a); E.want = 1; E.t0 = E.tt; E.wr = null; E.ok = {};
+    },
+    geo: function(E){ var c = Math.min(E.base*.2*E.vs, E.W*.9/E.n, (E.H*.86 - 40)/E.n); return {c:c, ox:(E.W - c*E.n)/2, oy:(E.H - c*E.n)/2 + 24}; },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var i = egGridHit(this.geo(E), E.n*E.n, E.n, x, y); if(i < 0) return;
+      if(E.nums[i] === E.want){
+        E.ok[i] = 1; E.want++;
+        if(E.want > E.n*E.n){ var tm = E.tt - E.t0; E.lastT = tm; E.score++; egFlash('完成！用时 '+tm.toFixed(1)+' 秒'); var self = this; E.later = {t:1.2, fn:function(){ self.next(E); }}; }
+      } else if(!E.ok[i]) E.wr = {i:i, t:.4};
+    },
+    step: function(E, dt){ if(E.wr){ E.wr.t -= dt; if(E.wr.t <= 0) E.wr = null; } },
+    draw: function(E, g){
+      var G = this.geo(E), c = G.c, p = c*.05;
+      if(E.want <= E.n*E.n) egPill(g, '找：'+E.want, E.W/2, G.oy - 30, Math.max(16, E.base*.035));
+      for(var i=0;i<E.n*E.n;i++){
+        var x = G.ox + (i % E.n)*c, y = G.oy + Math.floor(i/E.n)*c;
+        if(E.wr && E.wr.i === i) x += Math.sin(E.wr.t*60)*c*.05;
+        g.fillStyle = E.ok[i] ? '#dcfce7' : '#ffffff'; egRR(g, x+p, y+p, c-2*p, c-2*p, c*.12); g.fill();
+        g.strokeStyle = (E.wr && E.wr.i === i) ? '#ef4444' : E.ok[i] ? '#22c55e' : '#c4b5fd'; g.lineWidth = 2; g.stroke();
+        g.fillStyle = E.ok[i] ? '#86efac' : '#1f2937'; g.font = '800 '+Math.round(c*.42)+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(E.nums[i], x + c/2, y + c/2 + c*.02);
+      }
+    },
+    text: function(E){ return '🔢 完成 '+E.score+' 张'+(E.lastT ? ' · 上一张 '+E.lastT.toFixed(1)+' 秒' : ''); }
+  },
+
+  /* ⭐ 跳跳星：左右交替出现，练扫视 */
+  jump: {plain:1,
+    init: function(E){ E.miss = 0; E.side = 0; E.pops = []; this.spawn(E); },
+    spawn: function(E){
+      var r = Math.max(E.base*.028, E.base*.075*E.vs - E.score*E.base*.0012);
+      E.side = 1 - E.side;
+      E.st = {x: (E.side ? .55 + Math.random()*.38 : .07 + Math.random()*.38)*E.W, y: (.12 + Math.random()*.76)*E.H, r:r, life: Math.max(.9, 2.8 - E.score*.04)/E.sp, max:0};
+      E.st.max = E.st.life;
+    },
+    tap: function(E, x, y){
+      if(x == null) return;
+      if(Math.hypot(x - E.st.x, y - E.st.y) < E.st.r*1.6 + 10){ E.score++; E.pops.push({x:E.st.x, y:E.st.y, r:E.st.r, t:0}); this.spawn(E); }
+    },
+    step: function(E, dt){
+      E.st.life -= dt; if(E.st.life <= 0){ E.miss++; this.spawn(E); }
+      E.pops = E.pops.filter(function(p){ p.t += dt; return p.t < .4; });
+    },
+    draw: function(E, g){
+      g.strokeStyle = 'rgba(124,92,255,.25)'; g.lineWidth = 2; g.beginPath(); g.moveTo(E.W/2, 20); g.lineTo(E.W/2, E.H - 20); g.stroke();
+      var s = E.st, k = Math.max(0, s.life/s.max);
+      egStar(g, s.x, s.y, s.r, '#facc15');
+      g.strokeStyle = '#a78bfa'; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, s.r*1.45, -Math.PI/2, -Math.PI/2 + k*Math.PI*2); g.stroke();
+      E.pops.forEach(function(p){ g.strokeStyle = '#f59e0b'; g.lineWidth = 3; g.globalAlpha = 1 - p.t/.4; g.beginPath(); g.arc(p.x, p.y, p.r*(1 + p.t*3), 0, 7); g.stroke(); g.globalAlpha = 1; });
+    },
+    text: function(E){ return '⭐ 点到 '+E.score+' · 跑掉 '+E.miss; }
+  },
+
+  /* 🀄 拥挤认字：一排字中间那个是什么 */
+  crowd: {plain:1,
+    init: function(E){ E.pool = eyeHzPool(); this.next(E); },
+    next: function(E){
+      var lv = E.score;
+      E.sz = Math.max(E.base*.055, E.base*.15*E.vs - lv*E.base*.005);
+      E.gap = Math.max(.04, .75 - lv*.06);
+      var pool = egShuffle(E.pool.slice()); E.row = pool.slice(0, 5);
+      var tg = E.row[2], others = pool.slice(5, 7);
+      E.opts = egShuffle([tg, E.row[1], E.row[3]].concat(others.slice(0, 1)));
+      E.res = null; E.pick = -1;
+    },
+    geo: function(E){ var os = Math.min(E.base*.17, (E.W*.86)/4.6); return {os:os, gap:os*.2, ox:(E.W - (4*os + 3*os*.2))/2, oy:E.H*.9 - os}; },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var G = this.geo(E);
+      for(var i=0;i<4;i++){
+        var ox = G.ox + i*(G.os + G.gap);
+        if(x >= ox && x <= ox + G.os && y >= G.oy && y <= G.oy + G.os){
+          var ok = E.opts[i] === E.row[2], self = this; E.pick = i; E.res = ok ? 'ok' : 'no';
+          if(ok){ E.score++; try{ speak(E.row[2], 'zh'); }catch(e){} }
+          E.later = {t: ok ? .8 : 1.5, fn:function(){ self.next(E); }}; return;
+        }
+      }
+    },
+    step: function(){},
+    draw: function(E, g){
+      var sz = E.sz, step = sz*(1 + E.gap), cx = E.W/2, cy = E.H*.36;
+      g.fillStyle = '#1f2937'; g.font = '500 '+Math.round(sz)+'px "Kaiti SC","STKaiti","KaiTi",serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      for(var i=0;i<5;i++) g.fillText(E.row[i], cx + (i - 2)*step, cy);
+      g.fillStyle = '#7c3aed'; g.beginPath(); g.moveTo(cx - sz*.18, cy - sz*1.05); g.lineTo(cx + sz*.18, cy - sz*1.05); g.lineTo(cx, cy - sz*.75); g.closePath(); g.fill();
+      egPill(g, E.res === 'ok' ? '答对啦！🎉' : E.res === 'no' ? '中间那个是「'+E.row[2]+'」' : '箭头下面是哪个字？', E.W/2, E.H*.6, Math.max(15, E.base*.032));
+      var G = this.geo(E);
+      for(var j=0;j<4;j++){
+        var ox = G.ox + j*(G.os + G.gap), right = E.opts[j] === E.row[2];
+        g.fillStyle = '#fff'; egRR(g, ox, G.oy, G.os, G.os, G.os*.16); g.fill();
+        g.strokeStyle = E.pick === j ? (E.res === 'ok' ? '#22c55e' : '#ef4444') : (E.res === 'no' && right ? '#22c55e' : '#c4b5fd'); g.lineWidth = 3; g.stroke();
+        g.fillStyle = '#1f2937'; g.font = '500 '+Math.round(G.os*.6)+'px "Kaiti SC","STKaiti","KaiTi",serif'; g.fillText(E.opts[j], ox + G.os/2, G.oy + G.os/2);
+      }
+    },
+    text: function(E){ return '🀄 认对 '+E.score+' 个'; }
+  },
+
+  /* ✏️ 描点连线：按顺序连小点 */
+  dots: {plain:1,
+    init: function(E){ this.next(E); },
+    resize: function(E){ this.next(E); },
+    next: function(E){
+      var n = Math.min(15, 5 + E.score), pts = [], tries = 0, m = E.base*.08, md = E.base*.12;
+      while(pts.length < n && tries++ < 3000){
+        var p = {x: m + Math.random()*(E.W - 2*m), y: m + 20 + Math.random()*(E.H - 2*m - 20)};
+        if(pts.every(function(q){ return Math.hypot(p.x - q.x, p.y - q.y) > md; })) pts.push(p);
+      }
+      E.pts = pts; E.want = 0; E.wr = null;
+      E.r = Math.max(E.base*.009, E.base*.026*E.vs - E.score*E.base*.0012);
+    },
+    tap: function(E, x, y){
+      if(x == null || E.later) return;
+      var best = -1, bd = 1e9;
+      E.pts.forEach(function(p, i){ var d = Math.hypot(p.x - x, p.y - y); if(d < bd){ bd = d; best = i; } });
+      if(best < 0 || bd > Math.max(E.r*3, 22)) return;
+      if(best === E.want){
+        E.want++;
+        if(E.want === E.pts.length){ E.score++; egFlash('连好啦！'); var self = this; E.later = {t:1, fn:function(){ self.next(E); }}; }
+      } else if(best > E.want) E.wr = {i:best, t:.45};
+    },
+    step: function(E, dt){ if(E.wr){ E.wr.t -= dt; if(E.wr.t <= 0) E.wr = null; } },
+    draw: function(E, g){
+      var P = E.pts;
+      g.strokeStyle = '#7c3aed'; g.lineWidth = Math.max(2, E.r*.6); g.lineCap = 'round'; g.beginPath();
+      for(var i=0;i<E.want;i++){ if(i === 0) g.moveTo(P[0].x, P[0].y); else g.lineTo(P[i].x, P[i].y); }
+      if(E.want === P.length && P.length) g.lineTo(P[0].x, P[0].y);
+      g.stroke();
+      var fs = Math.max(13, E.base*.028*E.vs);
+      P.forEach(function(p, i){
+        var done = i < E.want, nx = i === E.want, bad = E.wr && E.wr.i === i;
+        g.fillStyle = bad ? '#ef4444' : done ? '#22c55e' : '#1f2937'; g.beginPath(); g.arc(p.x, p.y, E.r, 0, 7); g.fill();
+        if(nx){ g.strokeStyle = 'rgba(124,58,237,.5)'; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, E.r*2.4, 0, 7); g.stroke(); }
+        g.fillStyle = done ? '#16a34a' : '#374151'; g.font = '800 '+Math.round(fs)+'px sans-serif'; g.textAlign = 'left'; g.textBaseline = 'bottom';
+        g.fillText(i + 1, p.x + E.r + 3, p.y - E.r - 1);
+      });
+    },
+    text: function(E){ return '✏️ 连好 '+E.score+' 张'; }
+  },
+
+  /* 🐦 捕鸟入笼（同时视）：笼子只给弱视眼看，小鸟只给健眼看 */
+  cage: {
+    init: function(E){ E.bx = E.W*.2; E.by = E.H*.5; E.hold = 0; this.place(E); },
+    place: function(E){
+      E.cr = Math.max(E.base*.08, E.base*.17 - E.score*E.base*.006);
+      E.cx = E.cr + Math.random()*(E.W - 2*E.cr); E.cy = E.cr*1.2 + Math.random()*(E.H - 2.4*E.cr);
+      var sp = E.score >= 4 ? E.base*.12*E.sp*Math.min(1.5, (E.score - 3)/4) : 0, a = Math.random()*6.3;
+      E.cvx = Math.cos(a)*sp; E.cvy = Math.sin(a)*sp;
+    },
+    move: function(E, x, y, down){ if(down){ E.bx = x; E.by = y; } },
+    tap: function(E, x, y){ if(x != null){ E.bx = x; E.by = y; } },
+    dir: function(E, dx, dy){ E.bx += dx*E.base*.04; E.by += dy*E.base*.04; },
+    step: function(E, dt){
+      E.cx += E.cvx*dt; E.cy += E.cvy*dt;
+      if(E.cx < E.cr || E.cx > E.W - E.cr) E.cvx = -E.cvx; if(E.cy < E.cr || E.cy > E.H - E.cr) E.cvy = -E.cvy;
+      if(Math.hypot(E.bx - E.cx, E.by - E.cy) < E.cr*.5){ E.hold += dt; if(E.hold > .6){ E.score++; E.hold = 0; egFlash('🎉 进笼啦！'); this.place(E); } }
+      else E.hold = 0;
+    },
+    draw: function(E, g){
+      var C = E.col, r = E.cr;
+      g.strokeStyle = C.weak; g.lineWidth = Math.max(3, r*.07);
+      egRR(g, E.cx - r*.8, E.cy - r*.75, r*1.6, r*1.6, r*.12); g.stroke();
+      g.beginPath(); g.arc(E.cx, E.cy - r*.75, r*.8, Math.PI, 0); g.stroke();
+      for(var i=1;i<5;i++){ var xx = E.cx - r*.8 + i*r*1.6/5; g.beginPath(); g.moveTo(xx, E.cy - r*.75 - Math.sqrt(Math.max(0, r*r*.64 - Math.pow(xx - E.cx, 2))) ); g.lineTo(xx, E.cy + r*.85); g.stroke(); }
+      if(E.hold > 0){ g.strokeStyle = C.both; g.lineWidth = 4; g.beginPath(); g.arc(E.cx, E.cy, r*1.15, -Math.PI/2, -Math.PI/2 + E.hold/.6*Math.PI*2); g.stroke(); }
+      var b = r*.32;
+      g.fillStyle = C.strong; g.beginPath(); g.ellipse(E.bx, E.by, b, b*.78, 0, 0, 7); g.fill();
+      g.beginPath(); g.arc(E.bx + b*.7, E.by - b*.55, b*.45, 0, 7); g.fill();
+      g.beginPath(); g.moveTo(E.bx + b*1.05, E.by - b*.65); g.lineTo(E.bx + b*1.5, E.by - b*.5); g.lineTo(E.bx + b*1.05, E.by - b*.35); g.fill();
+      g.beginPath(); g.moveTo(E.bx - b*.8, E.by); g.lineTo(E.bx - b*1.5, E.by - b*.5); g.lineTo(E.bx - b*1.4, E.by + b*.4); g.fill();
+      g.fillStyle = '#000'; g.beginPath(); g.arc(E.bx + b*.82, E.by - b*.62, b*.09, 0, 7); g.fill();
+    },
+    text: function(E){ return '🐦 进笼 '+E.score+' 只'; }
+  },
+
+  /* 🎯 融合集合/散开（融合视）：两个圆慢慢拉开，记下还能融合成一个的最大距离 */
+  verge: {
+    init: function(E){ E.dir = 1; E.sep = 0; E.best = {}; E.best[1] = 0; E.best[-1] = 0; E.hint = 1; },
+    tap: function(E){
+      if(E.later) return;
+      var v = Math.round(E.sep); if(v > E.best[E.dir]) E.best[E.dir] = v;
+      E.score++; egFlash((E.dir > 0 ? '集合' : '散开')+' 拉开 '+v+' 像素'); E.hint = 0;
+      E.sep = 0; E.dir = -E.dir;
+    },
+    step: function(E, dt){ E.sep = Math.min(E.base*.45, E.sep + E.base*.018*E.sp*dt); },
+    draw: function(E, g){
+      var c = grtCfg(), redLeft = c.redEye === 'L', C = egCols(true), cx = E.W/2, cy = E.H*.46, r = E.base*.12;
+      var lx = cx + E.dir*E.sep/2, rx = cx - E.dir*E.sep/2;          /* 集合：左眼的图往右、右眼的图往左（交叉）；散开相反 */
+      var redX = redLeft ? lx : rx, othX = redLeft ? rx : lx;
+      var weakIsRed = c.amb === c.redEye, red = 'rgb(255,0,0)', oth = c.glass === 'rc' ? 'rgb(0,255,255)' : 'rgb(0,0,255)';
+      g.globalCompositeOperation = 'lighter';
+      [[redX, red, weakIsRed], [othX, oth, !weakIsRed]].forEach(function(o){
+        g.strokeStyle = o[1]; g.fillStyle = o[1]; g.lineWidth = Math.max(4, r*.1);
+        g.beginPath(); g.arc(o[0], cy, r, 0, 7); g.stroke();
+        g.beginPath(); g.arc(o[0] + (o[2] ? -r*.4 : r*.4), cy + (o[2] ? -r*.4 : r*.4), r*.16, 0, 7); g.fill();
+      });
+      g.globalCompositeOperation = 'source-over';
+      g.fillStyle = C.both; g.font = '800 '+Math.round(Math.max(15, E.base*.032))+'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText((E.dir > 0 ? '集合' : '散开')+' · 已拉开 '+Math.round(E.sep)+' 像素', cx, E.H*.12);
+      g.font = '700 '+Math.round(Math.max(13, E.base*.026))+'px sans-serif';
+      g.fillText(E.hint ? '看到一个圆圈、里面有两个小点就对了；圆圈变成两个时，点一下屏幕' : '变成两个圆圈时点一下屏幕', cx, E.H*.84);
+      g.fillText('最好：集合 '+E.best[1]+' · 散开 '+E.best[-1]+' 像素', cx, E.H*.91);
+    },
+    text: function(E){ return '🎯 完成 '+E.score+' 次'; }
+  }
+});
 
 /* —— 视觉刺激游戏（背景是高对比度条纹/棋盘，图案放在半透明白底上）—— */
 EG_GAMES.snake.pad = 'dir'; EG_GAMES.maze.pad = 'dir';
