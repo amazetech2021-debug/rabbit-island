@@ -5796,8 +5796,14 @@ function grtLoop(now){
   key += '|' + ty + '|' + c.size + '|' + pk + '|' + W + 'x' + H;
   if(key === _grt.last) return;
   _grt.last = key;
-  var g = cv.getContext('2d'), s = c.size, P = GRT_PAL[pk];
-  g.setTransform(DPR, 0, 0, DPR, 0, 0); g.imageSmoothingEnabled = false;
+  var g = cv.getContext('2d');
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  grtDraw(g, W, H, t, ty, pk, c.size, c.hz, phase);
+}
+/* 光栅绘制（视力训练和视觉刺激游戏共用） */
+function grtDraw(g, W, H, t, ty, pk, s, hz, phase){
+  var P = GRT_PAL[pk] || GRT_PAL.ry, c = {hz:hz};
+  g.imageSmoothingEnabled = false;
   var A = phase ? P[1] : P[0], B = phase ? P[0] : P[1];
   g.fillStyle = B; g.fillRect(0,0,W,H);
   if(ty === 'stripe'){
@@ -15999,6 +16005,9 @@ function egCfg(){
   if(!e.min) e.min = 10;
   if(!e.va) e.va = 'mh';
   if(!e.bg) e.bg = 'stripe';
+  if(!e.pal) e.pal = 'ry';
+  if(e.bg === 'spin') e.bg = 'pin';
+  if(e.bg === 'bw'){ e.bg = 'stripe'; e.pal = 'bw'; }
   if(e.bgHz == null) e.bgHz = 0;
   if(!e.best || typeof e.best !== 'object') e.best = {};
   return e;
@@ -16078,9 +16087,10 @@ function egListHtml(cat){
       + '<p>在高对比度的条纹、棋盘背景上玩小游戏，唤醒沉睡的视觉细胞。不用戴红蓝眼镜；需要遮盖眼睛时请按医生的建议。</p></div>'
       + '<div class="eg-bsets">'
       + sel('视力水平', 'va', [['low','低 0.0–0.1'],['ml','中低 0.2–0.4'],['mh','中高 0.5–0.6'],['high','高 0.7–0.9']])
-      + sel('刺激背景', 'bg', [['stripe','红黄条纹'],['check','红黄棋盘'],['spin','旋转棋盘'],['bw','黑白条纹'],['mix','轮流'],['off','关闭']])
-      + sel('背景闪烁', 'bgHz', [['0','不闪'],['1','1 次/秒'],['2','2 次/秒']])
-      + '<small>视力越低，图案越大、背景条纹越粗。这些设置对所有视觉刺激游戏都有效。</small></div></div>';
+      + sel('光栅类型', 'bg', [['mix','🔀 轮流随机']].concat(GRT_TYPES.map(function(t){ return [t.k, t.e+' '+t.n]; })).concat([['off','关闭']]))
+      + sel('颜色', 'pal', [['mix','🔀 轮流随机']].concat(Object.keys(GRT_PAL).map(function(k){ return [k, GRT_PAL[k][2]]; })))
+      + sel('背景闪烁', 'bgHz', [['0','不闪'],['1','1 次/秒'],['2','2 次/秒'],['3','3 次/秒']])
+      + '<small>和「视力训练 · 光栅刺激」是同一套光栅。视力越低，图案越大、条纹越粗；红黄闪烁、黑白闪烁、三色刺激不受颜色影响。设置对所有视觉刺激游戏有效。</small></div></div>';
   } else {
     head = '<div class="eg-banner eg-banner-rb"><div class="eg-bi">👓</div><div class="eg-bt"><h3>红蓝眼镜游戏</h3>'
       + '<p>戴上红蓝眼镜玩：重要的东西只有<b>弱视眼（'+(c.amb==='L'?'左':'右')+'眼）</b>能看到，健眼只看到暗一点的东西，两只眼睛要一起合作才能玩好。</p></div>'
@@ -16214,23 +16224,25 @@ function egPill(g, text, x, y, size){
 }
 function egRnd(n){ return Math.floor(Math.random()*n); }
 function egShuffle(a){ for(var i=a.length-1;i>0;i--){ var j = egRnd(i+1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-/* 视觉刺激背景：红黄条纹 / 棋盘 / 旋转棋盘 / 黑白条纹 */
+/* 视觉刺激背景：和「视力训练 · 光栅刺激」同一套光栅类型和颜色 */
 function egBg(E, g){
-  var e = egCfg(), ty = e.bg, t = E.tt;
-  if(ty === 'mix') ty = ['stripe','check','spin','bw'][Math.floor(t/30) % 4];
+  var e = egCfg(), ty = e.bg, pk = e.pal, t = E.tt;
   if(ty === 'off'){ g.fillStyle = '#efeaff'; g.fillRect(0, 0, E.W, E.H); return; }
-  var s = Math.max(6, Math.round(E.base*({low:.085, ml:.064, mh:.048, high:.034})[e.va]));
-  var P = ty === 'bw' ? ['#000000','#ffffff'] : ['#ff1e1e','#fff200'];
-  var ph = e.bgHz ? Math.floor(t*e.bgHz*2) % 2 : 0, A = P[ph], B = P[1-ph];
-  g.fillStyle = B; g.fillRect(0, 0, E.W, E.H); g.fillStyle = A;
-  if(ty === 'stripe' || ty === 'bw'){ for(var x=0;x<E.W;x+=s*2) g.fillRect(x, 0, s, E.H); }
-  else if(ty === 'check'){ for(var y=0, r=0; y<E.H; y+=s, r++) for(var x2=(r%2)*s; x2<E.W; x2+=s*2) g.fillRect(x2, y, s, s); }
-  else {
-    var D = Math.hypot(E.W, E.H), n = Math.ceil(D/2/s)+1;
-    g.save(); g.translate(E.W/2, E.H/2); g.rotate(t*.22);
-    for(var yy=-n; yy<n; yy++) for(var xx=-n + ((yy+n)&1); xx<n; xx+=2) g.fillRect(xx*s, yy*s, s, s);
-    g.restore();
+  if(ty === 'mix' || pk === 'mix'){
+    var slot = Math.floor(t/20);
+    if(E.mixSlot !== slot){
+      E.mixSlot = slot;
+      var TL = ['stripe','check','rotate','pin','tri','ring'], PL = Object.keys(GRT_PAL), a, b;
+      do { a = TL[egRnd(TL.length)]; } while(a === E.mixT);
+      do { b = PL[egRnd(PL.length)]; } while(b === E.mixP);
+      E.mixT = a; E.mixP = b;
+    }
+    if(ty === 'mix') ty = E.mixT;
+    if(pk === 'mix') pk = E.mixP;
   }
+  var sz = Math.max(6, Math.round(E.base*({low:.085, ml:.064, mh:.048, high:.034})[e.va]));
+  var phase = e.bgHz ? Math.floor(t*e.bgHz*2) % 2 : 0;
+  g.save(); grtDraw(g, E.W, E.H, t, ty, pk, sz, e.bgHz, phase); g.restore();
 }
 
 /* —— 游戏引擎 —— */
