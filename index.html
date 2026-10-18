@@ -5751,7 +5751,10 @@ function dchSetMask(el, url){
 }
 function dchApply(on){
   var ids = ['dchA','dchF','dchC'];
-  if(!on){ ids.forEach(function(id){ var e=document.getElementById(id); if(e) e.remove(); }); clearInterval(_grt.maskT); _grt.maskT = 0; return; }
+  if(!on){ ids.concat(['dchG']).forEach(function(id){ var e=document.getElementById(id); if(e) e.remove(); }); clearInterval(_grt.maskT); _grt.maskT = 0; return; }
+  /* 先把页面变成黑白（保留亮度），再分红蓝：否则页面上原本是红色的字在红斑块里、蓝色的字在蓝斑块里会看不见 */
+  var gEl = document.getElementById('dchG');
+  if(!gEl){ gEl = document.createElement('div'); gEl.id = 'dchG'; gEl.className = 'dch'; gEl.style.zIndex = 9979; gEl.style.webkitBackdropFilter = gEl.style.backdropFilter = 'grayscale(1) contrast(1.15)'; document.body.appendChild(gEl); }
   var c = grtCfg(), col = dchColors(c);
   var els = ids.map(function(id, i){
     var e = document.getElementById(id);
