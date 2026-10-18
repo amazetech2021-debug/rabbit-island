@@ -841,16 +841,23 @@ body{
   background:var(--cream-1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--ink)}
 .hw-chars button.on{background:var(--purple);color:#fff;border-color:var(--purple)}
 @media(min-width:1000px){
-  .hw-layout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start}
+  .hw-layout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:stretch}
+  .hw-left{background:var(--paper);border-radius:22px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center}
+  .hw-left .hw-inrow{align-self:stretch}
+  .hw-right .hw-chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px}
+  .hw-right .hw-chars button{width:auto;aspect-ratio:1;height:auto}
   .hw-right{order:1;scrollbar-width:none}.hw-right::-webkit-scrollbar{display:none}.hw-left{order:2}
   .hw-right{margin-top:0;background:var(--paper);border-radius:22px;padding:18px 20px;box-shadow:var(--shadow);
-    max-height:calc(100vh - 210px);overflow-y:auto}
+    height:0;min-height:100%;overflow-y:auto;box-sizing:border-box}
 }
 @media(min-width:1100px){
   :root{--pz:1.2}
   #page > *{zoom:var(--pz)}
   #page > .hw-layout{zoom:1}
-  .hw-inrow,.hw-right{zoom:var(--pz)}
+  .hw-inrow{zoom:var(--pz)}
+  .hw-right .hw-chars{grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:10px}
+  .hw-right .hw-chars button{font-size:27px}
+  .hw-right > div:first-child{font-size:16px!important}
   .title{font-size:28px}
   #page[data-big] > *{zoom:calc(var(--pz) * 1.25)}
   #page[data-big] > .tabs,#page[data-big] > .tabwrap{zoom:var(--pz)}
@@ -9142,7 +9149,7 @@ function pgHanziWrite(units){
 
   // 已学汉字：按年级归类
   var _vw = window.innerWidth, _vh = window.innerHeight;   // 写字框尽量大：横屏按高度，竖屏按宽度
-  var HWS = Math.round(_vw >= 1000 ? Math.max(400, Math.min(700, _vh - 320, _vw*0.48)) : Math.max(300, Math.min(620, _vw - 48, _vh - 330)));
+  var HWS = Math.round(_vw >= 1000 ? Math.max(400, Math.min(680, _vh - 370, _vw*0.42)) : Math.max(300, Math.min(620, _vw - 48, _vh - 330)));
   var _grp = {}, _ord = [];
   learned.forEach(function(k){
     var p = String(k).split('-');
