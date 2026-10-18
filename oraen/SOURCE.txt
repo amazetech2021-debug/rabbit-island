@@ -1,0 +1,3 @@
+来源：https://github.com/oraen/oraenView （作者：慢手 / oraen）
+原样部署 public/ 目录，仅把 index.html 里的 4 个绝对路径改成相对路径以适配 GitHub Pages 子目录。
+作者声明：免费使用，禁止商用。仅供家庭自用。

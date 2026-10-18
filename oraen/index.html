@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111c44">
+  <meta name="description" content="Oraen View Gabor 视觉知觉训练研究原型">
+  <title>开源视觉 Oraen View</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell" inert>
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#/training" aria-label="开源视觉 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span>
+          <strong>开源视觉</strong>
+          <small>ORAEN VIEW</small>
+        </span>
+      </a>
+
+      <nav class="main-nav" aria-label="主导航">
+        <p class="nav-label">训练中心</p>
+        <a class="nav-item" href="#/training" data-route="training">
+          <span class="nav-icon" aria-hidden="true">◉</span>
+          <span>视觉训练</span>
+        </a>
+        <a class="nav-item" href="#/mobile" data-route="mobile">
+          <span class="nav-icon" aria-hidden="true">▯</span><span>掌上训练</span>
+        </a>
+        <a class="nav-item" href="#/testing" data-route="testing">
+          <span class="nav-icon" aria-hidden="true">◌</span>
+          <span>视觉测试</span>
+        </a>
+        <a class="nav-item" href="#/records" data-route="records">
+          <span class="nav-icon" aria-hidden="true">▥</span>
+          <span>训练数据</span>
+        </a>
+        <a class="nav-item" href="#/guide" data-route="guide">
+          <span class="nav-icon" aria-hidden="true">?</span>
+          <span>使用指引</span>
+        </a>
+        <a class="nav-item" href="#/about" data-route="about">
+          <span class="nav-icon" aria-hidden="true">◎</span>
+          <span>关于项目</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="avatar">OV</div>
+        <div>
+          <strong>本机训练用户</strong>
+          <small>数据仅保存在此浏览器</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" type="button" aria-label="打开导航">☰</button>
+        <div>
+          <p class="eyebrow" id="pageEyebrow">TRAINING CENTER</p>
+          <h1 id="pageTitle" tabindex="-1">视觉训练</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="storage-pill" title="所有训练数据都存储在本机 IndexedDB">
+            <span class="pulse-dot"></span>
+            IndexedDB 本地存储
+          </div>
+          <div class="date-chip" id="currentDate"></div>
+        </div>
+      </header>
+
+      <main class="page-container">
+        <section class="page active" id="trainingPage" data-page="training" aria-labelledby="trainingHeading">
+          <div class="training-header">
+            <div>
+              <span class="section-kicker">PERCEPTUAL LEARNING</span>
+              <h2 id="trainingHeading">选择今天的训练任务</h2>
+              <p>四类任务分别测量目标检测、侧向整合、对比辨别与位置辨别能力。</p>
+            </div>
+            <div class="protocol-chip">
+              <span>推荐计划</span>
+              <strong>自适应 · 16 试次</strong>
+            </div>
+          </div>
+
+          <div class="mode-grid" id="modeGrid" role="radiogroup" aria-label="训练模式">
+            <button class="mode-card selected" type="button" data-mode="mixed" role="radio" aria-checked="true">
+              <span class="mode-number">综合</span>
+              <span class="mode-symbol mixed-symbol"><i></i><i></i><i></i><i></i></span>
+              <strong>综合训练</strong>
+              <small>四种任务依次分段进行</small>
+            </button>
+            <button class="mode-card" type="button" data-mode="single" role="radio" aria-checked="false">
+              <span class="mode-number">01</span>
+              <span class="mode-symbol single-symbol"><i></i></span>
+              <strong>单图训练</strong>
+              <small>判断目标出现的帧</small>
+            </button>
+            <button class="mode-card" type="button" data-mode="triple" role="radio" aria-checked="false">
+              <span class="mode-number">02</span>
+              <span class="mode-symbol triple-symbol"><i></i><i></i><i></i></span>
+              <strong>三图训练</strong>
+              <small>寻找共线中间目标</small>
+            </button>
+            <button class="mode-card" type="button" data-mode="darker" role="radio" aria-checked="false">
+              <span class="mode-number">03</span>
+              <span class="mode-symbol darker-symbol"><i></i><i></i></span>
+              <strong>清晰图训练</strong>
+              <small>辨别更清晰的一帧</small>
+            </button>
+            <button class="mode-card" type="button" data-mode="shifted" role="radio" aria-checked="false">
+              <span class="mode-number">04</span>
+              <span class="mode-symbol shifted-symbol"><i></i><i></i><i></i></span>
+              <strong>移图训练</strong>
+              <small>判断中间目标偏移方向</small>
+            </button>
+          </div>
+
+          <div class="training-layout">
+            <section class="panel setup-panel" id="setupPanel">
+              <div class="panel-heading">
+                <div>
+                  <span class="section-kicker">SESSION SETUP</span>
+                  <h3>训练设置</h3>
+                </div>
+                <span class="status-badge ready">准备就绪</span>
+              </div>
+
+              <div class="setup-group session-type-group">
+                <label>运行方式</label>
+                <div class="segmented session-type-switch" id="sessionTypeSwitch">
+                  <button class="active" type="button" data-session-type="training" aria-pressed="true">正式训练</button>
+                  <button type="button" data-session-type="experience" aria-pressed="false" disabled>体验模式</button>
+                </div>
+                <p class="field-help" id="sessionTypeHelp">体验模式仅用于四个单项训练，不改变累计难度和正式训练统计。</p>
+              </div>
+
+              <div class="setup-group" id="trainingLengthGroup">
+                <label for="trialCount">训练长度 <span id="trialCountValue">每种 16 次 · 共 64 次</span></label>
+                <input id="trialCount" type="range" min="8" max="96" step="4" value="16">
+                <div class="range-labels"><span>最少 8 次</span><span>最多 96 次</span></div>
+              </div>
+
+              <div class="experience-settings hidden" id="experienceSettings">
+                <div class="experience-field">
+                  <label for="experienceDifficulty">固定难度 <span id="experienceDifficultyUnit">%</span></label>
+                  <input id="experienceDifficulty" type="number" inputmode="decimal">
+                </div>
+                <div class="experience-field">
+                  <label for="experienceTrialCount">体验次数 <span>试次</span></label>
+                  <input id="experienceTrialCount" type="number" inputmode="numeric" min="1" max="96" step="1" value="16">
+                </div>
+                <p class="field-help" id="experienceDifficultyHelp"></p>
+              </div>
+
+              <div class="mode-explanation" id="modeExplanation">
+                <span class="explanation-icon">◎</span>
+                <div>
+                  <strong>综合训练</strong>
+                  <p>单图、三图、清晰图、移图按固定顺序分段进行，每种分别完成所选训练长度。</p>
+                </div>
+              </div>
+
+              <div class="checklist">
+                <div><span>1</span><p><strong>保持稳定距离</strong><small>建议坐姿稳定并正对屏幕</small></p></div>
+                <div><span>2</span><p><strong>注视中央圆环</strong><small>刺激出现时不要追随图像</small></p></div>
+                <div><span>3</span><p><strong>看不清也要猜</strong><small>错误是阈值测量的一部分</small></p></div>
+              </div>
+
+              <button class="primary-button start-button" id="startTrainingButton" type="button">
+                <span>开始本次训练</span><b aria-hidden="true">→</b>
+              </button>
+            </section>
+
+            <section class="panel trainer-panel" id="trainerPanel">
+              <div class="trainer-toolbar">
+                <div>
+                  <span class="live-indicator"><i></i><span id="trainerStatus">等待开始</span></span>
+                  <strong id="activeModeLabel">综合训练</strong>
+                  <small class="escape-hint">按 Esc 结束训练并退出全屏</small>
+                </div>
+                <div class="trainer-metrics">
+                  <span><small>进度</small><b id="trialProgressText">0 / 16</b></span>
+                  <span><small>正确</small><b id="correctCountText">0</b></span>
+                  <span><small>当前阈值</small><b id="thresholdText">—</b></span>
+                </div>
+              </div>
+
+              <div class="progress-track" aria-hidden="true"><i id="trainingProgressBar"></i></div>
+
+              <div class="stimulus-stage" id="stimulusStage">
+                <canvas id="stimulusCanvas" width="960" height="540" aria-label="视觉刺激区域"></canvas>
+                <div class="fixation" id="fixation" aria-hidden="true"><i></i></div>
+                <div class="stage-message" id="stageMessage">
+                  <span class="stage-orbit"><i></i><i></i><i></i></span>
+                  <h3>训练区已准备</h3>
+                  <p>选择训练模式和长度后，点击“开始本次训练”。</p>
+                </div>
+                <div class="interval-label" id="intervalLabel"></div>
+                <div class="feedback-flash" id="feedbackFlash" aria-live="polite"></div>
+              </div>
+
+              <div class="response-area" id="responseArea" aria-live="polite">
+                <p id="responsePrompt">训练开始后在这里作答</p>
+                <div class="response-buttons temporal-buttons" id="temporalButtons">
+                  <button type="button" data-answer="1"><kbd>左键</kbd><span>第一帧</span></button>
+                  <button type="button" data-answer="2"><kbd>右键</kbd><span>第二帧</span></button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="page mobile-page" id="mobilePage" data-page="mobile" aria-labelledby="mobileHeading">
+          <div class="mobile-intro"><h2 id="mobileHeading">掌上训练</h2>
+            <p>每次尽量保持相同的屏幕尺寸、观看距离和光线，距离屏幕最好半米以上。双眼训练，无需遮盖；平时戴眼镜的话，训练时也请戴上。</p>
+          </div>
+          <div class="mobile-mode-list"><button type="button" data-mobile-mode="mixed"><strong>综合训练</strong><span>四种模式，各 64 次 →</span></button>
+<button type="button" data-mobile-mode="single"><strong>单图训练</strong><span>选出有图像的那一帧 →</span></button>
+<button type="button" data-mobile-mode="triple"><strong>三图训练</strong><span>选出有中间图像的那一帧 →</span></button>
+<button type="button" data-mobile-mode="darker"><strong>清晰图训练</strong><span>选出更清晰的那一帧 →</span></button>
+<button type="button" data-mobile-mode="shifted"><strong>移图训练</strong><span>判断中间图像偏向哪边 →</span></button>
+</div>
+            <section class="panel trainer-panel" data-mobile="trainerPanel">
+              <div class="trainer-toolbar">
+                <div>
+                  <span class="live-indicator" data-mobile="liveIndicator"><i></i><span data-mobile="status">等待开始</span></span>
+                  <strong data-mobile="activeModeLabel">综合训练</strong>
+                  <button type="button" id="mobileExit" class="secondary-button">结束训练</button>
+                </div>
+                <div class="trainer-metrics">
+                  <span><small>进度</small><b data-mobile="progressText">0 / 64</b></span>
+                  <span><small>正确率</small><b data-mobile="correctText">—</b></span>
+                  <span><small>当前阈值</small><b data-mobile="thresholdText">—</b></span>
+                </div>
+              </div>
+
+              <div class="progress-track" aria-hidden="true"><i data-mobile="progressBar"></i></div>
+
+              <div class="stimulus-stage" >
+                <canvas data-mobile="canvas" width="480" height="480" aria-label="视觉刺激区域"></canvas>
+                <div class="fixation" data-mobile="fixation" aria-hidden="true"><i></i></div>
+                <div class="stage-message" data-mobile="stageMessage">
+                  <span class="stage-orbit"><i></i><i></i><i></i></span>
+                  <h3>训练区已准备</h3>
+                  <p>选择训练模式和长度后，点击“开始本次训练”。</p>
+                </div>
+                <div class="interval-label" data-mobile="intervalLabel"></div>
+                <div class="feedback-flash" data-mobile="feedbackFlash" aria-live="polite"></div>
+              </div>
+
+              <div class="response-area"  aria-live="polite">
+                <p data-mobile="responsePrompt">训练开始后在这里作答</p>
+                <div class="response-buttons temporal-buttons" data-mobile="temporalButtons">
+                  <button type="button" data-answer="1"><kbd>左键</kbd><span>第一帧</span></button>
+                  <button type="button" data-answer="2"><kbd>右键</kbd><span>第二帧</span></button>
+                </div>
+              </div>
+            </section>
+          <button type="button" class="primary-button hidden" data-mobile="startButton"><span>再训练一次</span></button>
+          <a class="mobile-author-card" href="https://www.xiaohongshu.com/user/profile/687b5c52000000001d009b80" target="_blank" rel="noopener noreferrer" aria-label="查看开发者慢手的小红书主页（新窗口打开）">
+            <img src="images/author-avatar.jpg" alt="开发者慢手的头像" width="64" height="64">
+            <div><small>开发者</small><p>小红书：慢手</p><span>ID：49624205605</span></div>
+          </a>
+        </section>
+
+        <section class="page" id="testingPage" data-page="testing" aria-labelledby="testingHeading">
+          <div class="training-header">
+            <div>
+              <span class="section-kicker">LANDOLT C ASSESSMENT</span>
+              <h2 id="testingHeading">选择视觉测试项目</h2>
+              <p>使用八方向 Landolt C，通过自适应阶梯法分别测试左眼、右眼和双眼。</p>
+            </div>
+            <div class="protocol-chip">
+              <span>测试顺序</span>
+              <strong>左眼 → 右眼 → 双眼</strong>
+            </div>
+          </div>
+
+          <div class="mode-grid test-mode-grid" id="testModeGrid" role="radiogroup" aria-label="视觉测试项目">
+            <button class="mode-card selected" type="button" data-test-mode="size" role="radio" aria-checked="true">
+              <span class="mode-number">01</span><span class="test-mode-symbol">C</span>
+              <strong>大小测试</strong><small>测量最小可辨 C 尺寸</small>
+            </button>
+            <button class="mode-card" type="button" data-test-mode="contrast" role="radio" aria-checked="false">
+              <span class="mode-number">02</span><span class="test-mode-symbol faded">C</span>
+              <strong>深浅测试</strong><small>固定大小，测量对比度阈值</small>
+            </button>
+            <button class="mode-card" type="button" data-test-mode="crowded-size" role="radio" aria-checked="false">
+              <span class="mode-number">03</span><span class="test-mode-symbol matrix">CC<br>CC</span>
+              <strong>拥挤大小测试</strong><small>比较单 C 与 5×5 中心 C</small>
+            </button>
+            <button class="mode-card" type="button" data-test-mode="crowded-contrast" role="radio" aria-checked="false">
+              <span class="mode-number">04</span><span class="test-mode-symbol matrix faded">CC<br>CC</span>
+              <strong>拥挤深浅测试</strong><small>测量邻近图形造成的对比损失</small>
+            </button>
+          </div>
+
+          <div class="training-layout testing-layout">
+            <section class="panel setup-panel" id="testSetupPanel">
+              <div class="panel-heading">
+                <div><span class="section-kicker">TEST PROTOCOL</span><h3>测试说明</h3></div>
+                <span class="status-badge ready">自适应</span>
+              </div>
+              <div class="mode-explanation" id="testModeExplanation">
+                <span class="explanation-icon">C</span>
+                <div><strong>大小测试</strong><p>辨认 C 缺口方向；连续两次正确后缩小，连续两次错误后放大。</p></div>
+              </div>
+              <div class="test-protocol-list">
+                <div><span>1</span><p><strong>佩戴最佳矫正眼镜</strong><small>保持稳定观看距离；本测试不是验光。</small></p></div>
+                <div><span>2</span><p><strong>按提示遮盖非测试眼</strong><small>只在本次短时测试中遮盖，不代表治疗处方。</small></p></div>
+                <div><span>3</span><p><strong>辨认缺口方向</strong><small>同等难度连续两次同结果后才调整；可使用方向盘或键盘。</small></p></div>
+              </div>
+              <div class="calibration-note">
+                <strong>关于结果单位</strong>
+                <p>大小以浏览器 CSS px 记录；未校准屏幕物理尺寸和观看距离，因此不能直接换算为标准视力或 logMAR。</p>
+              </div>
+              <button class="primary-button start-button" id="startTestButton" type="button"><span>开始视觉测试</span><b aria-hidden="true">→</b></button>
+            </section>
+
+            <section class="panel trainer-panel test-runner-panel" id="testRunnerPanel">
+              <div class="trainer-toolbar">
+                <div>
+                  <span class="live-indicator" id="testLiveIndicator"><i></i><span id="testStatus">等待开始</span></span>
+                  <strong id="activeTestLabel">大小测试</strong>
+                  <small class="escape-hint">按 Esc 结束测试并退出全屏</small>
+                </div>
+                <div class="trainer-metrics">
+                  <span><small>当前眼别</small><b id="testEyeText">—</b></span>
+                  <span><small>本阶段试次</small><b id="testTrialText">0</b></span>
+                  <span><small>当前水平</small><b id="testLevelText">—</b></span>
+                </div>
+              </div>
+              <div class="progress-track" aria-hidden="true"><i id="testProgressBar"></i></div>
+              <div class="stimulus-stage test-stage" id="testStage">
+                <canvas id="testCanvas" width="960" height="540" aria-label="Landolt C 视觉测试区域"></canvas>
+                <div class="stage-message" id="testStageMessage">
+                  <span class="stage-orbit"><i></i><i></i><i></i></span>
+                  <h3>测试区已准备</h3><p>选择测试项目后点击“开始视觉测试”。</p>
+                </div>
+                <div class="feedback-flash" id="testFeedback" aria-live="polite"></div>
+              </div>
+              <div class="response-area test-response-area">
+                <p id="testResponsePrompt">测试开始后选择 C 的缺口方向</p>
+                <div class="direction-pad" id="testDirectionPad" aria-label="八方向答案">
+                  <button type="button" data-direction="up-left" aria-label="左上">↖</button>
+                  <button type="button" data-direction="up" aria-label="上">↑</button>
+                  <button type="button" data-direction="up-right" aria-label="右上">↗</button>
+                  <button type="button" data-direction="left" aria-label="左">←</button>
+                  <span aria-hidden="true">C</span>
+                  <button type="button" data-direction="right" aria-label="右">→</button>
+                  <button type="button" data-direction="down-left" aria-label="左下">↙</button>
+                  <button type="button" data-direction="down" aria-label="下">↓</button>
+                  <button type="button" data-direction="down-right" aria-label="右下">↘</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="page" id="recordsPage" data-page="records" aria-labelledby="recordsHeading">
+          <div class="records-header">
+            <div>
+              <span class="section-kicker">LOCAL TRAINING DATA</span>
+              <h2 id="recordsHeading">用户训练数据</h2>
+              <p>数据直接读取自当前浏览器的 IndexedDB，不会自动上传。</p>
+            </div>
+            <div class="records-actions">
+              <button class="secondary-button" id="refreshDataButton" type="button">刷新数据</button>
+              <button class="secondary-button" id="exportDataButton" type="button">导出 JSON</button>
+              <button class="danger-button" id="clearDataButton" type="button">清空数据</button>
+            </div>
+          </div>
+
+          <div class="records-platform" aria-label="训练数据来源">
+            <button type="button" data-records-platform="desktop" aria-pressed="true">电脑版</button>
+            <button type="button" data-records-platform="mobile" aria-pressed="false">掌上训练</button>
+          </div>
+          <p id="recordsPlatformHint">当前显示电脑版数据；导出和清空仅针对电脑版。</p>
+          <div class="kpi-grid">
+            <article class="kpi-card accent-blue">
+              <span>完成训练</span><strong id="totalSessionsKpi">0</strong><small>次会话</small>
+              <i>↗</i>
+            </article>
+            <article class="kpi-card accent-violet">
+              <span>累计试次</span><strong id="totalTrialsKpi">0</strong><small>次判断</small>
+              <i>∑</i>
+            </article>
+            <article class="kpi-card accent-cyan">
+              <span>平均正确率</span><strong id="accuracyKpi">—</strong><small>全部已完成训练</small>
+              <i>◎</i>
+            </article>
+            <article class="kpi-card accent-orange">
+              <span>累计时长</span><strong id="durationKpi">0</strong><small>分钟</small>
+              <i>◷</i>
+            </article>
+          </div>
+
+          <section class="panel current-difficulty-panel">
+            <div class="panel-heading">
+              <div><span class="section-kicker">ADAPTIVE LEVELS</span><h3>当前累计难度</h3></div>
+              <span class="subtle-badge">0–100 · 越高越难</span>
+            </div>
+            <div class="current-difficulty-grid" id="currentDifficultyGrid"></div>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="panel trend-panel">
+              <div class="panel-heading">
+                <div><span class="section-kicker">ACCURACY TREND</span><h3>正确率趋势</h3></div>
+                <span class="subtle-badge">最近 12 次</span>
+              </div>
+              <div class="chart-wrap" id="accuracyChart"></div>
+            </section>
+
+            <section class="panel mode-summary-panel">
+              <div class="panel-heading">
+                <div><span class="section-kicker">MODE SUMMARY</span><h3>各模式表现</h3></div>
+              </div>
+              <div class="mode-bars" id="modeSummary"></div>
+            </section>
+          </div>
+
+          <section class="panel vision-test-results-panel">
+            <div class="panel-heading">
+              <div><span class="section-kicker">VISION TEST HISTORY</span><h3>视觉测试结果</h3></div>
+              <span class="subtle-badge">左眼 · 右眼 · 双眼</span>
+            </div>
+            <div class="vision-test-charts" id="visionTestCharts"></div>
+            <div class="table-wrap vision-test-table-wrap">
+              <table>
+                <thead><tr><th>测试时间</th><th>测试项目</th><th>左眼</th><th>右眼</th><th>双眼</th><th>状态</th></tr></thead>
+                <tbody id="visionTestsTableBody"></tbody>
+              </table>
+              <div class="test-records-empty" id="visionTestsEmpty">完成视觉测试后，结果会显示在这里。</div>
+            </div>
+          </section>
+
+          <section class="panel sessions-panel">
+            <div class="panel-heading sessions-heading">
+              <div><span class="section-kicker">SESSION HISTORY</span><h3>训练会话记录</h3></div>
+              <label class="search-field">
+                <span aria-hidden="true">⌕</span>
+                <input id="sessionSearch" type="search" placeholder="搜索模式或日期">
+              </label>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>开始时间</th><th>训练模式</th><th>完成情况</th><th>正确率</th><th>训练时长</th><th>最终阈值</th><th></th></tr></thead>
+                <tbody id="sessionsTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="recordsEmptyState">
+                <span>▥</span><h3>还没有训练数据</h3><p>完成一次视觉训练后，会话和试次数据会显示在这里。</p>
+                <a href="#/training">开始第一次训练</a>
+              </div>
+            </div>
+            <div class="pagination" id="sessionsPagination" aria-label="训练会话分页"></div>
+          </section>
+
+          <section class="panel difficulty-trends-panel">
+            <div class="panel-heading">
+              <div><span class="section-kicker">DIFFICULTY HISTORY</span><h3>累计难度变化曲线</h3></div>
+              <span class="subtle-badge">纵轴为等效难度阶数 · 越高越难</span>
+            </div>
+            <div class="difficulty-trends-grid" id="difficultyTrendsGrid"></div>
+          </section>
+
+          <section class="panel trial-detail-panel hidden" id="trialDetailPanel">
+            <div class="panel-heading">
+              <div><span class="section-kicker">TRIAL DETAILS</span><h3 id="trialDetailTitle">试次明细</h3></div>
+              <button class="icon-button" id="closeTrialDetail" type="button" aria-label="关闭明细">×</button>
+            </div>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead><tr><th>#</th><th>模式</th><th>答案</th><th>结果</th><th>反应时间</th><th>训练参数</th></tr></thead>
+                <tbody id="trialsTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+        <section class="page guide-page" id="guidePage" data-page="guide" aria-labelledby="guideHeading">
+          <div class="training-header">
+            <div>
+              <h2 id="guideHeading">使用介绍</h2>
+              <p>看图作答。下面的例图画得比较明显，正式训练会越来越难。</p>
+            </div>
+          </div>
+
+          <section class="panel guide-preparation" aria-labelledby="guidePreparationHeading">
+            <h3 id="guidePreparationHeading">开始前</h3>
+            <ul>
+              <li>每次训练时尽量用同一块屏幕，保持屏幕尺寸、屏幕亮度、观看距离和室内光线一致。</li>
+              <li>眼睛离屏幕最好在半米以上（不强制），坐稳后尽量保持距离，不要为了看清而往前凑。</li>
+              <li>这四种训练都用双眼看，无需遮盖任何一只眼。平时戴眼镜的话，训练时也戴着。</li>
+              <li>建议每天训练半个小时以上，无特殊情况使用综合训练即可，最难的是坚持！！！。</li>
+            </ul>
+            <p class="guide-start">选好模式和次数，点“开始本次训练”；进入全屏预备画面后，再按一次鼠标左键开始。每题先看中央圆环，等画面消失、出现“等待作答”后，在训练区域按鼠标左键或右键，不用追着图案点。按 Esc 可结束本次训练。</p>
+          </section>
+
+          <div class="guide-grid">
+            <article class="panel guide-card">
+              <h3><span>01</span>单图训练</h3>
+              <p>先后闪过两帧，只有一帧有条纹图案。记住它出现在第几帧。</p>
+              <div class="guide-examples">
+                <figure><canvas width="400" height="280" data-guide-example="single-target" role="img" aria-label="第一帧：中央有一个条纹图案"></canvas><figcaption>第一帧：有图案</figcaption></figure>
+                <figure><canvas width="400" height="280" data-guide-example="single-blank" role="img" aria-label="第二帧：空白灰色背景"></canvas><figcaption>第二帧：没有图案</figcaption></figure>
+              </div>
+              <p class="guide-answer"><strong>第一帧有 → 点击鼠标左键　第二帧有 → 点击鼠标右键</strong></p>
+              <p class="guide-example-note">上图这个例子，按左键。</p>
+            </article>
+
+            <article class="panel guide-card">
+              <h3><span>02</span>三图训练</h3>
+              <p>两帧都有两侧的图案，只有一帧中间多出一个较淡的图案。看中间有没有，找出有三个图案的那一帧。</p>
+              <div class="guide-examples">
+                <figure><canvas width="400" height="280" data-guide-example="triple-empty" role="img" aria-label="第一帧：只有左右两个图案，中间空白"></canvas><figcaption>第一帧：中间没有</figcaption></figure>
+                <figure><canvas width="400" height="280" data-guide-example="triple-target" role="img" aria-label="第二帧：左右图案之间多出一个较淡的图案"></canvas><figcaption>第二帧：中间有图案</figcaption></figure>
+              </div>
+              <p class="guide-answer"><strong>第一帧有三个 → 点击鼠标左键　第二帧有三个 → 点击鼠标右键</strong></p>
+              <p class="guide-example-note">上图这个例子，按右键。图案也可能竖着排列，判断方法一样。</p>
+            </article>
+
+            <article class="panel guide-card">
+              <h3><span>03</span>清晰图训练</h3>
+              <p>两帧各有一个图案。比较哪一帧的条纹更明显、黑白反差更大，选更清晰的那一帧。</p>
+              <div class="guide-examples">
+                <figure><canvas width="400" height="280" data-guide-example="darker-faint" role="img" aria-label="第一帧：较淡、对比度较低的条纹图案"></canvas><figcaption>第一帧：较淡</figcaption></figure>
+                <figure><canvas width="400" height="280" data-guide-example="darker-clear" role="img" aria-label="第二帧：条纹更明显、对比度更高的图案"></canvas><figcaption>第二帧：更清晰</figcaption></figure>
+              </div>
+              <p class="guide-answer"><strong>第一帧更清晰 → 点击鼠标左键　第二帧更清晰 → 点击鼠标右键</strong></p>
+              <p class="guide-example-note">上图这个例子，按右键。前面三种模式都是先后显示两帧，这里并排放只是为了方便对照。</p>
+            </article>
+
+            <article class="panel guide-card">
+              <h3><span>04</span>移图训练</h3>
+              <p>只闪过一幅图，里面有三个图案。以两端的图案为参照，看中间那个往哪边偏。</p>
+              <div class="guide-examples">
+                <figure><canvas width="400" height="320" data-guide-example="up" role="img" aria-label="横排三个图案，中间图案向上偏移，应按鼠标左键"></canvas><figcaption>横排，中间偏上 → 点击鼠标左键</figcaption></figure>
+                <figure><canvas width="400" height="320" data-guide-example="down" role="img" aria-label="横排三个图案，中间图案向下偏移，应按鼠标右键"></canvas><figcaption>横排，中间偏下 → 点击鼠标右键</figcaption></figure>
+                <figure><canvas width="400" height="320" data-guide-example="left" role="img" aria-label="竖排三个图案，中间图案向左偏移，应按鼠标左键"></canvas><figcaption>竖排，中间偏左 → 点击鼠标左键</figcaption></figure>
+                <figure><canvas width="400" height="320" data-guide-example="right" role="img" aria-label="竖排三个图案，中间图案向右偏移，应按鼠标右键"></canvas><figcaption>竖排，中间偏右 → 点击鼠标右键</figcaption></figure>
+              </div>
+              <p class="guide-answer"><strong>偏上 / 偏左 → 左键　偏下 / 偏右 → 点击鼠标右键</strong></p>
+              <p class="guide-example-note">每题可能换排列方向，作答时也可以看画面下方的提示。</p>
+            </article>
+          </div>
+          <p class="guide-footer">想先熟悉操作，可以选一个单项，再选“体验模式”。综合训练会按上面的顺序，把四种模式各做一轮。</p>
+        </section>
+        <section class="page about-page" id="aboutPage" data-page="about" aria-labelledby="aboutHeading">
+          <article class="about-article">
+            <h2 id="aboutHeading">关于项目</h2>
+
+            <p>项目起源于一个在互联网公司工作的普通程序员，他一直以来也受到弱视的困扰。对他来说，事物的纹理和细节总是不容易看清，也经常认不清人脸。看电视时，他常常只能靠发型区分人物，有时甚至分不清一个人长得好不好看。这些是他日常生活里很具体的烦恼，也是他一直想把视力改善一点的原因。</p>
+
+            <p>为了治疗弱视，他去过很多医院，也问过很多医生，得到的答复大多是：成人弱视很难处理。尽管有些沮丧和失望，他也就一直没有完全放下这件事。后来，他在网上了解到一些针对成人弱视的训练方法，又开始查资料、找软件，总觉得还有希望。</p>
+
+            <p>看了一圈后，他发现这类软件完整训练下来基本都要几万元，而且效果不能保证。他有些犹豫：花这笔钱，是不是就能看得更清楚？如果没有改善呢？可就这样不试了，又觉得不甘心。于是他想，自己平时就是写程序的，不如先把这些训练的原理弄明白，看看能不能做一个给自己用。</p>
+
+            <p>接下来的一个月，他利用工作之外的时间，翻看了接近 50 篇当时最新的成人弱视研究报告和论文。他想知道弱视为什么会形成，成年后还有哪些改善的可能，也想弄清楚软件训练视力的底层原理是什么。慢慢了解了不同训练方法的原理后，他借助 AI，把自己的理解做成了一个可以在浏览器里使用的训练软件，也就是现在的 Oraen View。</p>
+
+            <p>原本他只是想做着自己用。过了大约三四个月，他惊喜地发现，双眼视力从原来的 0.5/0.6 提升到了 0.6/0.8。这个变化让他挺高兴。这其实远超过他的预期了（这只是个人经历，每个人体质不一样，弱视原因可能也不一样，也不能保证别人用了会有同样的结果）。</p>
+
+            <p>也正是这段经历，让他想把软件分享出来。他知道，应该还有一些成年人和自己一样，听过“很难治”，却还是想再找找办法；看到训练软件，又拿不准值不值得花这笔钱。既然自己已经做了一个，也用了这么久，不如放出来，让有需要的人不用先花钱就能试试。能不能帮到别人，他不敢保证，但希望自己花在这件事上的时间，也能对别人有一点用。</p>
+
+            <p>考虑到很多人不是程序员，不会自己编译运行代码，他贡献了自己的服务器资源，部署了一份在自己网站上 <a href="https://view.oraen.com/" target="_blank" rel="noopener noreferrer">https://view.oraen.com/</a>。所以，这个项目不以盈利为目的，完全免费，不会以任何形式向用户收取费用。他把源码发布在他的github上 <a href="https://github.com/oraen/oraenView" target="_blank" rel="noopener noreferrer">github.com/oraen/oraenView</a>，大家可以自行使用，但不能用于商业用途。训练记录保存在用户自己的浏览器里，不会自动上传，清理浏览器数据之前记得先导出备份。</p>
+
+            <p>不过从作者得到消息中，成人弱视经过训练后视力提高两行以上的人也不到三分之一，可能和个人情况有关。建议愿意尝试的人坚持三个月，再观察有没有变化。</p>
+
+            <p>说到底，作者也是一个想办法自救的弱视患者，自己没有医疗资质。没办法对软件的训练效果负责。 只能对自己分享的经历和信息的真实性负责。 这也是项目开源免费的其中一个原因</p>
+
+            <p><button class="agreement-link" id="reviewAgreement" type="button">查看使用协议</button></p>
+            <a class="mobile-author-card" href="https://www.xiaohongshu.com/user/profile/687b5c52000000001d009b80" target="_blank" rel="noopener noreferrer" aria-label="查看开发者慢手的小红书主页（新窗口打开）">
+              <img src="images/author-avatar.jpg" alt="开发者慢手的头像" width="64" height="64" loading="lazy">
+              <div><small>开发者</small><p>小红书：慢手</p><span>ID：49624205605</span></div>
+            </a>
+
+            <section class="official-miniprogram" aria-labelledby="officialMiniProgramHeading">
+              <div>
+                <span>WECHAT MINI PROGRAM</span>
+                <h3 id="officialMiniProgramHeading">官方小程序</h3>
+                <p>使用微信扫描小程序码，在手机上马上开始训练。</p>
+              </div>
+              <img src="images/official-mini-program.png" alt="开源视觉官方微信小程序码" width="180" height="180" loading="lazy">
+            </section>
+
+            <section class="about-references" aria-labelledby="referencesHeading">
+              <h3 id="referencesHeading">重要参考文献</h3>
+              <ol class="reference-list">
+                <li>
+                  <span class="reference-meta">Campbell 等 · 1978 · British Journal of Ophthalmology</span>
+                  <a href="https://doi.org/10.1136/bjo.62.11.748" target="_blank" rel="noopener noreferrer">Preliminary results of a physiologically based treatment of amblyopia.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Ciuffreda 等 · 1980 · British Journal of Ophthalmology</span>
+                  <a href="https://doi.org/10.1136/bjo.64.8.607" target="_blank" rel="noopener noreferrer">Lack of positive results of a physiologically based treatment of amblyopia.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Yeh 等 · 2021 · Scientific Reports</span>
+                  <a href="https://doi.org/10.1038/s41598-021-90936-7" target="_blank" rel="noopener noreferrer">Portable rotating grating stimulation for anisometropic amblyopia with 6 months training</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Khorrami-Nejad 等 · 2024 · Strabismus</span>
+                  <a href="https://doi.org/10.1080/09273972.2024.2353153" target="_blank" rel="noopener noreferrer">Comparison of Cambridge vision stimulator (CAM) therapy with passive occlusion therapy in the management of unilateral amblyopia; a randomized clinical trial</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Bodur 等 · 2026（2025 年在线发表） · Strabismus</span>
+                  <a href="https://doi.org/10.1080/09273972.2025.2579178" target="_blank" rel="noopener noreferrer">Evaluation of the effectiveness of Cambridge Visual Stimulator treatment in amblyopia patients: a retrospective study</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Polat 等 · 2004 · PNAS</span>
+                  <a href="https://doi.org/10.1073/pnas.0401200101" target="_blank" rel="noopener noreferrer">Improving vision in adult amblyopia by perceptual learning</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Levi 与 Li · 2009 · Vision Research</span>
+                  <a href="https://doi.org/10.1016/j.visres.2009.02.010" target="_blank" rel="noopener noreferrer">Perceptual learning as a potential treatment for amblyopia: a mini-review.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Huang 等 · 2009 · Journal of Vision</span>
+                  <a href="https://doi.org/10.1167/9.11.24" target="_blank" rel="noopener noreferrer">Mechanisms underlying perceptual learning of contrast detection in adults with anisometropic amblyopia</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Li 与 Levi · 2004 · Journal of Vision</span>
+                  <a href="https://doi.org/10.1167/4.6.7" target="_blank" rel="noopener noreferrer">Characterizing the mechanisms of improvement for position discrimination in adult amblyopia</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Sanayei 等 · 2018 · Nature Communications</span>
+                  <a href="https://doi.org/10.1038/s41467-018-06698-w" target="_blank" rel="noopener noreferrer">Perceptual learning of fine contrast discrimination changes neuronal tuning and population coding in macaque V4</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Zhou 等 · 2024 · Translational Vision Science &amp; Technology</span>
+                  <a href="https://doi.org/10.1167/tvst.13.1.16" target="_blank" rel="noopener noreferrer">Perceptual Learning Based on the Lateral Masking Paradigm in Anisometropic Amblyopia With or Without a Patching History</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Li RW 等 · 2011 · PLOS Biology</span>
+                  <a href="https://doi.org/10.1371/journal.pbio.1001135" target="_blank" rel="noopener noreferrer">Video-game play induces plasticity in the visual system of adults with amblyopia.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Li J 等 · 2013 · Current Biology</span>
+                  <a href="https://doi.org/10.1016/j.cub.2013.01.059" target="_blank" rel="noopener noreferrer">Dichoptic training enables the adult amblyopic brain to learn</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Vedamurthy 等 · 2015 · Scientific Reports</span>
+                  <a href="https://doi.org/10.1038/srep08482" target="_blank" rel="noopener noreferrer">Mechanisms of recovery of visual function in adult amblyopia through a tailored action video game</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Levi、Knill 与 Bavelier · 2015 · Vision Research</span>
+                  <a href="https://doi.org/10.1016/j.visres.2015.01.002" target="_blank" rel="noopener noreferrer">Stereopsis and amblyopia: A mini-review.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Li SL 等 · 2015 · Journal of AAPOS</span>
+                  <a href="https://doi.org/10.1016/j.jaapos.2015.08.003" target="_blank" rel="noopener noreferrer">Dichoptic movie viewing treats childhood amblyopia.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Holmes 等 · 2016 · JAMA Ophthalmology</span>
+                  <a href="https://doi.org/10.1001/jamaophthalmol.2016.4262" target="_blank" rel="noopener noreferrer">Effect of a Binocular iPad Game vs Part-time Patching in Children Aged 5 to 12 Years With Amblyopia</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Gao 等 · 2018 · JAMA Ophthalmology</span>
+                  <a href="https://doi.org/10.1001/jamaophthalmol.2017.6090" target="_blank" rel="noopener noreferrer">Effectiveness of a Binocular Video Game vs Placebo Video Game for Improving Visual Functions in Older Children, Teenagers, and Adults With Amblyopia</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Scheiman 等 · 2005 · Archives of Ophthalmology</span>
+                  <a href="https://doi.org/10.1001/archopht.123.4.437" target="_blank" rel="noopener noreferrer">Randomized trial of treatment of amblyopia in children aged 7 to 17 years.</a>
+                </li>
+                <li>
+                  <span class="reference-meta">Levi · 2020 · Vision Research</span>
+                  <a href="https://doi.org/10.1016/j.visres.2020.07.014" target="_blank" rel="noopener noreferrer">Rethinking amblyopia 2020.</a>
+                </li>
+              </ol>
+            </section>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="agreement-dialog" id="usageAgreement" open aria-labelledby="agreementTitle" aria-describedby="agreementIntro">
+    <header class="agreement-heading">
+      <h2 id="agreementTitle" tabindex="-1">软件使用协议</h2>
+      <p id="agreementIntro">使用 Oraen View 前，请阅读并同意以下约定。</p>
+      <small>版本 <span id="agreementVersion">2026-09-12.2</span></small>
+    </header>
+    <div class="agreement-text" id="agreementText" tabindex="0" role="region" aria-label="使用协议全文">
+      <p><strong>1. 完全免费。</strong>项目不以盈利为目的，源码公开，不会以任何形式向用户收取费用。也无法代替正规医疗流程</p>
+      <p><strong>2. 自主使用。</strong>用户自行判断是否需要和使用，作者分享的个人经历不代表其他人的使用结果。作者没有医疗相关资质无法对训练效果作保证。</p>
+      <p><strong>3. 禁止商用。</strong>本项目仅供非商业用途，不得用于收费训练、商业转售，或作为付费产品、服务的一部分。</p>
+      <p><strong>4. 训练数据。</strong>训练记录存储用户自己的浏览器缓存中，服务不会保存。请自行保管和备份数据。</p>
+    </div>
+    <footer class="agreement-actions">
+      <label id="agreementConsent" class="agreement-consent"><input id="agreementCheckbox" type="checkbox"> <span>我已阅读并同意以上协议，自愿使用本项目。</span></label>
+      <p id="agreementStatus" role="status"></p>
+      <div class="agreement-buttons">
+        <button id="declineAgreement" type="button">不同意，暂不使用</button>
+        <button id="acceptAgreement" class="agreement-accept" type="button" disabled>同意并继续</button>
+        <button id="closeAgreement" type="button" hidden>关闭协议</button>
+      </div>
+      <noscript><p>网站需要启用 JavaScript 才能记录确认并提供训练功能。</p></noscript>
+    </footer>
+  </dialog>
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
