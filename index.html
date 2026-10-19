@@ -6951,7 +6951,7 @@ function dkSavePage(){
 /* 很宽的横版绘本：横屏时图放大放在上面，文字在下面（跟打时文字在左、跟打在右） */
 function dkSetWide(i, ar){
   if(!DK.wideMap) DK.wideMap = {};
-  var wide = ar > 1.5; DK.wideMap[i] = wide;
+  var wide = ar > 1.25;                 // 横版、PPT 比例（4:3、16:9）都算 DK.wideMap[i] = wide;
   var fb = document.querySelector('.dk-fbody'); if(fb && !fb.classList.contains('nopic')) fb.classList.toggle('dk-wide', wide);
   return wide && window.innerWidth >= window.innerHeight;
 }
