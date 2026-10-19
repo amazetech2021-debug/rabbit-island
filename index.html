@@ -6603,7 +6603,7 @@ function tyPanelHtml(book){
     + '<div class="ty-bar"><i id="tyProg"></i></div>'
     + '<div class="ty-card ty-tc"><div class="ty-em" id="tyEm"></div><div class="ty-tgt" id="tyTgt"></div></div>'
     + '<div class="ty-card ty-zc" id="tyZc"><div class="ty-zh" id="tyZh"></div></div>'
-    + '<div class="ty-card ty-ic"><input id="tyIn" class="ty-in" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="看着上面，在这里打出来…" oninput="tyInput(event)" oncompositionstart="if(TY)TY.comp=1" oncompositionend="if(TY)TY.comp=0;setTimeout(tyInput,0)" onkeydown="tyKey(event)"></div>'
+    + '<div class="ty-card ty-ic"><input id="tyIn" class="ty-in" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="看着上面，在这里打出来…" oninput="tyInput(event)" onkeydown="tyKey(event)" onkeyup="if(!event.isComposing)tyInput()"></div>'
     + '<div class="ty-done" id="tyDone"></div>'
     + '<div class="ty-btns">'
     + '<button onclick="tySay()">🔊 朗读</button>'
@@ -6639,6 +6639,12 @@ function tyShow(keep){
   $('tyZc').style.display = c.zh && it.zh ? '' : 'none';
   $('tyZh').textContent = it.zh || '（没有释义）';
   TY.comp = 0;
+  if(!inp._tyIme){                                     // 输入法事件不能写在标签上，要这样绑定
+    inp._tyIme = 1;
+    inp.addEventListener('compositionstart', function(){ tyComp(1); });
+    inp.addEventListener('compositionupdate', function(){ tyInput(); });
+    inp.addEventListener('compositionend', function(){ tyComp(0); });
+  }
   if(!keep){ inp.value = ''; TY.hint = 0; }
   TY.last = inp.value.length;
   inp.classList.remove('ok');
@@ -6650,7 +6656,7 @@ function tyShow(keep){
 function tyRender(){
   if(!TY || !$('tyTgt')) return;
   var it = tyCur(); if(!it) return;
-  var t = it.t, v = $('tyIn').value, c = tyCfg(), h = '', wordStart = true;
+  var t = it.t, v = tyVal(), c = tyCfg(), h = '', wordStart = true;
   for(var k=0; k<t.length; k++){
     var ch = t[k], cls, show = ch;
     if(k < v.length) cls = tyEq(v[k], ch) ? 'ok' : 'bad';
@@ -6668,17 +6674,30 @@ function tyRender(){
   var wpm = sec > 3 ? Math.round(TY.ok/5/(sec/60)) : 0, acc = TY.typed ? Math.round((TY.typed - TY.err)/TY.typed*100) : 0;
   $('tyStat').textContent = '速度 '+(wpm || '–')+' 词/分 · 正确率 '+(TY.typed ? acc+'%' : '–');
 }
+/* 拼音输入法：选字时输入框里是拼音，只看已经上屏的字；选完字再判断 */
+function tyComp(on){
+  if(!TY) return;
+  var inp = $('tyIn');
+  if(on){ TY.comp = 1; TY.cs = inp ? inp.selectionStart : 0; }
+  else { TY.comp = 0; setTimeout(tyInput, 0); setTimeout(tyInput, 60); }
+}
+function tyVal(){
+  var inp = $('tyIn'); if(!inp) return '';
+  var v = inp.value;
+  return TY && TY.comp ? v.slice(0, Math.min(TY.cs || 0, v.length)) : v;
+}
 function tyInput(ev){
   if(!TY || TY.fin) return;
-  if(TY.comp || (ev && ev.isComposing)) return;      // 拼音输入法还在选字，先不判断
-  var inp = $('tyIn'), v = inp.value, it = tyCur(); if(!it) return;
+  if(ev && ev.isComposing && !TY.comp){ TY.comp = 1; TY.cs = TY.last; }
+  if(ev && ev.isComposing === false && TY.comp && ev.inputType && ev.inputType.indexOf('Composition') < 0) TY.comp = 0;
+  var inp = $('tyIn'), v = tyVal(), it = tyCur(); if(!it) return;
   if(!TY.t0) TY.t0 = Date.now();
-  if(v.length > TY.last){
+  if(v.length > TY.last && !TY.comp){
     for(var k=TY.last; k<v.length; k++){ var good = tyEq(v[k], it.t[k] || ''); TY.typed++; if(good) TY.ok++; else TY.err++; tyBeep(good); }
   }
-  TY.last = v.length;
+  if(!TY.comp) TY.last = v.length;
   tyRender();
-  if(tyCore(v) === tyCore(it.t) && !inp.classList.contains('ok')){
+  if(!TY.comp && tyCore(v) === tyCore(it.t) && !inp.classList.contains('ok')){
     TY.done[TY.i] = 1; inp.classList.add('ok');
     tyList();
     if(!tyCfg().say) try{ speak(it.t, it.lang || tyLang(it.t)); }catch(e){}
