@@ -9597,7 +9597,7 @@ function pgHanziWrite(units){
 
   // 已学汉字：按年级归类
   var _vw = window.innerWidth, _vh = window.innerHeight;   // 写字框尽量大：横屏按高度，竖屏按宽度
-  var HWS = Math.round(_vw >= 1000 ? Math.max(400, Math.min(680, _vh - 370, _vw*0.42)) : Math.max(300, Math.min(620, _vw - 48, _vh - 330)));
+  var HWS = Math.round(_vw >= 1000 ? Math.max(460, Math.min(780, _vh - 250, _vw*0.5)) : Math.max(300, Math.min(620, _vw - 48, _vh - 330)));
   var _grp = {}, _ord = [];
   learned.forEach(function(k){
     var p = String(k).split('-');
