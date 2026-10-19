@@ -1240,11 +1240,18 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .ty-empty p{color:var(--ink);font-size:14.5px;line-height:1.7}
 .ty-empty pre{background:var(--cream);border-radius:12px;padding:12px 14px;font-size:14px}
 .ty-pn{width:100%;box-sizing:border-box;padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:inherit;font-size:15px;margin-bottom:8px}
+.dk-ftext.dk-typing{display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - 86px);max-height:calc(100vh - 86px)}
 .dk-ftext.dk-typing .dk-words{min-height:0}
+.dk-ftext.dk-typing .dk-tyscroll{flex:1 1 auto;min-height:90px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.dk-ftext.dk-typing .ty-box{flex:none}
+.dk-ftext.dk-typing .dk-tyscroll > *{flex-shrink:0}
+.dk-ftext.dk-typing .dk-tyscroll{flex-wrap:nowrap;padding-right:4px}
+.dk-ftext.dk-typing .ty-box{gap:10px}
+.dk-ftext.dk-typing .ty-card{padding:12px 18px}
 .dk-ftext.dk-typing .ty-box{margin-top:12px}
 .dk-ftext.dk-typing .ty-tgt{font-size:26px}
 .dk-ftext.dk-typing .ty-in{font-size:24px}
-@media (orientation:portrait){ .dk-ftext.dk-typing{max-height:62vh} }
+@media (orientation:portrait){ .dk-ftext.dk-typing{height:64vh;max-height:64vh} }
 @media (max-width:820px){ .ty-wrap{grid-template-columns:1fr} .ty-list{max-height:200px} .ty-tgt{font-size:26px} .ty-in{font-size:24px} }
 .eg-banner-skill{background:linear-gradient(120deg,#34d399,#0d9488);box-shadow:0 8px 24px rgba(13,148,136,.2)}
 .eg-banner-skill .eg-bsel button.on{color:#0f766e}
@@ -6589,7 +6596,7 @@ function tyBeep(ok){
   }catch(e){}
 }
 function tyLang(t){ return (String(t).match(/[一-鿿]/g) || []).length ? 'zh-CN' : 'en-US'; }
-function tyPanelHtml(){
+function tyPanelHtml(book){
   var c = tyCfg();
   return '<div class="ty-box" id="tyBox">'
     + '<div class="ty-top"><b id="tyPos"></b><span id="tyStat">速度 – · 正确率 –</span></div>'
@@ -6600,7 +6607,7 @@ function tyPanelHtml(){
     + '<div class="ty-done" id="tyDone"></div>'
     + '<div class="ty-btns">'
     + '<button onclick="tySay()">🔊 朗读</button>'
-    + '<button id="tyBzh" onclick="tyTog(\'zh\')">释义：'+(c.zh?'开':'关')+'</button>'
+    + (book ? '' : '<button id="tyBzh" onclick="tyTog(\'zh\')">释义：'+(c.zh?'开':'关')+'</button>')
     + '<button onclick="tyGo(-1)">⬅ 上一个</button>'
     + '<button onclick="tyGo(1)">下一个 ➡</button>'
     + '<button id="tyBhide" class="'+(c.hide?'on':'')+'" onclick="tyTog(\'hide\')">'+(c.hide?'显示原文':'隐藏原文')+'</button>'
@@ -6851,10 +6858,10 @@ function dkBookHtml(){
         + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSavePage()">💾 保存</button><button class="dk-btn" onclick="DK.editPage=false;render()">取消</button>'
         + '<button class="dk-btn" onclick="var e=$(\'dkPgEd\');if(e)e.value=\'\'">清空这一页</button><button class="dk-btn" onclick="dkExport(\'pages\')">⬇️ 导出全部文字</button></div></div>';
     } else {
-      txt = '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
+      txt = '<div class="dk-words ' + (d.py?'':'dk-nopy') + (DK.type && tx ? ' dk-tyscroll' : '') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
         + (tx ? dkCells(tx) : '<div class="dk-note" style="padding:10px">这一页没有文字，点上面「✏️ 改文字」加上。</div>') + '</div>'
         + (!DK.pyReady && /[一-鿿]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '')
-        + (DK.type && tx ? tyPanelHtml() : '');
+        + (DK.type && tx ? tyPanelHtml(1) : '');
     }
     return '<div class="dk-full" id="dkFull">'
       + '<div class="dk-fbar"><button class="dk-btn" onclick="DK.editPage=false;dkCfg().reading=false;save();render()">← 返回</button>'
