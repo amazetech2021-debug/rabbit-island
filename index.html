@@ -6603,7 +6603,7 @@ function tyPanelHtml(book){
     + '<div class="ty-bar"><i id="tyProg"></i></div>'
     + '<div class="ty-card ty-tc"><div class="ty-em" id="tyEm"></div><div class="ty-tgt" id="tyTgt"></div></div>'
     + '<div class="ty-card ty-zc" id="tyZc"><div class="ty-zh" id="tyZh"></div></div>'
-    + '<div class="ty-card ty-ic"><input id="tyIn" class="ty-in" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="看着上面，在这里打出来…" oninput="tyInput()" onkeydown="tyKey(event)"></div>'
+    + '<div class="ty-card ty-ic"><input id="tyIn" class="ty-in" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="看着上面，在这里打出来…" oninput="tyInput(event)" oncompositionstart="if(TY)TY.comp=1" oncompositionend="if(TY)TY.comp=0;setTimeout(tyInput,0)" onkeydown="tyKey(event)"></div>'
     + '<div class="ty-done" id="tyDone"></div>'
     + '<div class="ty-btns">'
     + '<button onclick="tySay()">🔊 朗读</button>'
@@ -6638,6 +6638,7 @@ function tyShow(keep){
   $('tyEm').innerHTML = it.img ? '<img src="'+it.img+'" alt="" onerror="this.remove()">' : (it.em || '');
   $('tyZc').style.display = c.zh && it.zh ? '' : 'none';
   $('tyZh').textContent = it.zh || '（没有释义）';
+  TY.comp = 0;
   if(!keep){ inp.value = ''; TY.hint = 0; }
   TY.last = inp.value.length;
   inp.classList.remove('ok');
@@ -6667,8 +6668,9 @@ function tyRender(){
   var wpm = sec > 3 ? Math.round(TY.ok/5/(sec/60)) : 0, acc = TY.typed ? Math.round((TY.typed - TY.err)/TY.typed*100) : 0;
   $('tyStat').textContent = '速度 '+(wpm || '–')+' 词/分 · 正确率 '+(TY.typed ? acc+'%' : '–');
 }
-function tyInput(){
+function tyInput(ev){
   if(!TY || TY.fin) return;
+  if(TY.comp || (ev && ev.isComposing)) return;      // 拼音输入法还在选字，先不判断
   var inp = $('tyIn'), v = inp.value, it = tyCur(); if(!it) return;
   if(!TY.t0) TY.t0 = Date.now();
   if(v.length > TY.last){
@@ -6685,6 +6687,7 @@ function tyInput(){
   }
 }
 function tyKey(e){
+  if(e.isComposing || e.keyCode === 229 || (TY && TY.comp)) return;   // 输入法里按回车是确认拼音，不跳题
   if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(TY && TY.tm); tyGo(1); }
 }
 function tyGo(k){
