@@ -1431,6 +1431,18 @@ html.grt-on .dk-sent,html.grt-on .dk-li:not(.on){background-color:rgba(255,255,2
   .dk-fbody.nopic .dk-ftext{flex-basis:min(900px,100%)}
 }
 
+@media (orientation:landscape){
+  #page .dk-fbody.dk-wide{flex-direction:column;flex-wrap:nowrap;align-items:center;justify-content:flex-start;align-content:normal}
+  .dk-wide .dk-fpic{flex:none;max-width:100%;justify-content:center}
+  .dk-wide .dk-fpic img,.dk-wide .dk-fpic canvas{max-width:calc(100vw - 40px);max-height:62vh}
+  .dk-wide.dk-ty .dk-fpic img,.dk-wide.dk-ty .dk-fpic canvas{max-height:50vh}
+  .dk-wide .dk-ftext{flex:1 1 auto;width:min(1200px,100%);max-height:none;min-height:0}
+  .dk-wide .dk-ftext.dk-typing{height:auto;max-height:none;flex-direction:row;gap:16px;align-items:stretch}
+  .dk-wide .dk-ftext.dk-typing .dk-tyscroll{flex:1 1 0;min-height:0;height:auto}
+  .dk-wide .dk-ftext.dk-typing .ty-box{flex:1.25 1 0;margin-top:0;min-height:0;overflow-y:auto}
+  .dk-wide .dk-ftext.dk-typing > .dk-note{display:none}
+}
+
 .dk-c.rd b{background:#f3edff}
 .dk-sent .dk-w.rd b{background:#efe7ff;border-color:#c9b6f3!important}
 .dk-c.on b{background:#ffe08a;border-color:#f5a623;transition:background .1s}
@@ -6894,7 +6906,7 @@ function dkBookHtml(){
       + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
       + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
       + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
-      + '<div class="dk-fbody' + (hasPic ? '' : ' nopic') + '">'
+      + '<div class="dk-fbody' + (hasPic ? '' : ' nopic') + (hasPic && DK.wideMap && DK.wideMap[d.pi] ? ' dk-wide' : '') + (DK.type && !DK.editPage ? ' dk-ty' : '') + '">'
       + '<div class="dk-fpic" id="dkPic">' + (hasPic && DK.pdfLoading ? '<div style="padding:30px">正在打开绘本…</div>' : '') + '</div>'
       + '<div class="dk-ftext' + (DK.type && !DK.editPage ? ' dk-typing' : '') + '">' + txt + '</div></div></div>';
   }
@@ -6934,19 +6946,31 @@ function dkSavePage(){
   d.pages = pages.map(function(t, i){ return '=== 第 ' + (i+1) + ' 页 ===\n' + t; }).join('\n');
   DK.editPage = false; save(); render(); toast('已保存');
 }
+/* 很宽的横版绘本：横屏时图放大放在上面，文字在下面（跟打时文字在左、跟打在右） */
+function dkSetWide(i, ar){
+  if(!DK.wideMap) DK.wideMap = {};
+  var wide = ar > 1.5; DK.wideMap[i] = wide;
+  var fb = document.querySelector('.dk-fbody'); if(fb && !fb.classList.contains('nopic')) fb.classList.toggle('dk-wide', wide);
+  return wide && window.innerWidth >= window.innerHeight;
+}
 function dkDrawPic(){
   var box = $('dkPic'); if(!box || !DK.book) return;
   var i = dkCfg().pi;
   if(i >= dkPicCount()) return;
-  if(DK.book.type === 'img'){ box.innerHTML = '<img src="' + DK.bookUrls[i] + '" alt="">'; return; }
+  if(DK.book.type === 'img'){
+    box.innerHTML = '<img src="' + DK.bookUrls[i] + '" alt="">';
+    var im = box.querySelector('img'), chk = function(){ if(im.naturalWidth) dkSetWide(i, im.naturalWidth/im.naturalHeight); };
+    if(im.complete) chk(); else im.onload = chk;
+    return;
+  }
   if(!DK.pdf) return;
   var tok = ++_dkDrawTok;
   DK.pdf.getPage(i+1).then(function(pg){
     if(tok !== _dkDrawTok) return;
     var v1 = pg.getViewport({scale:1}), dpr = Math.min(2, window.devicePixelRatio || 1);
-    var _land = window.innerWidth >= window.innerHeight;
-    var bw = _land ? (window.innerWidth - Math.min(560, window.innerWidth * 0.36) - 60) : (box.clientWidth || 800);
-    var bh = _land ? (window.innerHeight - 90) : window.innerHeight * 0.62;
+    var _land = window.innerWidth >= window.innerHeight, wide = dkSetWide(i, v1.width/v1.height);
+    var bw = _land ? (wide ? window.innerWidth - 40 : window.innerWidth - Math.min(560, window.innerWidth * 0.36) - 60) : (box.clientWidth || 800);
+    var bh = _land ? (wide ? window.innerHeight * (DK.type ? .5 : .62) : window.innerHeight - 90) : window.innerHeight * 0.62;
     var sc = Math.min(bw / v1.width, bh / v1.height) * dpr;
     sc = Math.max(0.5, Math.min(sc, 2600 / v1.width));
     var vp = pg.getViewport({scale: sc});
