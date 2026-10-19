@@ -1193,6 +1193,59 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .cal-box{overflow:hidden;padding:8px 0}
 .cal-card{background:linear-gradient(160deg,#a78bfa,#6366f1);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-weight:800;font-size:13px;box-sizing:border-box;max-width:none;box-shadow:0 3px 10px rgba(99,102,241,.3)}
 @media (max-width:900px){.as-wrap,.ck-wrap{grid-template-columns:1fr}}
+.ty-srcs{margin-top:6px}
+.ty-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
+.ty-sel{padding:9px 12px;font-size:14px;color:var(--ink);border:2px solid var(--line);border-radius:12px;background:var(--cream-2);max-width:320px;font-family:inherit}
+.ty-wrap{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.6fr);gap:16px;align-items:start}
+.ty-left{padding:14px 12px!important;margin:0!important}
+.ty-lh{display:flex;justify-content:space-between;align-items:center;padding:0 6px 8px}
+.ty-lh b{font-size:16px;color:var(--ink)} .ty-lh em{font-style:normal;font-size:13px;color:var(--ink-soft)}
+.ty-list{max-height:62vh;overflow:auto;display:flex;flex-direction:column;gap:4px;-webkit-overflow-scrolling:touch}
+.ty-list button{display:flex;gap:10px;align-items:flex-start;text-align:left;border:none;background:transparent;border-radius:12px;padding:9px 10px;font:inherit;color:var(--ink);cursor:pointer;border-left:4px solid transparent}
+.ty-list button i{font-style:normal;font-size:12px;color:var(--ink-soft);min-width:20px;padding-top:2px}
+.ty-list button span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ty-list button b{font-size:15.5px;font-weight:700;word-break:break-word}
+.ty-list button small{font-size:12.5px;color:var(--ink-soft)}
+.ty-list button.on{background:#ede4ff;border-left-color:#c026d3}
+.ty-list button.dn b::after{content:' ✓';color:#16a34a}
+.ty-box{display:flex;flex-direction:column;gap:12px}
+.ty-top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--ink-soft)}
+.ty-top b{color:var(--ink);font-size:16px}
+.ty-bar{height:6px;border-radius:4px;background:var(--cream-2);overflow:hidden}
+.ty-bar i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#d946ef);transition:width .3s}
+.ty-card{background:#fff;border-radius:18px;padding:18px 22px;box-shadow:0 3px 12px rgba(100,80,160,.1);border-top:6px solid #7c3aed}
+.ty-tc{display:flex;align-items:center;gap:16px;min-height:64px}
+.ty-em{font-size:44px;line-height:1;flex:none}
+.ty-em:empty{display:none}
+.ty-em img{width:84px;height:84px;object-fit:contain;border-radius:12px;background:#faf7ff;display:block}
+.ty-tgt{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:34px;letter-spacing:.04em;line-height:1.5;color:#9ca3af;word-break:break-word}
+.ty-tgt .ok{color:#16a34a}
+.ty-tgt .bad{color:#fff;background:#ef4444;border-radius:4px}
+.ty-tgt .cur{color:var(--ink);border-bottom:3px solid #c026d3}
+.ty-tgt .rest{color:#374151}
+.ty-zc{border-top-color:#f9a8d4;padding:14px 22px}
+.ty-zh{font-size:19px;color:var(--ink);font-weight:600}
+.ty-ic{border-top-color:#db2777;padding:12px 16px}
+.ty-in{width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:30px;padding:10px 6px;color:var(--ink)}
+.ty-in.ok{color:#16a34a}
+.ty-done{display:none;background:#f0fdf4;color:#166534;border-radius:14px;padding:12px 16px;font-size:16px;font-weight:800}
+.ty-done button{margin-left:8px;border:none;border-radius:12px;padding:7px 14px;background:#16a34a;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.ty-btns{display:flex;flex-wrap:wrap;gap:8px}
+.ty-btns button{border:none;border-radius:14px;padding:10px 14px;background:#fff;color:var(--ink);font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(100,80,160,.14)}
+.ty-btns button.on{background:#7c3aed;color:#fff}
+.ty-btns button:active{transform:scale(.97)}
+.ty-opts{display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:14px;color:var(--ink)}
+.ty-opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.ty-opts span{color:var(--ink-soft);font-size:12.5px}
+.ty-empty p{color:var(--ink);font-size:14.5px;line-height:1.7}
+.ty-empty pre{background:var(--cream);border-radius:12px;padding:12px 14px;font-size:14px}
+.ty-pn{width:100%;box-sizing:border-box;padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:inherit;font-size:15px;margin-bottom:8px}
+.dk-ftext.dk-typing .dk-words{min-height:0}
+.dk-ftext.dk-typing .ty-box{margin-top:12px}
+.dk-ftext.dk-typing .ty-tgt{font-size:26px}
+.dk-ftext.dk-typing .ty-in{font-size:24px}
+@media (orientation:portrait){ .dk-ftext.dk-typing{max-height:62vh} }
+@media (max-width:820px){ .ty-wrap{grid-template-columns:1fr} .ty-list{max-height:200px} .ty-tgt{font-size:26px} .ty-in{font-size:24px} }
 .eg-banner-skill{background:linear-gradient(120deg,#34d399,#0d9488);box-shadow:0 8px 24px rgba(13,148,136,.2)}
 .eg-banner-skill .eg-bsel button.on{color:#0f766e}
 .ep-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;align-items:start}
@@ -6506,6 +6559,266 @@ function dkSayEl(el){
 function dkLang(t){ var zh = (String(t).match(/[\u4e00-\u9fff]/g) || []).length, en = (String(t).match(/[A-Za-z]/g) || []).length; return zh >= en/3 ? 'zh-CN' : 'en-US'; }
 function dkSayText(t){ if(t) speak(t, dkLang(t)); }
 
+
+/* —— ⌨️ 跟打：英语的单词 / 短语 / 英语卡 / 自己上传的词典，以及绘本每页的句子 —— */
+var TY = null, _tyAc = null;
+function tyCfg(){
+  if(!S.ty || typeof S.ty !== 'object') S.ty = {};
+  var c = S.ty;
+  if(!c.src) c.src = 'learn';
+  if(c.say == null) c.say = true;
+  if(c.snd == null) c.snd = true;
+  if(c.zh == null) c.zh = true;
+  if(c.hide == null) c.hide = false;
+  if(c.cat == null) c.cat = '';
+  if(c.shuf == null) c.shuf = false;
+  if(!Array.isArray(c.dicts)) c.dicts = [];
+  return c;
+}
+function tyNorm(s){ return String(s || '').replace(/[’‘`]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim().toLowerCase(); }
+function tyCore(s){ return tyNorm(s).replace(/[\s.!?。！？,，;；:：]+$/, ''); }
+function tyEq(a, b){ return tyNorm(a) === tyNorm(b); }
+function tyBeep(ok){
+  if(!tyCfg().snd) return;
+  try{
+    _tyAc = _tyAc || new (window.AudioContext || window.webkitAudioContext)();
+    var t = _tyAc.currentTime, o = _tyAc.createOscillator(), g = _tyAc.createGain();
+    o.type = ok ? 'triangle' : 'square'; o.frequency.value = ok ? 880 : 170;
+    g.gain.setValueAtTime(ok ? .05 : .05, t); g.gain.exponentialRampToValueAtTime(.0001, t + (ok ? .05 : .14));
+    o.connect(g); g.connect(_tyAc.destination); o.start(t); o.stop(t + .16);
+  }catch(e){}
+}
+function tyLang(t){ return (String(t).match(/[一-鿿]/g) || []).length ? 'zh-CN' : 'en-US'; }
+function tyPanelHtml(){
+  var c = tyCfg();
+  return '<div class="ty-box" id="tyBox">'
+    + '<div class="ty-top"><b id="tyPos"></b><span id="tyStat">速度 – · 正确率 –</span></div>'
+    + '<div class="ty-bar"><i id="tyProg"></i></div>'
+    + '<div class="ty-card ty-tc"><div class="ty-em" id="tyEm"></div><div class="ty-tgt" id="tyTgt"></div></div>'
+    + '<div class="ty-card ty-zc" id="tyZc"><div class="ty-zh" id="tyZh"></div></div>'
+    + '<div class="ty-card ty-ic"><input id="tyIn" class="ty-in" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="看着上面，在这里打出来…" oninput="tyInput()" onkeydown="tyKey(event)"></div>'
+    + '<div class="ty-done" id="tyDone"></div>'
+    + '<div class="ty-btns">'
+    + '<button onclick="tySay()">🔊 朗读</button>'
+    + '<button id="tyBzh" onclick="tyTog(\'zh\')">释义：'+(c.zh?'开':'关')+'</button>'
+    + '<button onclick="tyGo(-1)">⬅ 上一个</button>'
+    + '<button onclick="tyGo(1)">下一个 ➡</button>'
+    + '<button id="tyBhide" class="'+(c.hide?'on':'')+'" onclick="tyTog(\'hide\')">'+(c.hide?'显示原文':'隐藏原文')+'</button>'
+    + '<button onclick="tyHint()">💡 提示</button>'
+    + '<button onclick="tyRestart()">🔄 从头再打</button></div>'
+    + '<div class="ty-opts"><label><input type="checkbox" '+(c.say?'checked':'')+' onchange="tyCfg().say=this.checked;save()"> 每个先读一遍</label>'
+    + '<label><input type="checkbox" '+(c.snd?'checked':'')+' onchange="tyCfg().snd=this.checked;save()"> 键盘音效</label>'
+    + '<span>按回车跳到下一个</span></div></div>';
+}
+function tyStart(items, key, onDone){
+  if(TY && TY.key === key && TY.items.length === items.length){ TY.onDone = onDone; tyShow(true); return; }
+  TY = {items:items, key:key, i:0, typed:0, err:0, ok:0, t0:0, sec:0, done:{}, last:0, hint:0, onDone:onDone, fin:false};
+  tyShow();
+}
+function tyCur(){ return TY && TY.items[TY.i]; }
+function tyShow(keep){
+  if(!TY || !$('tyBox')) return;
+  var it = tyCur(), c = tyCfg(), n = TY.items.length, inp = $('tyIn');
+  $('tyPos').textContent = TY.fin ? '全部打完啦' : '第 '+(TY.i+1)+' / '+n+' 个';
+  $('tyProg').style.width = Math.round(Object.keys(TY.done).length/Math.max(1, n)*100)+'%';
+  var dn = $('tyDone');
+  if(TY.fin){
+    var acc = TY.typed ? Math.round((TY.typed - TY.err)/TY.typed*100) : 100;
+    dn.innerHTML = '🎉 全部打完啦！正确率 '+acc+'%'+(TY.onDone ? ' <button onclick="TY.onDone()">继续 ➡</button>' : ' <button onclick="tyRestart()">🔄 再来一遍</button>');
+    dn.style.display = 'block';
+  } else dn.style.display = 'none';
+  if(!it) return;
+  $('tyEm').innerHTML = it.img ? '<img src="'+it.img+'" alt="" onerror="this.remove()">' : (it.em || '');
+  $('tyZc').style.display = c.zh && it.zh ? '' : 'none';
+  $('tyZh').textContent = it.zh || '（没有释义）';
+  if(!keep){ inp.value = ''; TY.hint = 0; }
+  TY.last = inp.value.length;
+  inp.classList.remove('ok');
+  tyRender();
+  if(!keep && c.say && !TY.fin) tySay();
+  if(!keep) try{ inp.focus({preventScroll:true}); }catch(e){}
+  tyList();
+}
+function tyRender(){
+  if(!TY || !$('tyTgt')) return;
+  var it = tyCur(); if(!it) return;
+  var t = it.t, v = $('tyIn').value, c = tyCfg(), h = '', wordStart = true;
+  for(var k=0; k<t.length; k++){
+    var ch = t[k], cls, show = ch;
+    if(k < v.length) cls = tyEq(v[k], ch) ? 'ok' : 'bad';
+    else cls = k === v.length ? 'cur' : 'rest';
+    var letter = /[A-Za-z0-9一-鿿]/.test(ch);
+    if(c.hide && k >= v.length && letter && !(TY.hint && wordStart)) show = '_';
+    if(c.hide && cls === 'bad') show = ch;
+    h += '<span class="'+cls+(ch === ' ' ? ' sp' : '')+'">'+(show === ' ' ? '&nbsp;' : htmlEsc(show))+'</span>';
+    wordStart = !letter;
+  }
+  if(v.length > t.length) h += '<span class="bad">'+htmlEsc(v.slice(t.length))+'</span>';
+  $('tyTgt').innerHTML = h;
+  $('tyTgt').style.fontSize = t.length > 60 ? '22px' : t.length > 28 ? '28px' : '';
+  var sec = TY.sec + (TY.t0 ? (Date.now() - TY.t0)/1000 : 0);
+  var wpm = sec > 3 ? Math.round(TY.ok/5/(sec/60)) : 0, acc = TY.typed ? Math.round((TY.typed - TY.err)/TY.typed*100) : 0;
+  $('tyStat').textContent = '速度 '+(wpm || '–')+' 词/分 · 正确率 '+(TY.typed ? acc+'%' : '–');
+}
+function tyInput(){
+  if(!TY || TY.fin) return;
+  var inp = $('tyIn'), v = inp.value, it = tyCur(); if(!it) return;
+  if(!TY.t0) TY.t0 = Date.now();
+  if(v.length > TY.last){
+    for(var k=TY.last; k<v.length; k++){ var good = tyEq(v[k], it.t[k] || ''); TY.typed++; if(good) TY.ok++; else TY.err++; tyBeep(good); }
+  }
+  TY.last = v.length;
+  tyRender();
+  if(tyCore(v) === tyCore(it.t) && !inp.classList.contains('ok')){
+    TY.done[TY.i] = 1; inp.classList.add('ok');
+    tyList();
+    if(!tyCfg().say) try{ speak(it.t, it.lang || tyLang(it.t)); }catch(e){}
+    var my = TY.i;
+    clearTimeout(TY.tm); TY.tm = setTimeout(function(){ if(TY && TY.i === my) tyGo(1); }, 900);
+  }
+}
+function tyKey(e){
+  if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(TY && TY.tm); tyGo(1); }
+}
+function tyGo(k){
+  if(!TY) return;
+  clearTimeout(TY.tm);
+  if(TY.t0){ TY.sec += (Date.now() - TY.t0)/1000; TY.t0 = 0; }
+  var n = TY.items.length, j = TY.i + k;
+  if(j >= n){ TY.fin = true; tyShow(true); return; }
+  TY.fin = false; TY.i = Math.max(0, j); tyShow();
+}
+function tyJump(i){ if(!TY) return; clearTimeout(TY.tm); TY.fin = false; TY.i = i; tyShow(); }
+function tyRestart(){ if(!TY) return; var it = TY.items, key = TY.key, od = TY.onDone; TY = null; tyStart(it, key, od); }
+function tySay(){ var it = tyCur(); if(it) try{ speak(it.t, it.lang || tyLang(it.t)); }catch(e){} var i = $('tyIn'); if(i) try{ i.focus({preventScroll:true}); }catch(e){} }
+function tyTog(k){
+  var c = tyCfg(); c[k] = !c[k]; save();
+  var b = $(k === 'zh' ? 'tyBzh' : 'tyBhide');
+  if(b){ if(k === 'zh') b.textContent = '释义：'+(c.zh?'开':'关'); else { b.textContent = c.hide ? '显示原文' : '隐藏原文'; b.classList.toggle('on', c.hide); } }
+  if(TY && tyCur()){ $('tyZc').style.display = c.zh && tyCur().zh ? '' : 'none'; tyRender(); }
+  var i = $('tyIn'); if(i) try{ i.focus({preventScroll:true}); }catch(e){}
+}
+function tyHint(){
+  var it = tyCur(), inp = $('tyIn'); if(!it || !inp) return;
+  if(tyCfg().hide && !TY.hint){ TY.hint = 1; tyRender(); }
+  else {
+    var v = inp.value, k = 0; while(k < v.length && tyEq(v[k], it.t[k] || '')) k++;
+    inp.value = it.t.slice(0, k + 1); TY.last = inp.value.length; tyRender(); tyInput();
+  }
+  try{ inp.focus({preventScroll:true}); }catch(e){}
+}
+function tyList(){
+  var L = $('tyList'); if(!L || !TY) return;
+  [].forEach.call(L.children, function(el, i){ el.classList.toggle('on', i === TY.i); el.classList.toggle('dn', !!TY.done[i]); });
+  var on = L.children[TY.i];
+  if(on && on.scrollIntoView){ var r = on.getBoundingClientRect(), R = L.getBoundingClientRect(); if(r.top < R.top || r.bottom > R.bottom) L.scrollTop += r.top - R.top - 40; }
+}
+
+/* —— 英语 · 跟打页面 —— */
+var TY_SRC = [['learn','📖 学习单词'],['phrase','💬 学习短语'],['cards','📚 英语卡'],['dict','📝 我的词典']];
+function tyCats(src){
+  var c = tyCfg();
+  if(src === 'learn') return Object.keys(ENGLISH);
+  if(src === 'phrase') return Object.keys(ENG_PHRASES);
+  if(src === 'cards') return EN_IMG_SETS.map(function(s){ return s.icon+' '+s.name; });
+  return c.dicts.map(function(d){ return '📝 '+d.name+'（'+d.items.length+'）'; });
+}
+function tyItems(){
+  var c = tyCfg(), cats = tyCats(c.src), ci = Math.max(0, cats.indexOf(c.cat)), out = [];
+  if(c.src === 'learn') (ENGLISH[cats[ci]] || []).forEach(function(e){ out.push({t:e[0], zh:e[1], em:e[2]}); });
+  else if(c.src === 'phrase') (ENG_PHRASES[cats[ci]] || []).forEach(function(e){ out.push({t:e[0], zh:e[1], em:e[2]}); });
+  else if(c.src === 'cards'){ var s = EN_IMG_SETS[ci]; if(s) s.words.forEach(function(w){ out.push({t:w, zh:EN_IMG_ZH[w] || '', img:enImgSrc(s.folder, w)}); }); }
+  else { var d = c.dicts[ci]; if(d) d.items.forEach(function(e){ out.push({t:e[0], zh:e[1] || ''}); }); }
+  out = out.filter(function(o){ return o.t && String(o.t).trim(); });
+  if(c.shuf){ var seed = TY_SEED; out = out.map(function(o, i){ return [o, Math.sin(seed + i*12.9898)*43758.5453 % 1]; }).sort(function(a, b){ return a[1] - b[1]; }).map(function(x){ return x[0]; }); }
+  return {items:out, key:c.src+'|'+cats[ci]+'|'+(c.shuf?TY_SEED:0), cat:cats[ci] || ''};
+}
+var TY_SEED = 1;
+function tyEnTabs(){
+  return '<div class="tabs">'
+    + '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
+    + '<button class="tab" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
+    + '<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    + '<button class="tab on">⌨️ 跟打</button>'
+    + '<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
+    + '<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button></div>';
+}
+function pgEnType(){
+  var c = tyCfg(), cats = tyCats(c.src);
+  if(cats.indexOf(c.cat) < 0) c.cat = cats[0] || '';
+  var R = tyItems();
+  var srcBtns = TY_SRC.map(function(o){ return '<button class="tab '+(c.src===o[0]?'on':'')+'" onclick="tyCfg().src=\''+o[0]+'\';tyCfg().cat=\'\';save();render()">'+o[1]+'</button>'; }).join('');
+  var sel = cats.length ? '<select class="ty-sel" onchange="tyCfg().cat=this.value;save();render()">'+cats.map(function(k){ return '<option'+(k===R.cat?' selected':'')+'>'+htmlEsc(k)+'</option>'; }).join('')+'</select>' : '';
+  var tools = '<div class="ty-tools">'+sel
+    + '<button class="dk-btn'+(c.shuf?' p':'')+'" onclick="tyCfg().shuf=!tyCfg().shuf;TY_SEED=Math.random()*1000;save();render()">🔀 '+(c.shuf?'打乱中':'打乱顺序')+'</button>'
+    + (c.src === 'dict' ? '<label class="dk-btn p" for="tyFile">⬆️ 上传词典</label><input type="file" id="tyFile" class="dk-vh" accept=".txt,.csv,.tsv,text/plain" onchange="tyUpload(this)">'
+        + '<button class="dk-btn" onclick="tyPasteOpen()">📋 粘贴词表</button>'
+        + (c.dicts.length ? '<button class="dk-btn" onclick="tyDelDict()">🗑 删除这个词典</button>' : '') : '')
+    + '</div>';
+  var body;
+  if(!R.items.length){
+    body = '<div class="card ty-empty"><h3>📝 还没有词典</h3><p>上传一个文字文件，或者直接粘贴，<b>每行一个单词或句子</b>，后面跟中文释义，中间用 Tab、逗号或空格隔开都可以，例如：</p>'
+      + '<pre>apple 苹果\nbanana, 香蕉\nI like reading.\t我喜欢读书。</pre><p>没有释义也可以，只写英文。</p></div>';
+  } else {
+    var list = R.items.map(function(o, i){ return '<button onclick="tyJump('+i+')"><i>'+(i+1)+'</i><span><b>'+htmlEsc(o.t)+'</b>'+(o.zh ? '<small>'+htmlEsc(o.zh)+'</small>' : '')+'</span></button>'; }).join('');
+    body = '<div class="ty-wrap"><div class="card ty-left"><div class="ty-lh"><b>📋 全部</b><em>'+R.items.length+' 个</em></div><div class="ty-list" id="tyList">'+list+'</div></div>'
+      + '<div class="ty-right">'+tyPanelHtml()+'</div></div>';
+  }
+  $('page').innerHTML = tyEnTabs() + '<div class="tabs ty-srcs">'+srcBtns+'</div>' + tools + body;
+  if(R.items.length) tyStart(R.items, R.key);
+}
+function tyParse(text){
+  return String(text || '').replace(/^﻿/, '').split(/\r?\n/).map(function(l){
+    l = l.trim(); if(!l || /^#/.test(l)) return null;
+    var m;
+    if(l.indexOf('\t') >= 0){ m = l.split('\t'); return [m[0].trim(), m.slice(1).join(' ').trim()]; }
+    if((m = l.match(/^([^,，]+?)\s*[,，]\s*(.+)$/)) && /[A-Za-z]/.test(m[1])) return [m[1].trim(), m[2].trim()];
+    if((m = l.match(/^([\x20-\x7e]+?)\s*(?:[-–=:：]\s*)?([^\x00-\x7f].*)$/))) return [m[1].trim(), m[2].trim()];
+    return [l, ''];
+  }).filter(function(x){ return x && x[0]; });
+}
+function tyAddDict(name, text){
+  var items = tyParse(text);
+  if(!items.length){ toast('没有认出单词，每行写一个'); return; }
+  var c = tyCfg(); name = (name || '我的词典').replace(/\.(txt|csv|tsv)$/i, '').slice(0, 30);
+  c.dicts.push({name:name, items:items.slice(0, 2000)}); c.src = 'dict'; c.cat = '📝 '+name+'（'+Math.min(2000, items.length)+'）';
+  save(); toast('已添加 '+items.length+' 个'); closeModal(); render();
+}
+function tyUpload(inp){
+  var f = inp.files && inp.files[0]; if(!f) return;
+  var r = new FileReader(); r.onload = function(){ tyAddDict(f.name, r.result); }; r.readAsText(f, 'utf-8');
+}
+function tyPasteOpen(){
+  modal('<h3 style="margin:0 0 6px">📋 粘贴词表</h3><p class="eg-note" style="margin:0 0 8px">每行一个，英文在前、释义在后，例如「apple 苹果」。</p>'
+    + '<input id="tyPN" class="ty-pn" placeholder="词典名字，例如：第三单元">'
+    + '<textarea id="tyPT" class="dk-ta" style="min-height:220px" placeholder="apple 苹果&#10;banana 香蕉&#10;I like reading. 我喜欢读书。"></textarea>'
+    + '<button class="big p" style="margin-top:10px" onclick="tyAddDict($(\'tyPN\').value,$(\'tyPT\').value)">添加</button>'
+    + '<button class="big" style="margin-top:8px;color:var(--ink)" onclick="closeModal()">取消</button>');
+}
+function tyDelDict(){
+  var c = tyCfg(), cats = tyCats('dict'), i = cats.indexOf(c.cat); if(i < 0) i = 0;
+  var d = c.dicts[i]; if(!d) return;
+  modal('<h3>删除词典「'+htmlEsc(d.name)+'」？</h3><p class="eg-note">删除后不能恢复。</p><button class="big r" onclick="tyCfg().dicts.splice('+i+',1);tyCfg().cat=\'\';save();closeModal();render()">删除</button>'
+    + '<button class="big" style="margin-top:8px;color:var(--ink)" onclick="closeModal()">取消</button>');
+}
+
+/* —— 绘本跟打：把这一页的句子一句一句打出来 —— */
+function dkTypeItems(){
+  var tx = dkBookPages()[dkCfg().pi] || '', out = [];
+  tx.split(/\n+/).forEach(function(l){
+    l = l.trim(); if(!l) return;
+    var parts = /[一-鿿]/.test(l) ? [l] : l.replace(/([.!?])\s+(?=[A-Z"'“])/g, '$1\n').split('\n');
+    parts.forEach(function(p){ p = p.trim(); if(p) out.push({t:p, zh:''}); });
+  });
+  return out;
+}
+function dkTypeMount(){
+  if(!$('tyBox')) return;
+  var items = dkTypeItems(), d = dkCfg(), n = Math.max(dkBookPages().length, dkPicCount());
+  if(!items.length) return;
+  tyStart(items, 'bk|'+d.pi+'|'+items.length, d.pi < n - 1 ? function(){ dkTurn(1); } : null);
+}
+
 /* —— 页面 —— */
 function pgDict(){
   var d = dkCfg(); dkLoadStored(); dkNeedPy();
@@ -6516,6 +6829,7 @@ function pgDict(){
   else h += dkBookHtml();
   $('page').innerHTML = h;
   if(d.tab === 'book') dkDrawPic();
+  if(d.tab === 'book' && DK.type) dkTypeMount();
   if(d.tab === 'dict') dkAfterDict();
   if(d.tab === 'cmd') dkCmdFill();
 }
@@ -6539,19 +6853,21 @@ function dkBookHtml(){
     } else {
       txt = '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">'
         + (tx ? dkCells(tx) : '<div class="dk-note" style="padding:10px">这一页没有文字，点上面「✏️ 改文字」加上。</div>') + '</div>'
-        + (!DK.pyReady && /[一-鿿]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '');
+        + (!DK.pyReady && /[一-鿿]/.test(tx) ? '<div class="dk-note">正在加载拼音…</div>' : '')
+        + (DK.type && tx ? tyPanelHtml() : '');
     }
     return '<div class="dk-full" id="dkFull">'
       + '<div class="dk-fbar"><button class="dk-btn" onclick="DK.editPage=false;dkCfg().reading=false;save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.pi+1) + ' / ' + n + ' 页</span><span style="flex:1"></span>'
       + dkSizeBtns()
       + '<button class="dk-btn y" onclick="dkReadPage()">🔊 读这一页</button>'
+      + '<button class="dk-btn' + (DK.type ? ' p' : '') + '" onclick="DK.type=!DK.type;DK.editPage=false;render()">⌨️ 跟打' + (DK.type ? '中' : '') + '</button>'
       + '<button class="dk-btn" onclick="DK.editPage=!DK.editPage;render()">✏️ 改文字</button>'
       + '<button class="dk-btn" ' + (d.pi<=0?'disabled':'') + ' onclick="dkTurn(-1)">⏮ 上一页</button>'
       + '<button class="dk-btn p" ' + (d.pi>=n-1?'disabled':'') + ' onclick="dkTurn(1)">下一页 ⏭</button></div>'
       + '<div class="dk-fbody' + (hasPic ? '' : ' nopic') + '">'
       + '<div class="dk-fpic" id="dkPic">' + (hasPic && DK.pdfLoading ? '<div style="padding:30px">正在打开绘本…</div>' : '') + '</div>'
-      + '<div class="dk-ftext">' + txt + '</div></div></div>';
+      + '<div class="dk-ftext' + (DK.type && !DK.editPage ? ' dk-typing' : '') + '">' + txt + '</div></div></div>';
   }
   var bk = DK.book;
   return '<div class="card"><div class="secthead"><h3>📖 绘本阅读</h3><em>PDF / 图片 + 每页的文字</em></div>'
@@ -10098,7 +10414,7 @@ function _doStartEnQuiz(){
 function _enQuizTabs(){
   return '<div class="tabs"><button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
-    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button><button class="tab" onclick="enMode=\'type\';render()">⌨️ 跟打</button>'
     +'<button class="tab on">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button></div>'
     +'<div class="tabs">'
@@ -12220,7 +12536,7 @@ function pgEnFlashCards(){
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
-    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button><button class="tab" onclick="enMode=\'type\';render()">⌨️ 跟打</button>'
     +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button>';
 
@@ -12257,7 +12573,7 @@ function showEnCatWords(setIdx, filterPrefix){
   var modeTabs =
     '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     +'<button class="tab on">📚 英语卡</button>'
-    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    +'<button class="tab" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button><button class="tab" onclick="enMode=\'type\';render()">⌨️ 跟打</button>'
     +'<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     +'<button class="tab" onclick="enMode=\'review\';render()">🔄 复习</button>';
 
@@ -12462,6 +12778,7 @@ function pgEnglish(){
   if(enMode === "quiz"){ renderEnQuizPage(); return; }
   if(enMode === "cards"){ pgEnFlashCards(); return; }
   if(enMode === "gemini"){ pgGemini(); return; }
+  if(enMode === "type"){ pgEnType(); return; }
   const isPh = (enSub==="phrases"), isAbc = (enSub==="alphabet");
   const cats = Object.keys(enSrc());
   if(enCat === null || enCat === undefined) enCat = "";
@@ -12474,6 +12791,7 @@ function pgEnglish(){
    <div class="tabs"><button class="tab ${enMode==="learn"?"on":""}" onclick="enMode='learn';render()">📖 学习</button>
      <button class="tab ${enMode==="cards"?"on":""}" onclick="enMode='cards';render()">📚 英语卡</button>
      <button class="tab ${enMode==="gemini"?"on":""}" onclick="enMode='gemini';_gemLesson=null;render()">🎙 口语课</button>
+     <button class="tab" onclick="enMode='type';render()">⌨️ 跟打</button>
      <button class="tab ${enMode==="quiz"?"on":""}" onclick="startEnQuiz()">🧪 测试</button>
      <button class="tab ${enMode==="review"?"on":""}" onclick="enMode='review';render()">🔄 复习${_rvCount('en')?" ("+_rvCount('en')+")":""}</button></div>
    <div class="tabs"><button class="tab ${!isPh&&!isAbc?"on":""}" onclick="enSwitch('words')">🔤 单词</button>
@@ -12641,7 +12959,7 @@ function pgEnglishReview(){
    '<div class="tabs">'
    +'<button class="tab '+(enMode==='learn'?'on':'')+'" onclick="enMode=\'learn\';render()">📖 学习</button>'
    +'<button class="tab '+(enMode==='cards'?'on':'')+'" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
-   +'<button class="tab '+(enMode==='gemini'?'on':'')+'" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+   +'<button class="tab '+(enMode==='gemini'?'on':'')+'" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button><button class="tab" onclick="enMode=\'type\';render()">⌨️ 跟打</button>'
    +'<button class="tab '+(enMode==='quiz'?'on':'')+'" onclick="startEnQuiz()">🧪 测试</button>'
    +'<button class="tab '+(enMode==='review'?'on':'')+'" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button>'
    +'</div>'
@@ -13479,7 +13797,7 @@ function pgGemini(){
   var _enTabBar = '<div class="tabs">'
     + '<button class="tab" onclick="enMode=\'learn\';render()">📖 学习</button>'
     + '<button class="tab" onclick="enMode=\'cards\';render()">📚 英语卡</button>'
-    + '<button class="tab on" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button>'
+    + '<button class="tab on" onclick="enMode=\'gemini\';_gemLesson=null;render()">🎙 口语课</button><button class="tab" onclick="enMode=\'type\';render()">⌨️ 跟打</button>'
     + '<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     + '<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button>'
     + '</div>';
