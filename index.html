@@ -1302,6 +1302,19 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .phx-res{font-size:20px;font-weight:900;color:var(--ink);padding:20px 0 6px}
 .phx-type{max-width:900px;margin:0 auto}
 @media (max-width:700px){ .phx-wd{font-size:34px} .phx-opts button{font-size:26px} .phx-nav{margin-left:0} .phx-head{flex-direction:column;align-items:flex-start} }
+.dkai h3{margin:2px 0 6px}
+.dkai-f{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:800;color:var(--ink);margin-top:10px;text-align:left}
+.dkai-f input{padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:inherit;font-size:15px;font-weight:600}
+.dkai-s{display:block;font-size:12px;color:var(--ink-soft);margin-top:4px;text-align:left}
+.dkai-r{display:flex;flex-direction:column;gap:6px;margin:12px 0 4px;font-size:14px;color:var(--ink);text-align:left}
+.dkai-r span{font-weight:800}
+.dkai-r label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.dkai-prog{font-size:14px;color:var(--ink);line-height:1.6;margin:10px 0;text-align:left;min-height:4px}
+.dkai-prog .bad{color:#dc2626;font-weight:800}
+.dkai-bar{height:8px;border-radius:5px;background:var(--cream-2);overflow:hidden;margin-top:6px}
+.dkai-bar i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#d946ef)}
+.dkai .big{width:100%;margin-top:6px;padding:14px}
+.dkai .big:disabled{opacity:.6}
 .eg-banner-skill{background:linear-gradient(120deg,#34d399,#0d9488);box-shadow:0 8px 24px rgba(13,148,136,.2)}
 .eg-banner-skill .eg-bsel button.on{color:#0f766e}
 .ep-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;align-items:start}
@@ -6465,6 +6478,127 @@ function dkPickMedia(inp){
 function dkClearMedia(){ dkPut('media', null).catch(function(){}); dkSetMedia(null); }
 function dkTextSave(field){ var el = $('dkT_' + field); if(!el) return; var d = dkCfg(); d[field] = el.value; if(field==='subs'){ d.di = 0; d.done = {}; } save(); }
 
+
+/* —— 🤖 AI 识别每页文字：PDF 里本来就有文字的直接取出来；图片和扫描版用 DeepSeek 看图识别 —— */
+var DK_AI = {run:false, stop:false};
+function dkAiKey(){ try{ return localStorage.getItem('kh_ds_key') || ''; }catch(e){ return ''; } }
+function dkAiOpen(){
+  dkTextSave('pages');
+  var n = dkPicCount(), k = dkAiKey(), c = dkCfg(), model = c.aiModel || 'deepseek-v4-flash-vision-exp';
+  if(!n){ toast(DK.pdfLoading ? '绘本还在打开，稍等一下' : '先在左边选绘本 PDF 或图片'); return; }
+  var empty = dkBookPages().slice(0, n).filter(function(t){ return !String(t || '').trim(); }).length + Math.max(0, n - dkBookPages().length);
+  modal('<div class="dkai"><h3>🤖 AI 识别每页文字</h3>'
+    + '<p class="eg-note">把绘本每一页的文字认出来，按「=== 第 N 页 ===」填进右边，一句一行。PDF 里本来带文字的页直接取出，不花钱；图片和扫描版用 DeepSeek 看图识别。</p>'
+    + '<label class="dkai-f">DeepSeek API Key<input id="dkAiKey" type="password" autocomplete="off" placeholder="sk-…" value="'+htmlEsc(k)+'"></label>'
+    + '<small class="dkai-s">只存在这台设备的浏览器里，不会上传到别处。在 platform.deepseek.com 的「API keys」里创建。</small>'
+    + '<label class="dkai-f">模型<input id="dkAiModel" value="'+htmlEsc(model)+'"></label>'
+    + '<div class="dkai-r"><span>识别哪些页</span><label><input type="radio" name="dkAiR" value="empty" '+(empty ? 'checked' : '')+'> 只识别还没有文字的页（'+empty+' 页）</label>'
+    + '<label><input type="radio" name="dkAiR" value="all" '+(empty ? '' : 'checked')+'> 全部 '+n+' 页重新识别（会替换原来的文字）</label></div>'
+    + '<div class="dkai-prog" id="dkAiProg"></div>'
+    + '<button class="big p" id="dkAiGo" onclick="dkAiRun()">开始识别</button>'
+    + '<button class="big" style="margin-top:8px;color:var(--ink)" onclick="DK_AI.stop=true;closeModal()">关闭</button></div>');
+}
+function dkAiProg(t){ var e = $('dkAiProg'); if(e) e.innerHTML = t; }
+/* 把一页变成 JPEG（最长边 1600 像素），同时取 PDF 自带的文字 */
+function dkAiPage(i){
+  if(DK.book.type === 'img'){
+    return new Promise(function(res, rej){
+      var im = new Image();
+      im.onload = function(){
+        var s = Math.min(1, 1600/Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
+        cv.width = Math.round(im.naturalWidth*s); cv.height = Math.round(im.naturalHeight*s);
+        var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(im, 0, 0, cv.width, cv.height);
+        res({img:cv.toDataURL('image/jpeg', .85), text:''});
+      };
+      im.onerror = function(){ rej(new Error('图片打不开')); };
+      im.src = DK.bookUrls[i];
+    });
+  }
+  return DK.pdf.getPage(i+1).then(function(pg){
+    return pg.getTextContent().then(function(tc){
+      var lines = [], lastY = null, cur = '';
+      tc.items.forEach(function(it){ var y = Math.round(it.transform[5]); if(lastY !== null && Math.abs(y - lastY) > 3){ lines.push(cur); cur = ''; } cur += it.str; lastY = y; });
+      if(cur) lines.push(cur);
+      var text = lines.map(function(l){ return l.trim(); }).filter(Boolean).join('\n');
+      if(text.replace(/\s/g, '').length >= 2) return {img:'', text:text};
+      var v1 = pg.getViewport({scale:1}), sc = Math.min(3, 1600/Math.max(v1.width, v1.height)), vp = pg.getViewport({scale:sc});
+      var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+      return pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise.then(function(){ return {img:cv.toDataURL('image/jpeg', .85), text:''}; });
+    });
+  });
+}
+function dkAiAsk(key, model, img, pageNo, total){
+  var prompt = '这是一本儿童绘本的第 '+pageNo+' 页（共 '+total+' 页）。请把图片里印着的故事文字原样抄出来：'
+    + '\n1. 只输出文字本身，一句一行（遇到句号、问号、感叹号就换行；很长的句子可以在逗号处换行）。'
+    + '\n2. 保持原来的语言，中文就写中文，英文就写英文，不要翻译，不要加拼音。'
+    + '\n3. 不要页码、出版社、条形码、水印，也不要描述图画。封面只写书名和作者。'
+    + '\n4. 如果这一页没有文字，只输出：（无）'
+    + '\n不要任何解释或多余的话。';
+  return fetch('https://api.deepseek.com/chat/completions', {
+    method:'POST', headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+key},
+    body:JSON.stringify({model:model, temperature:0, max_tokens:1200, stream:false,
+      messages:[{role:'user', content:[{type:'text', text:prompt}, {type:'image_url', image_url:{url:img}}]}]})
+  }).then(function(r){
+    return r.text().then(function(t){
+      var j = null; try{ j = JSON.parse(t); }catch(e){}
+      if(!r.ok){
+        var msg = (j && j.error && j.error.message) || t.slice(0, 160);
+        if(r.status === 401) msg = 'API Key 不对或已失效';
+        else if(r.status === 402) msg = '账户余额不足';
+        else if(r.status === 429) msg = '请求太快了，稍后再试';
+        else if(/model/i.test(msg) && /exist|support|found/i.test(msg)) msg = '这个模型用不了：'+msg;
+        throw new Error(msg);
+      }
+      var out = j && j.choices && j.choices[0] && j.choices[0].message ? String(j.choices[0].message.content || '') : '';
+      return out.replace(/^```[a-z]*\n?|```$/g, '').split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l && !/^（?无）?$/.test(l) && !/^\(?none\)?$/i.test(l); }).join('\n');
+    });
+  });
+}
+function dkAiRun(){
+  if(DK_AI.run) return;
+  var key = ($('dkAiKey') || {}).value || '', model = (($('dkAiModel') || {}).value || '').trim() || 'deepseek-v4-flash-vision-exp';
+  var all = (document.querySelector('input[name=dkAiR]:checked') || {}).value === 'all';
+  key = key.trim();
+  try{ if(key) localStorage.setItem('kh_ds_key', key); }catch(e){}
+  dkCfg().aiModel = model; save();
+  var n = dkPicCount();
+  if(DK.book.type === 'pdf' && !DK.pdf){ dkAiProg('<span class="bad">PDF 还在打开，稍等几秒再点</span>'); return; }
+  var pages = dkBookPages().slice(); while(pages.length < n) pages.push('');
+  var todo = []; for(var i=0; i<n; i++) if(all || !String(pages[i] || '').trim()) todo.push(i);
+  if(!todo.length){ dkAiProg('每一页都已经有文字了。要重新识别，请选「全部重新识别」。'); return; }
+  DK_AI.run = true; DK_AI.stop = false;
+  var btn = $('dkAiGo'); if(btn){ btn.disabled = true; btn.textContent = '识别中…'; }
+  var k = 0, okN = 0, aiN = 0, fail = [];
+  var put = function(){ dkCfg().pages = pages.map(function(t, i){ return '=== 第 '+(i+1)+' 页 ===\n'+(t || ''); }).join('\n\n'); save(); var ta = $('dkT_pages'); if(ta) ta.value = dkCfg().pages; };
+  var finish = function(err){
+    DK_AI.run = false; put();
+    var b = $('dkAiGo'); if(b){ b.disabled = false; b.textContent = '再识别一次'; }
+    dkAiProg((err ? '<span class="bad">停下来了：'+htmlEsc(err)+'</span><br>' : '✅ 识别完成！')
+      + '成功 '+okN+' 页'+(aiN ? '（其中 '+aiN+' 页用了 AI）' : '')+(fail.length ? '，第 '+fail.join('、')+' 页没认出来' : '')
+      + '<br><small>结果已经填进右边的文字框，可以直接「开始阅读」，认错的字在阅读时点「✏️ 改文字」改。</small>');
+    if(!$('dkAiProg') && cur === 'dict') render();
+  };
+  (function next(){
+    if(DK_AI.stop) return finish('已停止');
+    if(k >= todo.length) return finish();
+    var i = todo[k];
+    dkAiProg('正在识别第 '+(i+1)+' 页（'+(k+1)+' / '+todo.length+'）…<div class="dkai-bar"><i style="width:'+Math.round(k/todo.length*100)+'%"></i></div>');
+    dkAiPage(i).then(function(p){
+      if(p.text) return p.text;
+      if(!key) throw new Error('需要填 DeepSeek API Key（这一页是图片，要用 AI 识别）');
+      aiN++;
+      return dkAiAsk(key, model, p.img, i+1, n);
+    }).then(function(t){
+      pages[i] = t; if(t) okN++; else fail.push(i+1);
+      put(); k++; next();
+    }).catch(function(e){
+      var m = (e && e.message) || '网络出错';
+      if(/Failed to fetch|NetworkError|Load failed/i.test(m)) m = '连不上 DeepSeek（检查网络，或浏览器拦住了跨站请求）';
+      finish(m);
+    });
+  })();
+}
+
 /* —— 文字切分 —— */
 function dkBookPages(){
   var raw = String(dkCfg().pages || '').replace(/\r/g, '');
@@ -7184,6 +7318,7 @@ function dkBookHtml(){
     + '<div class="dk-box"><h4>② 每页的文字（中文、英文都可以）</h4><div class="dk-note">用「=== 第 1 页 ===」分页；没有分页的话，有绘本时按空行分页，没有绘本就是一整页。可以选终端命令认出来的「.pages.txt」。</div>'
     + '<textarea class="dk-ta" id="dkT_pages" placeholder="=== 第 1 页 ===&#10;两元钱！&#10;=== 第 2 页 ===&#10;十颗豆豆两人分。&#10;=== 第 3 页 ===&#10;I see a red apple." oninput="dkTextSave(\'pages\')">' + htmlEsc(d.pages) + '</textarea>'
     + '<div class="dk-tools"><label class="dk-btn" for="dkPgIn">选择文字文件</label><input type="file" id="dkPgIn" class="dk-vh" accept=".txt,text/plain" onchange="dkPickText(this,\'pages\')">'
+    + '<button class="dk-btn p" onclick="dkAiOpen()">🤖 AI 识别</button>'
     + '<button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkExport(\'pages\')">⬇️ 导出</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartRead()">▶ 开始阅读</button>'
