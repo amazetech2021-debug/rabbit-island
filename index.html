@@ -1320,6 +1320,56 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .dkai-bar i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#d946ef)}
 .dkai .big{width:100%;margin-top:6px;padding:14px}
 .dkai .big:disabled{opacity:.6}
+.phx-stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:4px 0 10px}
+.phx-st{display:flex;flex-direction:column;align-items:center;gap:2px;border:3px solid transparent;background:var(--paper);border-radius:18px;padding:10px 6px;font:inherit;color:var(--ink);cursor:pointer;box-shadow:0 3px 10px rgba(100,80,160,.1)}
+.phx-st.on{border-color:#a855f7;background:#faf5ff}
+.phx-st-i{font-size:30px;line-height:1.1}
+.phx-st b{font-size:15px}
+.phx-st small{font-size:12px;color:var(--ink-soft)}
+.phx-later{display:inline-block;margin-left:8px;font-size:12.5px;background:#fef3c7;color:#92400e;border-radius:10px;padding:2px 8px}
+.phx-uem{font-size:34px;line-height:1;min-height:34px}
+.phx-ustars i,.phx-bigstars i{font-style:normal;color:#e5e7eb}
+.phx-ustars i.on,.phx-bigstars i.on{color:#fbbf24}
+.phx-ustars{font-size:18px;letter-spacing:2px}
+.phx-unit .phx-ustars i{position:static;display:inline;background:none;width:auto;height:auto;border-radius:0;font-size:18px;font-weight:400;color:#e5e7eb}
+.phx-unit .phx-ustars i.on{color:#fbbf24}
+.phx-unit .phx-uem{font-size:36px}
+.phx-one{display:flex;align-items:center;justify-content:center;gap:14px;margin:6px 0 10px}
+.phx-arrow{flex:none;width:64px;height:64px;border:none;border-radius:50%;background:#fff;font-size:26px;color:#7c3aed;cursor:pointer;box-shadow:0 3px 10px rgba(100,80,160,.15)}
+.phx-arrow:disabled{opacity:.3}
+.phx-big{display:flex;flex-direction:column;align-items:center;gap:8px;border:none;background:#fff;border-radius:30px;padding:24px 40px 18px;min-width:min(460px,70vw);font:inherit;color:var(--ink);cursor:pointer;box-shadow:0 8px 28px rgba(124,58,237,.16)}
+.phx-bem{font-size:110px;line-height:1}
+.phx-big .phx-wd{font-size:72px}
+.phx-big .phx-wd i{border:3px solid #ede9fe;border-radius:16px;padding:0 10px;margin:0 3px;background:#faf7ff}
+.phx-big .phx-wd i.h{border-color:#f9a8d4;background:#fdf2f8}
+.phx-big .phx-ipa{font-size:22px}
+.phx-big small{font-size:20px;color:var(--ink-soft)}
+.phx-tap{font-size:13px;color:#a78bfa}
+.phx-say{text-align:center;font-size:18px;color:var(--ink);margin:0 0 10px}
+.phx-say b{color:#db2777;font-size:22px}
+.phx-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px 0}
+.phx-dots button{min-width:52px;height:52px;border:3px solid transparent;border-radius:16px;background:#fff;font-size:26px;cursor:pointer;box-shadow:0 2px 8px rgba(100,80,160,.12);font-family:inherit}
+.phx-dots button.on{border-color:#a855f7}
+.phx-parent{text-align:center;font-size:13px;color:var(--ink-soft);margin:10px 0}
+.phx-opts.pic button span{font-size:84px;min-height:84px;line-height:1.1}
+.phx-ans{display:none;font-style:normal;font-size:26px}
+.phx-opts button.show .phx-ans{display:block}
+.phx-bigstars{font-size:56px;letter-spacing:6px;text-align:center}
+.phx-spic{display:flex;flex-direction:column;align-items:center;margin:4px auto 14px;border:none;background:#fff;border-radius:24px;padding:12px 30px;cursor:pointer;box-shadow:0 4px 14px rgba(100,80,160,.14);font:inherit}
+.phx-spic span{font-size:90px;line-height:1.1}
+.phx-spic small{font-size:16px;color:var(--ink-soft)}
+.phx-slots{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
+.phx-slots span{min-width:70px;height:80px;padding:0 6px;box-sizing:border-box;border:3px dashed #c4b5fd;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:"Comic Sans MS","Chalkboard SE","Avenir Next",ui-rounded,sans-serif;font-size:50px;font-weight:700;color:#1f2937}
+.phx-slots span.cur{border-color:#7c3aed;border-style:solid;background:#faf5ff}
+.phx-slots span.on{border-style:solid;border-color:#86efac;background:#f0fdf4}
+.phx-slots.win span{border-color:#22c55e;background:#dcfce7;transform:scale(1.06);transition:transform .2s}
+.phx-tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.phx-tiles button{min-width:76px;height:76px;padding:0 10px;border:none;border-radius:18px;background:linear-gradient(160deg,#fde68a,#fbbf24);color:#422006;font-family:"Comic Sans MS","Chalkboard SE","Avenir Next",ui-rounded,sans-serif;font-size:44px;font-weight:700;cursor:pointer;box-shadow:0 5px 0 #d97706}
+.phx-tiles button:active{transform:translateY(3px);box-shadow:0 2px 0 #d97706}
+.phx-tiles button.used{visibility:hidden}
+.phx-tiles button.shake{animation:phxShake .4s}
+@keyframes phxShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (max-width:700px){ .phx-bem{font-size:80px} .phx-big .phx-wd{font-size:48px} .phx-big{padding:18px 16px;min-width:0} .phx-arrow{width:44px;height:44px} .phx-opts.pic button span{font-size:60px} }
 .eg-banner-skill{background:linear-gradient(120deg,#34d399,#0d9488);box-shadow:0 8px 24px rgba(13,148,136,.2)}
 .eg-banner-skill .eg-bsel button.on{color:#0f766e}
 .ep-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;align-items:start}
@@ -7267,101 +7317,180 @@ function phxTabs(){
     + '<button class="tab" onclick="startEnQuiz()">🧪 测试</button>'
     + '<button class="tab" onclick="enMode=\'review\';render()">🔄 复习'+(_rvCount('en')?' ('+_rvCount('en')+')':'')+'</button></div>';
 }
-var _phxU = null, _phxMode = 'learn', _phxQ = null;
+/* —— 给 5 岁孩子的玩法：一次只看一个词、听音找图片、拼字母积木，答对得星星 —— */
+Object.assign(PHX_EM, {red:'🟥',six:'6️⃣',ten:'🔟',hot:'🔥',sit:'🪑',run:'🏃',wet:'💧',net:'🥅',leg:'🦵',jump:'🤸',kid:'🧒',yes:'✅',wind:'🌬️',vest:'🦺',
+  pot:'🍲',pin:'📌',black:'⚫',blue:'🔵',brown:'🟤',green:'🟢',white:'⚪',yellow:'🟡',clap:'👏',stop:'🛑',shop:'🏪',sing:'🎤',cape:'🦸',tape:'📼',
+  lake:'🏞️',kit:'🧰',pine:'🌲',note:'📝',rope:'🪢',tub:'🛁',tube:'🧪',mule:'🫏',day:'🌞',play:'🎮',feet:'🦶',eat:'🍽️',look:'👀',cook:'🧑‍🍳',down:'⬇️',
+  oil:'🛢️',soil:'🪴',joy:'😄',park:'🏞️',turn:'🔄',page:'📄',write:'✍️',wrap:'🎁',wrong:'❌',climb:'🧗',two:'2️⃣',one:'1️⃣',up:'⬆️',see:'👀',go:'🚶',
+  like:'👍',come:'👋',desk:'🪑',hen:'🐔',top:'🔝',star:'⭐',fan:'🪭',ant:'🐜',igloo:'🛖',quilt:'🛏️',queen:'👸',yes2:''});
+var PHX_KID = [
+  ['🔤','字母宝宝','每个字母都有自己的声音','4 岁+'],['🧩','三个字母拼一拼','cat、dog、pig：三个音连起来读','5 岁+'],
+  ['👯','字母好朋友','两个字母手拉手，比如 sh、ch','5–6 岁'],['🪄','魔法 e','词尾的 e 不出声，却让前面的字母读出名字','6 岁+'],
+  ['🎵','元音二重唱','两个元音一起唱一个音，比如 ee、oo','6 岁+'],['🦉','特别规则','不出声的字母、长单词拆开读','7 岁+'],['⭐','常用词','不按规律读的词，多看几遍就认识','5 岁+']];
+var _phxU = null, _phxMode = 'learn', _phxQ = null, _phxI = 0;
+function phxStars(id){ var c = phxCfg(); if(!c.stars) c.stars = {}; return c.stars[id] || (c.done[id] ? 1 : 0); }
+function phxIpaOn(){ return phxCfg().ipa !== false; }
 function pgEnPhonics(){
-  var c = phxCfg(), st = PHX[c.st] || PHX[0], h = phxTabs();
+  var c = phxCfg(), st = PHX[c.st] || PHX[0], K = PHX_KID[c.st], h = phxTabs();
   if(_phxU != null && st.u[_phxU]) h += phxUnitHtml(c.st, _phxU);
   else {
-    var total = 0, done = 0; PHX.forEach(function(S2, si){ S2.u.forEach(function(u, ui){ total++; if(c.done[phxId(si, ui)]) done++; }); });
-    h += '<div class="phx-head"><div><h3>🔡 自然拼读</h3><p>学字母和读音的对应规律，看到生词能拼读出来，听到单词能大致写出来。按顺序一关一关学。</p></div><div class="phx-prog"><b>'+done+'</b> / '+total+' 课</div></div>'
-      + '<div class="tabs phx-stages">'+PHX.map(function(S2, i){
-          var n = S2.u.length, d = S2.u.filter(function(u, ui){ return c.done[phxId(i, ui)]; }).length;
-          return '<button class="tab '+(i===c.st?'on':'')+'" onclick="phxCfg().st='+i+';save();render()">'+S2.n+(d ? ' <small>'+d+'/'+n+'</small>' : '')+'</button>'; }).join('')+'</div>'
-      + '<div class="phx-tip">'+st.d+'</div>'
+    var stars = 0; PHX.forEach(function(S2, si){ S2.u.forEach(function(u, ui){ stars += phxStars(phxId(si, ui)); }); });
+    h += '<div class="phx-head"><div><h3>🔡 自然拼读</h3><p>学会字母的声音，就能把没见过的单词拼着读出来。一次学一课：先看一看、听一听，再玩找图片和拼积木，答对就能得星星。</p></div>'
+      + '<div class="phx-prog"><b>⭐ '+stars+'</b>颗星星</div></div>'
+      + '<div class="phx-stages">'+PHX.map(function(S2, i){
+          var k = PHX_KID[i], n = S2.u.length, d = S2.u.filter(function(u, ui){ return phxStars(phxId(i, ui)); }).length;
+          return '<button class="phx-st'+(i===c.st?' on':'')+'" onclick="phxCfg().st='+i+';save();render()"><span class="phx-st-i">'+k[0]+'</span><b>'+k[1]+'</b><small>'+k[3]+(d ? ' · '+d+'/'+n : '')+'</small></button>'; }).join('')+'</div>'
+      + '<div class="phx-tip"><b>'+K[0]+' '+K[1]+'</b>：'+K[2]+'。'+(c.st >= 3 && c.st <= 5 ? '<span class="phx-later">前面几关熟练了再学这里</span>' : '')+'</div>'
       + '<div class="phx-units">'+st.u.map(function(u, ui){
-          var ok = c.done[phxId(c.st, ui)], big = u[1] && u[1].indexOf('|') < 0 && c.st < 6 ? u[1].replace('_', '_') : u[0];
-          return '<button class="phx-unit'+(ok?' ok':'')+'" onclick="_phxU='+ui+';_phxMode=\'learn\';render()">'
-            + '<b>'+htmlEsc(c.st === 0 ? u[0].toUpperCase()+' '+u[0] : big)+'</b><span>'+htmlEsc(u[2] || u[0])+'</span>'
-            + '<em>'+u[4].slice(0, 3).map(function(w){ return (PHX_EM[phxWord(w)] || '')+phxWord(w); }).join(' · ')+'</em>'+(ok ? '<i>✓</i>' : '')+'</button>'; }).join('')+'</div>';
+          var s = phxStars(phxId(c.st, ui)), em = PHX_EM[phxWord(u[4][0])] || PHX_EM[phxWord(u[4][1] || '')] || '';
+          var big = c.st === 0 ? u[0].toUpperCase()+' '+u[0] : (u[1] && u[1].indexOf('|') < 0 && c.st < 6 ? u[1] : u[0]);
+          return '<button class="phx-unit'+(s?' ok':'')+'" onclick="_phxU='+ui+';_phxMode=\'learn\';_phxI=0;_phxQ=null;render()">'
+            + '<span class="phx-uem">'+em+'</span><b>'+htmlEsc(big)+'</b>'
+            + '<em>'+u[4].slice(0, 3).map(phxWord).join(' · ')+'</em>'
+            + '<span class="phx-ustars">'+[1,2,3].map(function(k){ return '<i class="'+(k<=s?'on':'')+'">★</i>'; }).join('')+'</span></button>'; }).join('')+'</div>';
   }
   $('page').innerHTML = h;
   if(_phxU != null && _phxMode === 'type') phxTypeMount();
   if(_phxU != null && _phxMode === 'quiz'){ if(_phxQ) phxQuizNext(); else phxQuizNew(); }
+  if(_phxU != null && _phxMode === 'spell'){ if(_phxQ) phxSpellShow(); else phxSpellNew(); }
 }
 function phxUnitHtml(si, ui){
-  var u = PHX[si].u[ui], pat = u[1], words = u[4], c = phxCfg();
+  var u = PHX[si].u[ui];
   var title = si === 0 ? u[0].toUpperCase()+' '+u[0] : u[0];
   var head = '<div class="phx-uhead"><button class="dk-btn" onclick="_phxU=null;_phxQ=null;render()">← 返回</button>'
-    + '<div class="phx-ut"><b>'+htmlEsc(title)+'</b>'+(u[2] ? '<span>'+htmlEsc(u[2])+'</span>' : '')+'<small>'+htmlEsc(u[3])+'</small></div>'
-    + '<div class="tabs phx-modes">'+[['learn','👀 学一学'],['quiz','🎧 听音选词'],['type','⌨️ 打一打']].map(function(m){
-        return '<button class="tab '+(_phxMode===m[0]?'on':'')+'" onclick="_phxMode=\''+m[0]+'\';_phxQ=null;render()">'+m[1]+'</button>'; }).join('')+'</div>'
-    + '<div class="phx-nav"><button class="dk-btn" '+(ui<=0?'disabled':'')+' onclick="_phxU='+(ui-1)+';_phxQ=null;render()">⬅ 上一课</button>'
-    + '<button class="dk-btn p" '+(ui>=PHX[si].u.length-1?'disabled':'')+' onclick="_phxU='+(ui+1)+';_phxQ=null;render()">下一课 ➡</button></div></div>';
+    + '<div class="phx-ut"><b>'+htmlEsc(title)+'</b>'+(u[2] && phxIpaOn() ? '<span>'+htmlEsc(u[2])+'</span>' : '')+'</div>'
+    + '<div class="tabs phx-modes">'+[['learn','👀 看一看'],['quiz','🎧 找图片'],['spell','🧩 拼一拼'],['type','⌨️ 打一打']].map(function(m){
+        return '<button class="tab '+(_phxMode===m[0]?'on':'')+'" onclick="_phxMode=\''+m[0]+'\';_phxQ=null;_phxI=0;render()">'+m[1]+'</button>'; }).join('')+'</div>'
+    + '<div class="phx-nav"><button class="dk-btn'+(phxIpaOn()?' p':'')+'" onclick="phxCfg().ipa=!phxIpaOn();save();render()">音标 '+(phxIpaOn()?'开':'关')+'</button>'
+    + '<button class="dk-btn" '+(ui<=0?'disabled':'')+' onclick="_phxU='+(ui-1)+';_phxQ=null;_phxI=0;render()">⬅ 上一课</button>'
+    + '<button class="dk-btn p" '+(ui>=PHX[si].u.length-1?'disabled':'')+' onclick="_phxU='+(ui+1)+';_phxQ=null;_phxI=0;render()">下一课 ➡</button></div></div>';
   var body;
   if(_phxMode === 'quiz') body = '<div class="phx-quiz" id="phxQuiz"></div>';
+  else if(_phxMode === 'spell') body = '<div class="phx-quiz" id="phxSpell"></div>';
   else if(_phxMode === 'type') body = '<div class="phx-type">'+tyPanelHtml()+'</div>';
-  else {
-    var magic = /^[aeiou]_e$/.test(pat || '') && si === 3, cards = '';
-    if(magic){
-      var pairs = [], rest = [];
-      for(var k=0; k<words.length; k++){ var w = words[k]; if(words[k+1] === w+'e'){ pairs.push([w, words[k+1]]); k++; } else rest.push(w); }
-      cards = pairs.map(function(p, i){
-        return '<div class="phx-pair"><button class="phx-card" onclick="phxBlend('+(i*2)+',\''+p[0]+'\')">'+phxWordHtml(p[0], '', i*2)+'<span class="phx-ipa">'+phxIpa(p[0])+'</span><small>'+(PHX_ZH[p[0]]||'')+'</small></button>'
-          + '<span class="phx-arr">+ e →</span><button class="phx-card" onclick="phxBlend('+(i*2+1)+',\''+p[1]+'\')">'+phxWordHtml(p[1], pat, i*2+1)+'<span class="phx-ipa">'+phxIpa(p[1])+'</span><small>'+(PHX_ZH[p[1]]||'')+'</small></button></div>'; }).join('')
-        + '<div class="phx-grid">'+rest.map(function(w, i){ var id = 100+i; return phxCardHtml(w, pat, id); }).join('')+'</div>';
-    } else cards = '<div class="phx-grid">'+words.map(function(w, i){ return phxCardHtml(w, si === 6 ? '' : pat, i); }).join('')+'</div>';
-    body = '<div class="phx-learn"><div class="phx-tools"><button class="dk-btn y" onclick="phxReadAll()">🔊 全部读一遍</button><span>点单词：一个音一个音亮起来，再读整个词。<b class="phx-key">彩色</b>是这一课要学的字母，<s>划线</s>的不发音。</span></div>'+cards
-      + '<div class="phx-done"><button class="dk-btn p" onclick="_phxMode=\'quiz\';_phxQ=null;render()">学会了，去听音选词 ➡</button></div></div>';
-  }
+  else body = phxLearnHtml(si, ui);
   return head + body;
+}
+/* 看一看：一次只看一个词，大图 + 字母积木；点积木一块一块亮起来，再读整个词 */
+function phxLearnHtml(si, ui){
+  var u = PHX[si].u[ui], words = u[4], n = words.length, i = Math.max(0, Math.min(_phxI, n-1)), w = words[i], k = phxWord(w);
+  var magic = si === 3 && /^[aeiou]_e$/.test(u[1]), prev = magic && words[i-1] && words[i-1]+'e' === w ? words[i-1] : '', next = magic && words[i+1] === w+'e' ? words[i+1] : '';
+  var pat = si === 6 ? '' : (magic && next ? '' : u[1]);
+  var tip = si === 0 ? '<div class="phx-say">'+htmlEsc(u[0])+' 的声音，就是 <b>'+htmlEsc(k)+'</b> 开头的那个音</div>'
+    : magic && next ? '<div class="phx-say">后面加上一个魔法 <b>e</b>，就变成 <b>'+htmlEsc(next)+'</b> 了！</div>'
+    : magic && prev ? '<div class="phx-say">魔法 e 不出声，让 <b>'+htmlEsc(u[1][0])+'</b> 读出自己的名字</div>' : '';
+  return '<div class="phx-one">'
+    + '<button class="phx-arrow" '+(i<=0?'disabled':'')+' onclick="_phxI='+(i-1)+';render()">◀</button>'
+    + '<button class="phx-big" onclick="phxBlend(0,\''+w+'\')">'
+    + '<span class="phx-bem">'+(PHX_EM[k] || '🔤')+'</span>'
+    + phxWordHtml(w, pat, 0)
+    + (phxIpaOn() ? '<span class="phx-ipa">'+phxIpa(w)+'</span>' : '')
+    + '<small>'+(PHX_ZH[k] || '')+'</small><span class="phx-tap">👆 点一点，听我读</span></button>'
+    + '<button class="phx-arrow" '+(i>=n-1?'disabled':'')+' onclick="_phxI='+(i+1)+';render()">▶</button></div>'
+    + tip
+    + '<div class="phx-dots">'+words.map(function(x, j){ return '<button class="'+(j===i?'on':'')+'" onclick="_phxI='+j+';render()">'+(PHX_EM[phxWord(x)] || phxWord(x))+'</button>'; }).join('')+'</div>'
+    + (si === 0 && u[3] ? '<p class="phx-parent">家长提示：'+htmlEsc(u[3])+'。电脑读不出单独的字母音，可以家长示范，让孩子跟着说「'+htmlEsc(k)+'」的开头。</p>' : '')
+    + (i >= n-1 ? '<div class="phx-done"><button class="dk-btn p" style="font-size:17px;padding:12px 26px" onclick="_phxMode=\'quiz\';_phxQ=null;render()">都看完啦，去玩找图片 🎧</button></div>' : '');
 }
 function phxCardHtml(w, pat, i){
   var k = phxWord(w);
-  return '<button class="phx-card" onclick="phxBlend('+i+',\''+w+'\')"><span class="phx-em">'+(PHX_EM[k] || '')+'</span>'+phxWordHtml(w, pat, i)+'<span class="phx-ipa">'+phxIpa(w)+'</span><small>'+(PHX_ZH[k] || '')+'</small></button>';
+  return '<button class="phx-card" onclick="phxBlend('+i+',\''+w+'\')"><span class="phx-em">'+(PHX_EM[k] || '')+'</span>'+phxWordHtml(w, pat, i)+(phxIpaOn() ? '<span class="phx-ipa">'+phxIpa(w)+'</span>' : '')+'<small>'+(PHX_ZH[k] || '')+'</small></button>';
 }
 function phxReadAll(){
   var u = PHX[phxCfg().st].u[_phxU], ws = u[4].map(phxWord), k = 0;
   _phxTm.forEach(clearTimeout); _phxTm = [];
   (function nx(){ if(k >= ws.length) return; phxSay(ws[k]); k++; _phxTm.push(setTimeout(nx, 1300)); })();
 }
-/* 听音选词：读一个词，从三个里选；对 6 个以上算这一课学会 */
+function phxSaveStars(n){
+  var c = phxCfg(), id = phxId(c.st, _phxU); if(!c.stars) c.stars = {};
+  if(n > (c.stars[id] || 0)) c.stars[id] = n;
+  if(n >= 1) c.done[id] = 1;
+  save();
+}
+function phxStarHtml(n){ return '<div class="phx-bigstars">'+[1,2,3].map(function(k){ return '<i class="'+(k<=n?'on':'')+'">★</i>'; }).join('')+'</div>'; }
+/* 🎧 找图片：听一个词，从三张图里点出来（不用认字）；6 题，对 4 题得 1 颗星，5 题 2 颗，全对 3 颗 */
 function phxQuizNew(){
   var c = phxCfg(), si = c.st, u = PHX[si].u[_phxU], ws = u[4].map(phxWord);
-  var others = []; PHX[si].u.forEach(function(x, i){ if(i !== _phxU) x[4].forEach(function(w){ others.push(phxWord(w)); }); });
-  if(others.length < 4) PHX[1].u.forEach(function(x){ x[4].forEach(function(w){ others.push(w); }); });
-  _phxQ = {n:0, ok:0, total:8, ws:ws, others:others};
+  var em = function(w){ return !!PHX_EM[w]; }, mine = ws.filter(em), pic = mine.length >= 2;
+  var others = []; PHX[si].u.forEach(function(x, i){ if(i !== _phxU) x[4].forEach(function(w){ w = phxWord(w); if(!pic || em(w)) others.push(w); }); });
+  if(others.length < 4) PHX[1].u.forEach(function(x){ x[4].forEach(function(w){ if(!pic || em(w)) others.push(w); }); });
+  _phxQ = {n:0, ok:0, total:6, ws:pic ? mine : ws, others:others, pic:pic};
   phxQuizNext();
 }
 function phxQuizNext(){
   var Q = _phxQ, box = document.getElementById('phxQuiz'); if(!Q || !box) return;
   if(Q.n >= Q.total){
-    var pass = Q.ok >= 6, id = phxId(phxCfg().st, _phxU);
-    if(pass){ phxCfg().done[id] = 1; save(); }
-    box.innerHTML = '<div class="phx-res">'+(pass ? '🎉 答对 '+Q.ok+' / '+Q.total+'，这一课学会啦！' : '答对 '+Q.ok+' / '+Q.total+'，再练一次吧（对 6 个就过关）')+'</div>'
-      + '<div class="phx-done"><button class="dk-btn" onclick="phxQuizNew()">🔄 再来一次</button>'
-      + (pass ? '<button class="dk-btn p" onclick="_phxMode=\'type\';_phxQ=null;render()">去打一打 ➡</button>' : '<button class="dk-btn p" onclick="_phxMode=\'learn\';_phxQ=null;render()">回去再学一学</button>')+'</div>';
+    var s = Q.ok >= 6 ? 3 : Q.ok >= 5 ? 2 : Q.ok >= 4 ? 1 : 0; phxSaveStars(s);
+    box.innerHTML = phxStarHtml(s) + '<div class="phx-res">'+(s ? '太棒了！答对 '+Q.ok+' / '+Q.total : '答对 '+Q.ok+' / '+Q.total+'，再试一次吧，对 4 个就有星星')+'</div>'
+      + '<div class="phx-done"><button class="dk-btn" onclick="phxQuizNew()">🔄 再玩一次</button><button class="dk-btn p" onclick="_phxMode=\'spell\';_phxQ=null;render()">去拼一拼 🧩</button></div>';
     return;
   }
-  var ans = Q.ws[Q.n % Q.ws.length], pool = Q.others.filter(function(w){ return w !== ans && Q.ws.indexOf(w) < 0; });
-  if(Q.n >= Q.ws.length) ans = Q.ws[Math.floor(Math.random()*Q.ws.length)];
-  var opts = [ans]; while(opts.length < 3 && pool.length){ var w = pool.splice(Math.floor(Math.random()*pool.length), 1)[0]; if(opts.indexOf(w) < 0) opts.push(w); }
+  var ans = Q.ws[Q.n % Q.ws.length]; if(Q.n >= Q.ws.length) ans = Q.ws[Math.floor(Math.random()*Q.ws.length)];
+  var pool = Q.others.filter(function(w){ return w !== ans && Q.ws.indexOf(w) < 0; }), opts = [ans];
+  while(opts.length < 3 && pool.length){ var w = pool.splice(Math.floor(Math.random()*pool.length), 1)[0]; if(opts.indexOf(w) < 0 && (!Q.pic || opts.every(function(o){ return PHX_EM[o] !== PHX_EM[w]; }))) opts.push(w); }
   opts.sort(function(){ return Math.random() - .5; });
   Q.ans = ans; Q.lock = false;
-  box.innerHTML = '<div class="phx-qtop">第 '+(Q.n+1)+' / '+Q.total+' 题 · 答对 '+Q.ok+'</div>'
+  box.innerHTML = '<div class="phx-qtop">第 '+(Q.n+1)+' / '+Q.total+' 题　'+'⭐'.repeat(Q.ok)+'</div>'
     + '<button class="phx-listen" onclick="phxSay(_phxQ.ans)">🔊 再听一遍</button>'
-    + '<div class="phx-opts">'+opts.map(function(w){ return '<button data-w="'+w+'" onclick="phxQuizPick(this,\''+w+'\')"><span>'+(PHX_EM[w] || '')+'</span>'+htmlEsc(w)+'<em>'+phxIpa(w)+'</em></button>'; }).join('')+'</div>';
+    + '<div class="phx-opts'+(Q.pic ? ' pic' : '')+'">'+opts.map(function(w){
+        return '<button data-w="'+w+'" onclick="phxQuizPick(this,\''+w+'\')">'+(Q.pic ? '<span>'+PHX_EM[w]+'</span><em class="phx-ans">'+htmlEsc(w)+'</em>' : '<span>'+(PHX_EM[w] || '')+'</span>'+htmlEsc(w))+'</button>'; }).join('')+'</div>';
   setTimeout(function(){ phxSay(ans); }, 250);
 }
 function phxQuizPick(btn, w){
   var Q = _phxQ; if(!Q || Q.lock) return; Q.lock = true;
   var ok = w === Q.ans; if(ok) Q.ok++;
   btn.classList.add(ok ? 'ok' : 'no');
-  if(!ok) [].forEach.call(btn.parentNode.children, function(b){ if(b.getAttribute('data-w') === Q.ans) b.classList.add('ok'); });
-  setTimeout(function(){ Q.n++; phxQuizNext(); }, ok ? 700 : 1500);
+  [].forEach.call(btn.parentNode.children, function(b){ b.classList.add('show'); if(b.getAttribute('data-w') === Q.ans) b.classList.add('ok'); });
+  if(!ok) setTimeout(function(){ phxSay(Q.ans); }, 300);
+  setTimeout(function(){ Q.n++; phxQuizNext(); }, ok ? 900 : 1800);
+}
+/* 🧩 拼一拼：看图听音，按顺序点字母积木，把单词拼出来 */
+function phxSpellNew(){
+  var c = phxCfg(), si = c.st, u = PHX[si].u[_phxU];
+  var ws = u[4].map(phxWord).filter(function(w){ return w.length <= 8; });
+  ws = ws.slice().sort(function(){ return Math.random() - .5; }).slice(0, Math.min(5, ws.length));
+  _phxQ = {ws:ws, n:0, ok:0, miss:0, pat:si === 6 ? '' : u[1]};
+  phxSpellStart();
+}
+function phxSpellStart(){
+  var Q = _phxQ, w = Q.ws[Q.n], parts = phxSplit(w, /^[aeiou]_e$/.test(Q.pat) ? '' : Q.pat).map(function(p){ return p.t; });
+  var tiles = parts.map(function(t, i){ return {t:t, i:i}; });
+  if(tiles.length > 1){ do { tiles.sort(function(){ return Math.random() - .5; }); } while(tiles.every(function(t, i){ return t.i === i; })); }
+  Q.parts = parts; Q.tiles = tiles; Q.got = 0; Q.lock = false; Q.err = 0;
+  phxSpellShow(); setTimeout(function(){ phxSay(w); }, 250);
+}
+function phxSpellShow(){
+  var Q = _phxQ, box = document.getElementById('phxSpell'); if(!Q || !box) return;
+  if(Q.n >= Q.ws.length){
+    var s = Q.miss === 0 ? 3 : Q.miss <= 2 ? 2 : 1; phxSaveStars(s);
+    box.innerHTML = phxStarHtml(s) + '<div class="phx-res">拼完 '+Q.ws.length+' 个词啦！'+(Q.miss ? '点错 '+Q.miss+' 次' : '一次都没点错 🎉')+'</div>'
+      + '<div class="phx-done"><button class="dk-btn" onclick="phxSpellNew()">🔄 再拼一次</button>'
+      + (_phxU < PHX[phxCfg().st].u.length-1 ? '<button class="dk-btn p" onclick="_phxU++;_phxMode=\'learn\';_phxI=0;_phxQ=null;render()">学下一课 ➡</button>' : '')+'</div>';
+    return;
+  }
+  var w = Q.ws[Q.n];
+  box.innerHTML = '<div class="phx-qtop">第 '+(Q.n+1)+' / '+Q.ws.length+' 个词</div>'
+    + '<button class="phx-spic" onclick="phxSay(\''+w+'\')"><span>'+(PHX_EM[w] || '🔊')+'</span><small>'+(PHX_ZH[w] || '')+' 🔊</small></button>'
+    + '<div class="phx-slots">'+Q.parts.map(function(t, i){ return '<span class="'+(i < Q.got ? 'on' : '')+(i === Q.got ? ' cur' : '')+'">'+(i < Q.got ? htmlEsc(t) : '')+'</span>'; }).join('')+'</div>'
+    + '<div class="phx-tiles">'+Q.tiles.map(function(t, k){ return '<button class="'+(t.used ? 'used' : '')+'" onclick="phxSpellTap(this,'+k+')">'+htmlEsc(t.t)+'</button>'; }).join('')+'</div>'
+    + '<p class="phx-parent">按顺序点字母积木，把这个词拼出来。拼不出来可以点图片再听一遍。</p>';
+}
+function phxSpellTap(btn, k){
+  var Q = _phxQ, t = Q.tiles[k]; if(!Q || Q.lock || t.used) return;
+  if(t.t === Q.parts[Q.got]){
+    t.used = true; Q.got++;
+    if(Q.got >= Q.parts.length){
+      Q.lock = true; phxSpellShow(); phxSay(Q.ws[Q.n]);
+      var sl = document.querySelector('.phx-slots'); if(sl) sl.classList.add('win');
+      setTimeout(function(){ Q.n++; if(Q.n < Q.ws.length) phxSpellStart(); else phxSpellShow(); }, 1500);
+    } else phxSpellShow();
+  } else {
+    Q.miss++; btn.classList.add('shake'); setTimeout(function(){ btn.classList.remove('shake'); }, 450);
+  }
 }
 function phxTypeMount(){
   var c = phxCfg(), u = PHX[c.st].u[_phxU];
-  var items = u[4].map(function(w){ var k = phxWord(w); return {t:k, zh:(phxIpa(k)+'　'+(PHX_ZH[k] || '')).trim(), em:PHX_EM[k] || ''}; });
+  var items = u[4].map(function(w){ var k = phxWord(w); return {t:k, zh:((phxIpaOn() ? phxIpa(k) : '')+'　'+(PHX_ZH[k] || '')).trim(), em:PHX_EM[k] || ''}; });
   tyStart(items, 'phx|'+c.st+'|'+_phxU);
 }
 
