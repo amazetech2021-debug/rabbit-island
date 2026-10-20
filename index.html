@@ -6547,15 +6547,15 @@ function dkAiTidy(out){
   out.split('\n').forEach(function(l){
     l = l.replace(/^[\s#*\-•>]+/, '').trim();
     if(!l || /^（?无）?$/.test(l) || /^\(?none\)?$/i.test(l)) return;
+    if(/小红书|淘宝|扫一扫|微信|抖音|ISBN|^第?\s*\d+\s*页?$|^[\d\s/·.:：-]+$/i.test(l)) return;   // 水印、二维码、页码
     if(/[一-鿿]/.test(l)) l.replace(/([。！？!?][”"’」』]?)/g, '$1\n').split('\n').forEach(function(x){ x = x.trim(); if(x) lines.push(x); });
     else l.replace(/([.!?]["”’']?)\s+(?=[A-Z"“‘'])/g, '$1\n').split('\n').forEach(function(x){ x = x.trim(); if(x) lines.push(x); });
   });
   return lines.join('\n');
 }
 function dkAiAsk(key, base, model, img){
-  var prompt = '这是一本儿童绘本的一页。请把图片里印着的故事文字原样抄出来，一句一行。'
-    + '保持原来的语言（中文写中文，英文写英文），不要翻译，不要加拼音。不要页码、出版社、条形码、水印，也不要描述图画。'
-    + '封面只写书名和作者。如果这一页没有文字，只输出：（无）。不要任何解释。';
+  // 识字模型听不懂太复杂的要求，提示越简单越好；水印、页码在本地过滤
+  var prompt = '请输出图片中所有的文字内容，按阅读顺序，一句一行，不要翻译，不要任何解释。';
   return fetch(base.replace(/\/+$/, '') + '/chat/completions', {
     method:'POST', headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+key},
     body:JSON.stringify({model:model, stream:false, max_tokens:2000,
@@ -6573,6 +6573,7 @@ function dkAiAsk(key, base, model, img){
       }
       var out = j && j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : '';
       if(Array.isArray(out)) out = out.map(function(x){ return x.text || ''; }).join('\n');
+      DK_AI.last = String(out || '').slice(0, 120);
       return dkAiTidy(out);
     });
   });
@@ -6600,7 +6601,7 @@ function dkAiRun(){
   var pages = dkBookPages().slice(); while(pages.length < n) pages.push('');
   var todo = []; for(var i=0; i<n; i++) if(all || !String(pages[i] || '').trim()) todo.push(i);
   if(!todo.length){ dkAiProg('每一页都已经有文字了。要重新识别，请选「全部重新识别」。'); return; }
-  DK_AI.run = true; DK_AI.stop = false;
+  DK_AI.run = true; DK_AI.stop = false; DK_AI.raw = {};
   var btn = $('dkAiGo'); if(btn){ btn.disabled = true; btn.textContent = '识别中…'; }
   var k = 0, okN = 0, aiN = 0, fail = [];
   var put = function(){ dkCfg().pages = pages.map(function(t, i){ return '=== 第 '+(i+1)+' 页 ===\n'+(t || ''); }).join('\n\n'); save(); var ta = $('dkT_pages'); if(ta) ta.value = dkCfg().pages; };
@@ -6609,6 +6610,7 @@ function dkAiRun(){
     var b = $('dkAiGo'); if(b){ b.disabled = false; b.textContent = '再识别一次'; }
     dkAiProg((err ? '<span class="bad">停下来了：'+htmlEsc(err)+'</span><br>' : '✅ 识别完成！')
       + '成功 '+okN+' 页'+(aiN ? '（其中 '+aiN+' 页用了千问识别）' : '')+(fail.length ? '<br>第 '+fail.join('、')+' 页没有认出文字（放大后也没认出来）：可能是只有图没有字的页，也可能是手写体、艺术字太特别。打开阅读翻到这几页，点「✏️ 改文字」手动补上就行。' : '')
+      + (fail.length ? '<br><small>千问对这几页的回答：'+fail.map(function(p){ return '第 '+p+' 页「'+htmlEsc(DK_AI.raw[p] || '（空）')+'」'; }).join('；')+'</small>' : '')
       + '<br><small>结果已经填进右边的文字框，可以直接「开始阅读」，认错的字在阅读时点「✏️ 改文字」改。</small>');
     if(!$('dkAiProg') && cur === 'dict') render();
   };
@@ -6622,11 +6624,11 @@ function dkAiRun(){
       if(!key) throw new Error('需要填通义千问的 API Key（这一页是图片，要用 AI 识别）');
       aiN++;
       return dkAiAsk(key, base, model, p.img).then(function(t){
-        if(t || !p.cv) return t;
+        if(t || !p.cv){ if(!t) DK_AI.raw[i+1] = DK_AI.last; return t; }
         dkAiProg('第 '+(i+1)+' 页没认出字，放大再认一次…<div class="dkai-bar"><i style="width:'+Math.round((k+.5)/todo.length*100)+'%"></i></div>');
         var tiles = dkAiTiles(p.cv), res = [];
         return tiles.reduce(function(pr, im){ return pr.then(function(){ return dkAiAsk(key, base, model, im).then(function(x){ if(x) res.push(x); }); }); }, Promise.resolve())
-          .then(function(){ return dkAiDedup(res.join('\n')); });
+          .then(function(){ var r = dkAiDedup(res.join('\n')); if(!r) DK_AI.raw[i+1] = DK_AI.last; return r; });
       });
     }).then(function(t){
       pages[i] = t; if(t) okN++; else fail.push(i+1);
