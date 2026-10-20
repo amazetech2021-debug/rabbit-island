@@ -5484,6 +5484,7 @@ function applyPenalty(){
   // 水分自然消耗
   S.water = Math.max(0, 100 - gap * CFG.waterDecay);
   if(gap >= CFG.deadDay){
+    S._streakBak = Math.max(S.streak || 0, (S.rabbit && S.rabbit.streak) || 0);
     S.dead = true; S.hp = 0;
     penaltyMsg = `已经 ${gap} 天没有打卡，小兔兔没能撑住…`;
   }else if(gap >= CFG.warnDay){
@@ -5658,6 +5659,7 @@ function _checkinProgressPanel(){
   var c = S.cnt || {};
   var html = '<div class="ck-box" style="background:linear-gradient(135deg,#f5f0ff,#e8e0ff);border-radius:16px;padding:14px">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  if(S.dead) html = html.replace('<div style="display:flex', '<div style="background:#fff1f2;border:2px dashed #fda4af;border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:14px;color:#9f1239;display:flex;gap:8px;align-items:center;flex-wrap:wrap">💔 小兔兔饿晕了，现在不能打卡。<button onclick="reviveAsk()" style="margin-left:auto;border:none;border-radius:12px;padding:6px 12px;background:#f43f5e;color:#fff;font-weight:800;cursor:pointer;font-family:inherit">💖 家长复活</button></div><div style="display:flex');
   html += '<div style="font-weight:700;font-size:14px;color:#6c5ce7">📋 今日打卡进度</div>';
   var ready = _checkinReady();
   var alreadyDone = (S.lastCheck === today());
@@ -5740,7 +5742,7 @@ function completeGemLesson(num){
 
 function checkin(){
   if(S.lastCheck === today()){ toast("今天已经打过卡啦 ✅"); return; }
-  if(S.dead){ toast("小兔兔已经不在了，先复活它吧"); return; }
+  if(S.dead){ toast("小兔兔饿晕了，请爸爸妈妈在「家长模式」里复活它"); return; }
   if(!_checkinReady()){
     // 显示还差什么
     var c = S.cnt||{};
@@ -5765,12 +5767,34 @@ function checkin(){
     <p>连续打卡 <b>${S.streak}</b> 天 🎉<br>奖励天数 +1，可用 <b>${S.rewardDays}</b> 天去兑换奖励<br>小兔兔体力回复 ${CFG.checkinHp} 点，水分 +10</p>
     <button class="big g" onclick="closeModal();render()">继续</button>`);
 }
-function revive(){
-  S.dead=false; S.hp=60; S.water=60;
-  S.grow = Math.floor(S.grow*.8); S.lastCheck = today(); S.streak = 1; save();
-  modal(`<div class="e">✨</div><h3>它回来了</h3>
-    <p>小兔兔睁开了圆溜溜的眼睛，不过瘦了一圈。<br>这次别再让它等太久了。</p>
-    <button class="big g" onclick="closeModal();render()">我知道了</button>`);
+/* 家长复活：恢复成断卡前的样子（成长值、打卡天数、奖励、皮肤都不扣），可选把连续天数接上 */
+function reviveAsk(){
+  var dead = !!S.dead, sick = !dead && S.hp < 100;
+  var st = Math.max(S.streak || 0, (S.rabbit && S.rabbit.streak) || 0, S._streakBak || 0);
+  modal('<div class="e">'+(dead ? '💖' : '🩹')+'</div><h3>'+(dead ? '复活小兔兔' : '给小兔兔治病')+'</h3>'
+    + '<p>'+(dead ? '小兔兔饿晕了。' : (sick ? '小兔兔现在体力 '+S.hp+'。' : '小兔兔现在很健康。'))+'复活后体力、水分回满，<b>成长、打卡天数、可兑换天数、换装都保持原样</b>，今天可以继续打卡。</p>'
+    + '<label style="display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;margin:8px 0 12px"><input type="checkbox" id="reviveStreak" checked style="width:18px;height:18px"> 连续打卡天数也接上（之前是 '+st+' 天，不算断卡）</label>'
+    + '<button class="big g" onclick="revive($(\'reviveStreak\').checked)">'+(dead ? '💖 复活' : '🩹 治好它')+'</button>'
+    + '<button class="big" style="margin-top:8px;color:var(--ink)" onclick="closeModal()">取消</button>');
+}
+function revive(keepStreak){
+  var yd = new Date(Date.now() - 864e5).toISOString().slice(0,10);
+  var st = Math.max(S.streak || 0, (S.rabbit && S.rabbit.streak) || 0, S._streakBak || 0);
+  S.dead = false; S.hp = 100; S.water = 100;
+  if(S.lastCheck !== today()) S.lastCheck = yd;          // 当作昨天刚打过卡，不再触发断卡惩罚，今天照常打卡
+  if(keepStreak){
+    S.streak = st;
+    if(S.rabbit){
+      if(S.rabbit.lastDay !== today()){ S.rabbit.prevLastDay = S.rabbit.lastDay; S.rabbit.lastDay = yd; }
+      S.rabbit.streak = Math.max(S.rabbit.streak || 0, st);
+      if(S.rabbit.bonusAt > S.rabbit.streak) S.rabbit.bonusAt = S.rabbit.streak;
+    }
+  }
+  delete S._streakBak;
+  save(); penaltyMsg = '';
+  modal(`<div class="e">✨</div><h3>小兔兔回来啦！</h3>
+    <p>它睁开了圆溜溜的眼睛，体力、水分都满了，之前的成长和打卡记录都还在。<br>以后每天记得来学习打卡哦。</p>
+    <button class="big g" onclick="closeModal();render()">太好了</button>`);
 }
 
 /* ══════════ 侧边栏 ══════════ */
@@ -8206,6 +8230,7 @@ function rabbitRender(){
    <section class="rpanel rparent" id="rparentPanel">
     <h2>家长模式</h2>
     <div class="rrow">
+     <button onclick="reviveAsk()" style="${S.dead?'border-color:#f9a8d4;background:#fdf2f8;font-weight:800':''}">${S.dead?'💖 复活小兔兔':'🩹 恢复小兔兔健康'}</button>
      <button onclick="rabbitAddCheckinDay()">🎉 +1天 奖励打卡</button>
      <button onclick="rabbitRemoveCheckinDay()">↩️ -1天 更正打卡</button>
      <button class="rwarn" onclick="if(confirm('清空今日学习记录？')){S.rabbit.done=[];S.rabbit.counted=false;save();rabbitRender();}">清空今日学习</button>
@@ -15199,8 +15224,9 @@ if(penaltyMsg && !S.dead){
   modal(`<div class="e">⚠️</div><h3>小兔兔生病了</h3><p>${penaltyMsg}</p>
     <button class="big g" onclick="closeModal();checkin()">马上打卡救它</button>`);
 }else if(penaltyMsg && S.dead){
-  modal(`<div class="e">💔</div><h3>它没能等到你</h3><p>${penaltyMsg}<br>下次别隔这么久了。</p>
-    <button class="big p" onclick="closeModal()">我知道了</button>`);
+  modal(`<div class="e">💔</div><h3>小兔兔饿晕了</h3><p>${penaltyMsg}<br>请爸爸妈妈帮忙复活它，之前的成长和打卡记录都不会丢。</p>
+    <button class="big g" onclick="closeModal();reviveAsk()">💖 家长复活</button>
+    <button class="big p" style="margin-top:8px" onclick="closeModal()">我知道了</button>`);
 }
 
 /* ══════════════════════════════════════════════════════════════
