@@ -1308,6 +1308,9 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .dkai-f{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:800;color:var(--ink);margin-top:10px;text-align:left}
 .dkai-f input{padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:inherit;font-size:15px;font-weight:600}
 .dkai-s{display:block;font-size:12px;color:var(--ink-soft);margin-top:4px;text-align:left}
+.dkai-ck{display:block;font-size:13.5px;color:var(--ink);margin-top:10px;text-align:left;line-height:2}
+.dkai-ck input[type=checkbox]{width:18px;height:18px;vertical-align:middle;accent-color:#7c3aed}
+.dkai-ck input:not([type]){width:150px;padding:4px 8px;border:2px solid var(--line);border-radius:10px;font:inherit;font-size:13.5px}
 .dkai-r{display:flex;flex-direction:column;gap:6px;margin:12px 0 4px;font-size:14px;color:var(--ink);text-align:left}
 .dkai-r span{font-weight:800}
 .dkai-r label{display:flex;gap:8px;align-items:center;cursor:pointer}
@@ -6486,14 +6489,16 @@ var DK_AI = {run:false, stop:false};
 function dkAiKey(){ try{ return localStorage.getItem('kh_ds_key') || ''; }catch(e){ return ''; } }
 function dkAiOpen(){
   dkTextSave('pages');
-  var n = dkPicCount(), k = dkAiKey(), c = dkCfg(), model = c.aiModel || 'deepseek-v4-flash-vision-exp';
+  var n = dkPicCount(), k = dkAiKey(), c = dkCfg(), model = (!c.aiModel || /vision-exp|v4-pro/.test(c.aiModel)) ? 'deepseek-flash' : c.aiModel, pro = c.aiPro !== false, proModel = c.aiProModel || 'deepseek-v4-pro';
   if(!n){ toast(DK.pdfLoading ? '绘本还在打开，稍等一下' : '先在左边选绘本 PDF 或图片'); return; }
   var empty = dkBookPages().slice(0, n).filter(function(t){ return !String(t || '').trim(); }).length + Math.max(0, n - dkBookPages().length);
   modal('<div class="dkai"><h3>🤖 AI 识别每页文字</h3>'
     + '<p class="eg-note">把绘本每一页的文字认出来，按「=== 第 N 页 ===」填进右边，一句一行。PDF 里本来带文字的页直接取出，不花钱；图片和扫描版用 DeepSeek 看图识别。</p>'
     + '<label class="dkai-f">DeepSeek API Key<input id="dkAiKey" type="password" autocomplete="off" placeholder="sk-…" value="'+htmlEsc(k)+'"></label>'
     + '<small class="dkai-s">只存在这台设备的浏览器里，不会上传到别处。在 platform.deepseek.com 的「API keys」里创建。</small>'
-    + '<label class="dkai-f">模型<input id="dkAiModel" value="'+htmlEsc(model)+'"></label>'
+    + '<label class="dkai-f">看图识别的模型<input id="dkAiModel" value="'+htmlEsc(model)+'"></label>'
+    + '<small class="dkai-s">DeepSeek 目前只有 deepseek-flash 能看图；deepseek-v4-pro 只能处理文字，所以用它来校对。</small>'
+    + '<label class="dkai-ck"><input type="checkbox" id="dkAiPro" '+(pro ? 'checked' : '')+'> 认出来以后，再用 <input id="dkAiProModel" value="'+htmlEsc(proModel)+'"> 校对一遍（改形近字、整理断句，稍慢一点）</label>'
     + '<div class="dkai-r"><span>识别哪些页</span><label><input type="radio" name="dkAiR" value="empty" '+(empty ? 'checked' : '')+'> 只识别还没有文字的页（'+empty+' 页）</label>'
     + '<label><input type="radio" name="dkAiR" value="all" '+(empty ? '' : 'checked')+'> 全部 '+n+' 页重新识别（会替换原来的文字）</label></div>'
     + '<div class="dkai-prog" id="dkAiProg"></div>'
@@ -6556,13 +6561,29 @@ function dkAiAsk(key, model, img, pageNo, total){
     });
   });
 }
+/* 用文字模型（deepseek-v4-pro）校对看图认出来的文字 */
+function dkAiFix(key, model, text, pageNo){
+  if(!text) return Promise.resolve(text);
+  var prompt = '下面是从一本儿童绘本第 '+pageNo+' 页的图片里识别出来的文字，可能有认错的形近字、漏字、多余的符号，断行也可能不对。'
+    + '\n请只改明显的识别错误，按一句一行整理（句号、问号、感叹号后换行）。保持原来的语言，不要翻译，不要增加或删掉内容，不要解释，直接输出整理好的文字。\n\n' + text;
+  return fetch('https://api.deepseek.com/chat/completions', {
+    method:'POST', headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+key},
+    body:JSON.stringify({model:model, temperature:0, max_tokens:1500, stream:false, messages:[{role:'user', content:prompt}]})
+  }).then(function(r){ return r.json().then(function(j){
+    if(!r.ok) throw new Error((j && j.error && j.error.message) || ('校对出错 '+r.status));
+    var out = j.choices && j.choices[0] && j.choices[0].message ? String(j.choices[0].message.content || '') : '';
+    out = out.replace(/^```[a-z]*\n?|```$/g, '').split('\n').map(function(l){ return l.trim(); }).filter(Boolean).join('\n');
+    return out || text;
+  }); });
+}
 function dkAiRun(){
   if(DK_AI.run) return;
-  var key = ($('dkAiKey') || {}).value || '', model = (($('dkAiModel') || {}).value || '').trim() || 'deepseek-v4-flash-vision-exp';
+  var key = ($('dkAiKey') || {}).value || '', model = (($('dkAiModel') || {}).value || '').trim() || 'deepseek-flash';
+  var pro = !!($('dkAiPro') || {}).checked, proModel = (($('dkAiProModel') || {}).value || '').trim() || 'deepseek-v4-pro', proErr = '';
   var all = (document.querySelector('input[name=dkAiR]:checked') || {}).value === 'all';
   key = key.trim();
   try{ if(key) localStorage.setItem('kh_ds_key', key); }catch(e){}
-  dkCfg().aiModel = model; save();
+  dkCfg().aiModel = model; dkCfg().aiPro = pro; dkCfg().aiProModel = proModel; save();
   var n = dkPicCount();
   if(DK.book.type === 'pdf' && !DK.pdf){ dkAiProg('<span class="bad">PDF 还在打开，稍等几秒再点</span>'); return; }
   var pages = dkBookPages().slice(); while(pages.length < n) pages.push('');
@@ -6576,7 +6597,8 @@ function dkAiRun(){
     DK_AI.run = false; put();
     var b = $('dkAiGo'); if(b){ b.disabled = false; b.textContent = '再识别一次'; }
     dkAiProg((err ? '<span class="bad">停下来了：'+htmlEsc(err)+'</span><br>' : '✅ 识别完成！')
-      + '成功 '+okN+' 页'+(aiN ? '（其中 '+aiN+' 页用了 AI）' : '')+(fail.length ? '，第 '+fail.join('、')+' 页没认出来' : '')
+      + '成功 '+okN+' 页'+(aiN ? '（其中 '+aiN+' 页用了 AI'+(pro && !proErr ? '，并用 '+htmlEsc(proModel)+' 校对过' : '')+'）' : '')
+      + (proErr ? '<br><span class="bad">校对没做成：'+htmlEsc(proErr)+'，用的是看图直接认出的文字</span>' : '')+(fail.length ? '，第 '+fail.join('、')+' 页没认出来' : '')
       + '<br><small>结果已经填进右边的文字框，可以直接「开始阅读」，认错的字在阅读时点「✏️ 改文字」改。</small>');
     if(!$('dkAiProg') && cur === 'dict') render();
   };
@@ -6589,7 +6611,11 @@ function dkAiRun(){
       if(p.text) return p.text;
       if(!key) throw new Error('需要填 DeepSeek API Key（这一页是图片，要用 AI 识别）');
       aiN++;
-      return dkAiAsk(key, model, p.img, i+1, n);
+      return dkAiAsk(key, model, p.img, i+1, n).then(function(t){
+        if(!pro || proErr || !t) return t;
+        dkAiProg('正在校对第 '+(i+1)+' 页（'+(k+1)+' / '+todo.length+'）…<div class="dkai-bar"><i style="width:'+Math.round((k+.5)/todo.length*100)+'%"></i></div>');
+        return dkAiFix(key, proModel, t, i+1).catch(function(e){ proErr = (e && e.message) || '校对出错'; return t; });
+      });
     }).then(function(t){
       pages[i] = t; if(t) okN++; else fail.push(i+1);
       put(); k++; next();
