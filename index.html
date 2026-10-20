@@ -1280,6 +1280,8 @@ html.eg-play #grtCanvas,html.eg-play .dch{display:none!important}
 .phx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 .phx-card{display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:#fff;border-radius:20px;padding:16px 10px;font:inherit;cursor:pointer;box-shadow:0 3px 12px rgba(100,80,160,.12);color:var(--ink)}
 .phx-card small{font-size:14px;color:var(--ink-soft)}
+.phx-ipa{font-family:"Lucida Grande","Segoe UI","Arial Unicode MS",sans-serif;font-size:17px;color:#7c3aed;letter-spacing:.02em}
+.phx-opts button em{font-style:normal;font-family:"Lucida Grande","Segoe UI",sans-serif;font-size:16px;font-weight:500;color:#7c3aed}
 .phx-em{font-size:40px;line-height:1;min-height:40px}
 .phx-wd{font-family:"Comic Sans MS","Chalkboard SE","Avenir Next",ui-rounded,sans-serif;font-size:44px;font-weight:700;letter-spacing:.02em;display:flex;gap:2px}
 .phx-wd i{font-style:normal;padding:0 3px;border-radius:10px;transition:background .15s,transform .15s;color:#1f2937}
@@ -7114,6 +7116,23 @@ var PHX = [
     ['第3组','','','',['she','we','me','my','and','go','can','come']],['第4组','','','',['see','like','here','where','what','for','up','little']]]}
 ];
 var PHX_GR = ['tch','igh','qu','ck','sh','ch','th','ph','wh','ng','kn','wr','mb','ai','ay','ee','ea','oa','ow','oo','ou','oi','oy','ar','er','ir','ur','or'];
+var PHX_IPA = {apple:'ˈæpl',ant:'ænt',cat:'kæt',ball:'bɔːl',bed:'bed',bus:'bʌs',cup:'kʌp',cake:'keɪk',dog:'dɒɡ',duck:'dʌk',desk:'desk',egg:'eɡ',pen:'pen',fish:'fɪʃ',fan:'fæn',fox:'fɒks',
+  goat:'ɡəʊt',girl:'ɡɜːl',bag:'bæɡ',hat:'hæt',hen:'hen',hand:'hænd',igloo:'ˈɪɡluː',pig:'pɪɡ',sit:'sɪt',jam:'dʒæm',jet:'dʒet',jump:'dʒʌmp',kite:'kaɪt',kid:'kɪd',king:'kɪŋ',lion:'ˈlaɪən',leg:'leɡ',lamp:'læmp',
+  moon:'muːn',map:'mæp',milk:'mɪlk',nest:'nest',net:'net',nut:'nʌt',octopus:'ˈɒktəpəs',hot:'hɒt',pot:'pɒt',queen:'kwiːn',quilt:'kwɪlt',quick:'kwɪk',rabbit:'ˈræbɪt',red:'red',run:'rʌn',sun:'sʌn',sock:'sɒk',six:'sɪks',
+  tiger:'ˈtaɪɡə',ten:'ten',top:'tɒp',umbrella:'ʌmˈbrelə',van:'væn',vet:'vet',vest:'vest',web:'web',wet:'wet',wind:'wɪnd',box:'bɒks',yoyo:'ˈjəʊjəʊ','yo-yo':'ˈjəʊjəʊ',yes:'jes',yellow:'ˈjeləʊ',zebra:'ˈzebrə',zoo:'zuː',zip:'zɪp',
+  bat:'bæt',mat:'mæt',rat:'ræt',cap:'kæp',big:'bɪɡ',pin:'pɪn',fig:'fɪɡ',lip:'lɪp',log:'lɒɡ',mop:'mɒp',bug:'bʌɡ',mud:'mʌd',hut:'hʌt',
+  black:'blæk',blue:'bluː',clap:'klæp',clock:'klɒk',flag:'flæɡ',glass:'ɡlɑːs',plug:'plʌɡ',sled:'sled',brown:'braʊn',bread:'bred',crab:'kræb',drum:'drʌm',frog:'frɒɡ',green:'ɡriːn',tree:'triː',truck:'trʌk',
+  skip:'skɪp',smile:'smaɪl',snake:'sneɪk',snow:'snəʊ',spoon:'spuːn',stop:'stɒp',star:'stɑː',swim:'swɪm',ship:'ʃɪp',shop:'ʃɒp',shell:'ʃel',chip:'tʃɪp',chin:'tʃɪn',lunch:'lʌntʃ',thin:'θɪn',bath:'bɑːθ',three:'θriː',
+  this:'ðɪs',that:'ðæt',phone:'fəʊn',photo:'ˈfəʊtəʊ',dolphin:'ˈdɒlfɪn',whale:'weɪl',white:'waɪt',wheel:'wiːl',back:'bæk',ring:'rɪŋ',sing:'sɪŋ',long:'lɒŋ',
+  cape:'keɪp',tap:'tæp',tape:'teɪp',can:'kæn',cane:'keɪn',lake:'leɪk',gate:'ɡeɪt',kit:'kɪt',pine:'paɪn',bike:'baɪk',five:'faɪv',hop:'hɒp',hope:'həʊp',not:'nɒt',note:'nəʊt',home:'həʊm',rope:'rəʊp',bone:'bəʊn',
+  cub:'kʌb',cube:'kjuːb',tub:'tʌb',tube:'tjuːb',mule:'mjuːl',these:'ðiːz',rain:'reɪn',tail:'teɪl',train:'treɪn',day:'deɪ',play:'pleɪ',tray:'treɪ',bee:'biː',feet:'fiːt',sea:'siː',eat:'iːt',leaf:'liːf',
+  boat:'bəʊt',coat:'kəʊt',soap:'səʊp',bow:'bəʊ',food:'fuːd',book:'bʊk',look:'lʊk',foot:'fʊt',cook:'kʊk',out:'aʊt',house:'haʊs',mouse:'maʊs',cow:'kaʊ',down:'daʊn',owl:'aʊl',coin:'kɔɪn',oil:'ɔɪl',soil:'sɔɪl',
+  boy:'bɔɪ',toy:'tɔɪ',joy:'dʒɔɪ',car:'kɑː',farm:'fɑːm',park:'pɑːk',her:'hɜː',bird:'bɜːd',turn:'tɜːn',nurse:'nɜːs',fork:'fɔːk',horse:'hɔːs',corn:'kɔːn',city:'ˈsɪti',ice:'aɪs',face:'feɪs',gem:'dʒem',
+  giant:'ˈdʒaɪənt',page:'peɪdʒ',knife:'naɪf',knee:'niː',know:'nəʊ',write:'raɪt',wrap:'ræp',wrong:'rɒŋ',lamb:'læm',thumb:'θʌm',climb:'klaɪm',basket:'ˈbɑːskɪt',sunset:'ˈsʌnset',picnic:'ˈpɪknɪk',pencil:'ˈpensl',
+  the:'ðə',a:'ə',I:'aɪ',is:'ɪz',you:'juː',said:'sed',was:'wɒz',one:'wʌn',two:'tuː',are:'ɑː',have:'hæv',they:'ðeɪ',do:'duː',to:'tuː',of:'ɒv',he:'hiː',she:'ʃiː',we:'wiː',me:'miː',my:'maɪ',and:'ænd',go:'ɡəʊ',
+  come:'kʌm',see:'siː',like:'laɪk',here:'hɪə',where:'weə',what:'wɒt','for':'fɔː',up:'ʌp',little:'ˈlɪtl'};
+PHX_ZH.yoyo = PHX_ZH['yo-yo']; PHX_EM.yoyo = PHX_EM['yo-yo'];
+function phxIpa(w){ var k = phxWord(w); return PHX_IPA[k] ? '/'+PHX_IPA[k]+'/' : ''; }
 function phxCfg(){ if(!S.phx || typeof S.phx !== 'object') S.phx = {}; var c = S.phx; if(c.st == null) c.st = 0; if(!c.done || typeof c.done !== 'object') c.done = {}; return c; }
 function phxId(s, u){ return s+'-'+u; }
 function phxWord(w){ return String(w).replace(/-/g, ''); }
@@ -7199,8 +7218,8 @@ function phxUnitHtml(si, ui){
       var pairs = [], rest = [];
       for(var k=0; k<words.length; k++){ var w = words[k]; if(words[k+1] === w+'e'){ pairs.push([w, words[k+1]]); k++; } else rest.push(w); }
       cards = pairs.map(function(p, i){
-        return '<div class="phx-pair"><button class="phx-card" onclick="phxBlend('+(i*2)+',\''+p[0]+'\')">'+phxWordHtml(p[0], '', i*2)+'<small>'+(PHX_ZH[p[0]]||'')+'</small></button>'
-          + '<span class="phx-arr">+ e →</span><button class="phx-card" onclick="phxBlend('+(i*2+1)+',\''+p[1]+'\')">'+phxWordHtml(p[1], pat, i*2+1)+'<small>'+(PHX_ZH[p[1]]||'')+'</small></button></div>'; }).join('')
+        return '<div class="phx-pair"><button class="phx-card" onclick="phxBlend('+(i*2)+',\''+p[0]+'\')">'+phxWordHtml(p[0], '', i*2)+'<span class="phx-ipa">'+phxIpa(p[0])+'</span><small>'+(PHX_ZH[p[0]]||'')+'</small></button>'
+          + '<span class="phx-arr">+ e →</span><button class="phx-card" onclick="phxBlend('+(i*2+1)+',\''+p[1]+'\')">'+phxWordHtml(p[1], pat, i*2+1)+'<span class="phx-ipa">'+phxIpa(p[1])+'</span><small>'+(PHX_ZH[p[1]]||'')+'</small></button></div>'; }).join('')
         + '<div class="phx-grid">'+rest.map(function(w, i){ var id = 100+i; return phxCardHtml(w, pat, id); }).join('')+'</div>';
     } else cards = '<div class="phx-grid">'+words.map(function(w, i){ return phxCardHtml(w, si === 6 ? '' : pat, i); }).join('')+'</div>';
     body = '<div class="phx-learn"><div class="phx-tools"><button class="dk-btn y" onclick="phxReadAll()">🔊 全部读一遍</button><span>点单词：一个音一个音亮起来，再读整个词。<b class="phx-key">彩色</b>是这一课要学的字母，<s>划线</s>的不发音。</span></div>'+cards
@@ -7210,7 +7229,7 @@ function phxUnitHtml(si, ui){
 }
 function phxCardHtml(w, pat, i){
   var k = phxWord(w);
-  return '<button class="phx-card" onclick="phxBlend('+i+',\''+w+'\')"><span class="phx-em">'+(PHX_EM[k] || '')+'</span>'+phxWordHtml(w, pat, i)+'<small>'+(PHX_ZH[k] || '')+'</small></button>';
+  return '<button class="phx-card" onclick="phxBlend('+i+',\''+w+'\')"><span class="phx-em">'+(PHX_EM[k] || '')+'</span>'+phxWordHtml(w, pat, i)+'<span class="phx-ipa">'+phxIpa(w)+'</span><small>'+(PHX_ZH[k] || '')+'</small></button>';
 }
 function phxReadAll(){
   var u = PHX[phxCfg().st].u[_phxU], ws = u[4].map(phxWord), k = 0;
@@ -7242,7 +7261,7 @@ function phxQuizNext(){
   Q.ans = ans; Q.lock = false;
   box.innerHTML = '<div class="phx-qtop">第 '+(Q.n+1)+' / '+Q.total+' 题 · 答对 '+Q.ok+'</div>'
     + '<button class="phx-listen" onclick="phxSay(_phxQ.ans)">🔊 再听一遍</button>'
-    + '<div class="phx-opts">'+opts.map(function(w){ return '<button data-w="'+w+'" onclick="phxQuizPick(this,\''+w+'\')"><span>'+(PHX_EM[w] || '')+'</span>'+htmlEsc(w)+'</button>'; }).join('')+'</div>';
+    + '<div class="phx-opts">'+opts.map(function(w){ return '<button data-w="'+w+'" onclick="phxQuizPick(this,\''+w+'\')"><span>'+(PHX_EM[w] || '')+'</span>'+htmlEsc(w)+'<em>'+phxIpa(w)+'</em></button>'; }).join('')+'</div>';
   setTimeout(function(){ phxSay(ans); }, 250);
 }
 function phxQuizPick(btn, w){
@@ -7254,7 +7273,7 @@ function phxQuizPick(btn, w){
 }
 function phxTypeMount(){
   var c = phxCfg(), u = PHX[c.st].u[_phxU];
-  var items = u[4].map(function(w){ var k = phxWord(w); return {t:k, zh:PHX_ZH[k] || '', em:PHX_EM[k] || ''}; });
+  var items = u[4].map(function(w){ var k = phxWord(w); return {t:k, zh:(phxIpa(k)+'　'+(PHX_ZH[k] || '')).trim(), em:PHX_EM[k] || ''}; });
   tyStart(items, 'phx|'+c.st+'|'+_phxU);
 }
 
