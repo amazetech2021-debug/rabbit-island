@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🐰 开心兔兔养成岛</title>
-<!-- 语音引擎：豆包直连 ByteDance API（中文）+ ElevenLabs（英文）+ 浏览器兜底 --><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=JetBrains+Mono:wght@400&display=swap">
+<!-- 语音引擎：豆包直连 ByteDance API（中文）+ 有道词典（英文）+ 浏览器兜底 --><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
 :root{
   --cream:#EDE8F8; --cream-2:#E0D9F2; --paper:#FAFAFE;
@@ -4607,19 +4607,14 @@ const STAGES = [
  [280,"兔兔小公主","🐰","它是这片花园里最闪亮的小明星！"]
 ];
 /* ══════════════════════════════════════════════════════════════
-   语音引擎 · 豆包直连（中文）+ ElevenLabs（英文）+ 浏览器兜底
+   语音引擎 · 豆包直连（中文）+ 有道词典（英文）+ 浏览器兜底
    ══════════════════════════════════════════════════════════════ */
 var TTS = {
   /* 词典发音开关（有道免费接口），分语言 */
   dictAudio : {zh:true, en:true},
 
-  /* 英文引擎：'eleven' ElevenLabs / 'dict' 有道词典 */
+  /* 英文引擎：有道词典 */
   enEngine   : 'dict',
-  elevenKey  : 'sk_ed70dcb109f5c398f78c5e9d070ff4e4e0b3f84b5c252ac5',
-  elevenBase : 'https://api.elevenlabs.io',
-  elevenMaxFail : 2,
-  elevenVoice: 'XrExE9yKIg1WjnnlVkGX',
-  elevenModel: 'eleven_multilingual_v2',
 
   /* 火山引擎豆包（中文） */
   doubaoKey       : 'b90b39d5-e7f0-49fa-9627-34e3ab47866c',
@@ -4795,44 +4790,6 @@ function playUrl(url, cacheKey, onEnd, onError){
   if(cacheKey) TTS.cache.set(cacheKey, url);
 }
 
-/* ElevenLabs（英文） */
-function ttsEleven(text, key, next){
-  if(!TTS.elevenKey || typeof fetch === 'undefined' || ttsPref().en !== 'auto'){ next(); return; }
-  const g0 = TTS.gen;
-  let t = String(text).trim();
-  if(/^[A-Za-z][A-Za-z'-]*$/.test(t)) t = t + '.';
-  try{
-  fetch((TTS.elevenBase||'https://api.elevenlabs.io')+'/v1/text-to-speech/'+TTS.elevenVoice+'/stream?output_format=mp3_44100_128',{
-    method:'POST',
-    headers:{'xi-api-key':TTS.elevenKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
-    body:JSON.stringify({text: t, model_id: TTS.elevenModel,
-      voice_settings:{stability:.45, similarity_boost:.85, style:.10, use_speaker_boost:true}})
-  })
-  .then(r => {
-    if(!r.ok){
-      const hint = r.status===401 ? 'Key 无效或已停用'
-                 : r.status===429 ? '额度用完或频率超限'
-                 : r.status===422 ? '音色 ID 或模型名不对' : '';
-      throw new Error('ElevenLabs '+r.status+(hint?'（'+hint+'）':''));
-    }
-    return r.blob();
-  })
-  .then(b => { TTS._elevenFail = 0; if(g0 !== TTS.gen) return; playUrl(URL.createObjectURL(b), key); })
-  .catch(e => {
-    if(g0 !== TTS.gen) return;
-    const netFail = /Failed to fetch|NetworkError|load failed/i.test(e.message);
-    TTS._elevenFail = (TTS._elevenFail || 0) + 1;
-    if(netFail && TTS._elevenFail >= (TTS.elevenMaxFail||2) && !TTS._elevenDown){
-      TTS._elevenDown = true;
-      console.warn('[英文语音] ElevenLabs 连续连不上，本次会话不再重试。');
-    }else{
-      console.warn('[英文语音] '+e.message+' → 已降级');
-    }
-    next();
-  });
-  }catch(e){ console.warn('ElevenLabs 异常:', e.message); next(); }
-}
-
 /* 火山引擎豆包（中文）- 直连 ByteDance API */
 function ttsDoubao(text, key, next, onEnd, isSSML){
   if(!TTS.doubaoKey || typeof fetch === 'undefined' || ttsPref().zh !== 'doubao'){ next(); return; }
@@ -4986,8 +4943,7 @@ function speak(text, lang){
   TTS.busy = true;
 
   const toBrowser = () => ttsBrowser(text, isEn);
-  const toEleven = () => ttsEleven(text, key, toBrowser);
-  if(isEn){ ttsDict(text, true, key, toEleven); return; }
+  if(isEn){ ttsDict(text, true, key, toBrowser); return; }
   if(TTS._dbFail >= 5){ toBrowser(); return; }
   ttsDoubao(text, key, toBrowser);
 }
@@ -15644,50 +15600,6 @@ if(penaltyMsg && !S.dead){
    同一只小白兔的剪影，安静地蜷缩着睡着了，
    灰白色调，柔和朦胧，周围飘着几片羽毛，透明背景
 
-   ══════════════════════════════════════════════════════════════
-   附二：ElevenLabs 中转（Cloudflare Worker，免费）
-   ──────────────────────────────────────────────────────────────
-   什么时候需要：浏览器控制台看到 ElevenLabs 网络错误（Failed to fetch）。
-   部署步骤：
-     1. dash.cloudflare.com 注册 → Workers & Pages → Create Worker
-     2. 把下面代码整段粘进去，Deploy
-     3. 拿到形如 https://xxx.workers.dev 的地址
-     4. 把本文件里的 elevenBase 改成那个地址
-   注意：workers.dev 域名在部分网络下同样可能不通，
-        真不行就绑一个自己的域名，或换成香港的轻量服务器做反代。
-
-   ──── Worker 代码（从下一行开始复制）────
-
-   export default {
-     async fetch(request) {
-       const url = new URL(request.url);
-       const target = 'https://api.elevenlabs.io' + url.pathname + url.search;
-
-       // 预检直接放行，这一步是让浏览器能带 xi-api-key 的关键
-       if (request.method === 'OPTIONS') {
-         return new Response(null, { status: 204, headers: {
-           'Access-Control-Allow-Origin': '*',
-           'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-           'Access-Control-Allow-Headers': '*',
-           'Access-Control-Max-Age': '86400'
-         }});
-       }
-
-       const resp = await fetch(target, {
-         method: request.method,
-         headers: request.headers,
-         body: ['GET','HEAD'].includes(request.method) ? undefined : request.body
-       });
-
-       const h = new Headers(resp.headers);
-       h.set('Access-Control-Allow-Origin', '*');
-       h.set('Access-Control-Expose-Headers', '*');
-       return new Response(resp.body, { status: resp.status, headers: h });
-     }
-   };
-
-   ──── 复制到这里为止 ────
-   ══════════════════════════════════════════════════════════════
 
    填进去的方法（以 base64 内嵌为例）：
      PET_ART.stage[0] = 'data:image/png;base64,……';
