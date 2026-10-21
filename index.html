@@ -1073,6 +1073,10 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-cmd pre{margin:0;background:var(--cream);border-radius:10px;padding:10px 12px;font:12.5px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all;max-height:11em;overflow:auto}
 .dk-cmd .hd{display:flex;align-items:center;gap:8px}
 .dk-cmd .hd strong{flex:1}
+.dk-extbox{position:fixed;z-index:56;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+.dk-extbox iframe,.dk-extbox #dkYT,.dk-extbox > div{width:100%;height:100%;border:0;display:block}
+.dk-extph{aspect-ratio:16/9;background:#111}
+.dk-or{font-size:13.5px;font-weight:800;color:var(--ink);margin:14px 0 6px}
 .dk-in2{width:100%;box-sizing:border-box;border:2px solid var(--cream-2);border-radius:12px;padding:9px 12px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
 @media (min-width:1100px){
   .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
@@ -7657,7 +7661,7 @@ function dkDictHtml(){
   var d = dkCfg(), cues = DK.cues = dkCues();
   if(d.going && cues.length){
     if(d.di >= cues.length) d.di = cues.length - 1; if(d.di < 0) d.di = 0;
-    var c = cues[d.di], timed = c.s != null && DK.media;
+    var c = cues[d.di], timed = c.s != null && (DK.media || dkExtInfo());
     var showTx = d.mode === 'read' || d.reveal;
     var list = '<div class="dk-side"><div class="dk-list" id="dkList">' + cues.map(function(x, i){
       if(DK.editCue === i) return '<div class="dk-li edit"><em>' + (i+1) + '</em><div style="flex:1;display:flex;flex-direction:column;gap:6px"><textarea class="dk-ta" id="dkCueEd" style="min-height:70px">' + htmlEsc(x.t) + '</textarea>'
@@ -7675,7 +7679,7 @@ function dkDictHtml(){
       + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
       + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
       + '<div class="dk-play dk-dbody"><div class="dk-stage">'
-      + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : '')
+      + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : (dkExtInfo() ? '<div class="dk-vid dk-extph" id="dkExt"></div>' : ''))
       + '<div class="dk-tools" style="justify-content:center">'
       + '<button class="dk-btn" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
       + '<button class="dk-btn y" style="font-size:15px;padding:10px 20px" onclick="dkPlay()">🔊 ' + (timed ? '播放这一句' : '读这一句') + '</button>'
@@ -7693,7 +7697,12 @@ function dkDictHtml(){
     + '<div class="dk-box"><h4>① 视频或音频（可以不选）</h4><div class="dk-note">mp4、mov、mp3、m4a 等，在这里播放，一句放完自动停。RMVB、AVI 先用「终端命令 → 格式转换」转成 mp4。不选的话，就用语音一句一句读给孩子听。</div>'
     + (DK.media ? '<div class="dk-file">🎬 ' + htmlEsc(DK.media.name) + '</div>' : '')
     + '<div class="dk-tools"><label class="dk-btn p" for="dkMedIn">选择文件</label><input type="file" id="dkMedIn" class="dk-vh" accept="video/*,audio/*" onchange="dkPickMedia(this)">'
-    + (DK.media ? '<button class="dk-btn" onclick="dkClearMedia()">清除</button>' : '') + '</div></div>'
+    + (DK.media ? '<button class="dk-btn" onclick="dkClearMedia()">清除</button>' : '') + '</div>'
+    + '<div class="dk-or">或者粘贴视频链接（YouTube、哔哩哔哩）</div>'
+    + '<div class="dk-tools" style="flex-wrap:nowrap"><input class="dk-in2" id="dkLink" placeholder="https://www.bilibili.com/video/BV…　或　https://www.youtube.com/watch?v=…" value="' + htmlEsc(d.link || '') + '" onchange="dkCfg().link=this.value.trim();save();render()" spellcheck="false" autocapitalize="off">'
+    + (d.link ? '<button class="dk-btn" style="flex:none;white-space:nowrap" onclick="dkCfg().link=\'\';save();render()">清除</button>' : '') + '</div>'
+    + dkExtLinkNote()
+    + '<div class="dk-note">用链接时，字幕要自己贴到右边：带时间点的 .srt / .vtt，或者 YouTube「显示文字记录」里复制出来的（时间一行、文字一行）。</div></div>'
     + '<div class="dk-box"><h4>② 字幕或文字</h4><div class="dk-note">选 .srt、.vtt、.txt 文件，或直接粘贴。带时间点的会跟着视频一句一句放；普通文字按句号、问号分句。</div>'
     + '<textarea class="dk-ta" id="dkT_subs" placeholder="小兔子乖乖，把门开开。&#10;I like apples. I like bananas." oninput="dkTextSave(\'subs\')">' + htmlEsc(d.subs) + '</textarea>'
     + '<div class="dk-tools"><label class="dk-btn" for="dkSubIn">选择字幕文件</label><input type="file" id="dkSubIn" class="dk-vh" accept=".srt,.vtt,.txt,text/plain" onchange="dkPickText(this,\'subs\')">'
@@ -7703,6 +7712,112 @@ function dkDictHtml(){
     + '</div>'
     + '</div>';
 }
+
+/* —— 听写用网上的视频（YouTube / 哔哩哔哩链接）——
+   播放器放在页面最上层的一个固定框里，跟着占位框的位置走，这样翻句子重新画页面时视频不会重新加载。
+   YouTube 用官方播放接口，可以精确跳到每一句、放完自动停；
+   哔哩哔哩的外链播放器不能被网页控制，只能带着时间点重新打开，放完这一句的时长后再重新打开停在下一句开头，时间是大概的。 */
+var DKX = {kind:null, id:null, p:1, box:null, yt:null, ytReady:false, ytWait:null, stopAt:null, poll:0, biliT:0, raf:0};
+function dkExtInfo(){
+  var d = dkCfg(); if(DK.media || !d.link) return null;
+  var y = d.link.match(/youtube\.com\/watch\?[^#]*v=([\w-]{11})/) || d.link.match(/youtu\.be\/([\w-]{11})/) || d.link.match(/youtube\.com\/(?:shorts|embed|live)\/([\w-]{11})/);
+  if(y) return {kind:'yt', id:y[1]};
+  var b = d.link.match(/(BV[0-9A-Za-z]{10})/);
+  if(b){ var p = d.link.match(/[?&]p=(\d+)/); return {kind:'bili', id:b[1], p:p ? +p[1] : 1}; }
+  return null;
+}
+function dkExtLinkNote(){
+  var d = dkCfg(); if(!d.link) return '';
+  var x = dkExtInfo();
+  if(DK.media) return '<div class="dk-note" style="color:#b45309">已经选了本地文件，会优先用本地文件；要用链接，先点「清除」。</div>';
+  if(!x) return '<div class="dk-note" style="color:#dc2626">认不出这个链接，请粘贴 YouTube 或哔哩哔哩的视频网址。</div>';
+  return '<div class="dk-file">'+(x.kind === 'yt' ? '▶️ YouTube 视频 '+x.id : '📺 哔哩哔哩 '+x.id+(x.p > 1 ? ' 第 '+x.p+' 集' : ''))+'</div>'
+    + (x.kind === 'bili' ? '<div class="dk-note">哔哩哔哩的播放器不让网页控制，只能大概跳到那一句、放完大概停住，可能会多放或少放一点。想要准，就用「终端命令」把视频下载下来再选文件。</div>' : '');
+}
+function dkExtBox(){
+  if(DKX.box && document.body.contains(DKX.box)) return DKX.box;
+  var b = document.createElement('div'); b.id = 'dkExtBox'; b.className = 'dk-extbox'; b.style.display = 'none';
+  document.body.appendChild(b); DKX.box = b; return b;
+}
+function dkExtHide(){
+  if(DKX.box) DKX.box.style.display = 'none';
+  cancelAnimationFrame(DKX.raf); DKX.raf = 0;
+  dkExtStop();
+  if(DKX.kind === 'bili' && DKX.box){ DKX.box.innerHTML = ''; DKX.kind = null; }   // 哔哩哔哩没法暂停，离开时直接关掉
+}
+function dkExtFollow(){
+  var ph = $('dkExt'), b = DKX.box;
+  if(!ph || !b || !document.body.contains(ph)){ dkExtHide(); return; }
+  var r = ph.getBoundingClientRect();
+  b.style.left = r.left + 'px'; b.style.top = r.top + 'px'; b.style.width = r.width + 'px'; b.style.height = r.height + 'px';
+  b.style.display = (r.width > 0 && r.height > 0) ? 'block' : 'none';
+  DKX.raf = requestAnimationFrame(dkExtFollow);
+}
+function dkExtMount(){
+  var x = dkExtInfo(), ph = $('dkExt');
+  if(!x || !ph){ dkExtHide(); return; }
+  var b = dkExtBox();
+  if(DKX.kind !== x.kind || DKX.id !== x.id || DKX.p !== x.p){
+    dkExtStop(); b.innerHTML = ''; DKX.yt = null; DKX.ytReady = false;
+    DKX.kind = x.kind; DKX.id = x.id; DKX.p = x.p;
+    if(x.kind === 'yt'){ var host = document.createElement('div'); host.id = 'dkYT'; b.appendChild(host); dkYTCreate(); }
+    else dkBiliSrc(0, false);
+  }
+  if(!DKX.raf) DKX.raf = requestAnimationFrame(dkExtFollow);
+}
+/* —— YouTube —— */
+function dkYTLoad(cb){
+  if(window.YT && YT.Player){ cb(); return; }
+  (DKX.ytWait = DKX.ytWait || []).push(cb);
+  if(DKX.ytWait.length > 1) return;
+  var prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){ try{ if(prev) prev(); }catch(e){} var q = DKX.ytWait || []; DKX.ytWait = null; q.forEach(function(f){ f(); }); };
+  var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = function(){ DKX.ytWait = null; toast('YouTube 打不开，检查一下网络（可能要开 VPN）'); };
+  document.head.appendChild(s);
+}
+function dkYTCreate(){
+  dkYTLoad(function(){
+    if(!$('dkYT') || DKX.kind !== 'yt') return;
+    DKX.yt = new YT.Player('dkYT', {width:'100%', height:'100%', videoId:DKX.id,
+      playerVars:{playsinline:1, rel:0, modestbranding:1, controls:1, fs:0},
+      events:{onReady:function(){ DKX.ytReady = true; if(DKX.pending){ var c = DKX.pending; DKX.pending = null; dkExtPlay(c); } }}});
+  });
+}
+/* —— 哔哩哔哩 —— */
+function dkBiliSrc(t, play){
+  var b = dkExtBox(), f = b.querySelector('iframe');
+  if(!f){ f = document.createElement('iframe'); f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media'); f.setAttribute('allowfullscreen', ''); f.setAttribute('frameborder', '0'); f.setAttribute('scrolling', 'no'); b.appendChild(f); }
+  f.src = 'https://player.bilibili.com/player.html?bvid='+DKX.id+'&p='+DKX.p+'&t='+Math.max(0, Math.floor(t))+'&autoplay='+(play ? 1 : 0)+'&danmaku=0&high_quality=1&isOutside=true&_='+Date.now();
+  return f;
+}
+function dkExtPlay(c){
+  if(!c || c.s == null) return false;
+  dkExtStop();
+  var stop = c.e != null ? c.e + 0.15 : null;
+  if(DKX.kind === 'yt'){
+    if(!DKX.ytReady || !DKX.yt){ DKX.pending = c; return true; }
+    try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){}
+    DKX.stopAt = stop;
+    if(stop != null) DKX.poll = setInterval(function(){
+      try{ if(DKX.yt.getCurrentTime() >= DKX.stopAt){ DKX.yt.pauseVideo(); clearInterval(DKX.poll); DKX.poll = 0; DKX.stopAt = null; } }catch(e){}
+    }, 80);
+    return true;
+  }
+  if(DKX.kind === 'bili'){
+    var f = dkBiliSrc(c.s, true), dur = stop != null ? (stop - Math.floor(c.s)) : null;
+    if(dur != null){
+      f.onload = function(){ f.onload = null; clearTimeout(DKX.biliT); DKX.biliT = setTimeout(function(){ dkBiliSrc(c.e, false); }, (dur + 1.2) * 1000); };   // 1.2 秒留给播放器加载
+    }
+    return true;
+  }
+  return false;
+}
+function dkExtStop(){
+  clearInterval(DKX.poll); DKX.poll = 0; DKX.stopAt = null; DKX.pending = null; clearTimeout(DKX.biliT);
+  try{ if(DKX.kind === 'yt' && DKX.yt && DKX.ytReady) DKX.yt.pauseVideo(); }catch(e){}
+}
+
 function dkMS(t){ t = Math.max(0, Math.floor(t || 0)); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), x = t%60; return (h ? h + ':' + (m<10?'0':'') : '') + m + ':' + (x<10?'0':'') + x; }
 function dkFmtT(t){ t = Math.max(0, t || 0); var h = Math.floor(t/3600), m = Math.floor(t%3600/60), sec = Math.floor(t%60), ms = Math.round((t - Math.floor(t))*1000); function z(n, w){ n = String(n); while(n.length < (w||2)) n = '0' + n; return n; } return z(h) + ':' + z(m) + ':' + z(sec) + ',' + z(ms, 3); }
 function dkWriteCues(cues){
@@ -7748,6 +7863,7 @@ function dkStartDict(mode){
   setTimeout(dkPlay, 300);
 }
 function dkAfterDict(){
+  dkExtMount();
   var l = $('dkList'), on = l && l.querySelector('.dk-li.on');
   if(on){ l.scrollTop = on.offsetTop - l.offsetTop - 60; }
   var v = $('dkVid');
@@ -7759,7 +7875,7 @@ function dkVidHL(v){
   if(v.currentTime < c.s || v.currentTime > c.e + 0.2){ return; }
   dkHLSet(els, dkHLWeights(els), (v.currentTime - c.s) / Math.max(0.3, c.e - c.s));
 }
-function dkStopMedia(){ var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; }
+function dkStopMedia(){ var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; dkExtStop(); }
 function dkGo(i){
   var d = dkCfg(), n = DK.cues.length; if(i < 0 || i >= n) return;
   d.di = i; d.reveal = false; save(); render(); setTimeout(dkPlay, 200);
@@ -7772,6 +7888,7 @@ function dkPlay(){
     try{ v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
     return;
   }
+  if(!v && c.s != null && dkExtInfo()){ try{ stopSpeak && stopSpeak(); }catch(e){} if(dkExtPlay(c)) return; }
   dkSpeakHL(c.t, [].slice.call(document.querySelectorAll('#dkAns .dk-c,#dkAns .dk-w')));
 }
 function dkNorm(s){ return String(s || '').toLowerCase().replace(/[^\u3400-\u9fffa-z0-9]/g, ''); }
