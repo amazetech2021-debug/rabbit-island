@@ -1107,6 +1107,13 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-src .dk-wave{border:1px solid #e3daf0;border-radius:12px;padding:14px 16px}
 .dk-src .dk-wave span{font-size:13px;color:#5b5476;line-height:1.7}
 .dk-src .dk-foot{margin-top:auto;padding-top:4px}
+.tts-api{margin:0 0 14px;border:1px solid var(--cream-2);border-radius:12px;background:var(--paper)}
+.tts-api summary{cursor:pointer;padding:10px 12px;font-weight:800;font-size:14px}
+.tts-api-b{display:flex;flex-direction:column;gap:8px;padding:0 12px 12px}
+.tts-api-n,.tts-api small{font-size:12px;color:var(--ink-soft);line-height:1.6}
+.tts-api b{font-size:13.5px;margin-top:4px}
+.tts-api label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.tts-api input{font-size:14px;padding:8px 10px;border:1px solid #d6cbe6;border-radius:8px;font-family:inherit;background:#fff;color:var(--ink)}
 .dk-src .dk-foot .sp{flex:1}
 @media (min-width:1100px){
   .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
@@ -4632,12 +4639,13 @@ var TTS = {
   /* 词典发音开关（有道免费接口），分语言 */
   dictAudio : {zh:true, en:true},
 
-  /* 英文引擎：有道词典 */
+  /* 英文：有道词典（单词）→ ElevenLabs（自己填 Key）→ 浏览器 */
   enEngine   : 'dict',
+  elevenBase : 'https://api.elevenlabs.io',
+  elevenModel: 'eleven_multilingual_v2',
 
-  /* 火山引擎豆包（中文） */
-  doubaoKey       : 'b90b39d5-e7f0-49fa-9627-34e3ab47866c',
-  doubaoVoice     : 'zh_female_xiaoxue_uranus_bigtts',  // 儿童绘本
+  /* 火山引擎豆包（中文）：Key 自己在「🔊 朗读声音」里填，只存在这台设备的浏览器里，不写进网页 */
+  doubaoVoiceDef  : 'zh_female_xiaoxue_uranus_bigtts',  // 儿童绘本
   doubaoResourceId: 'seed-tts-2.0',
 
   rateZh : 1.0,
@@ -4793,6 +4801,43 @@ function ttsEl(){
   }
   document.addEventListener('touchend', unlock, true); document.addEventListener('click', unlock, true);
 })();
+/* 语音 API Key：只存在这台设备的浏览器里 */
+function ttsLS(k, v){ try{ if(v === undefined) return localStorage.getItem(k) || ''; if(v) localStorage.setItem(k, v); else localStorage.removeItem(k); }catch(e){ return ''; } }
+Object.defineProperty(TTS, 'doubaoKey',   {get:function(){ return ttsLS('kh_tts_db_key'); }});
+Object.defineProperty(TTS, 'doubaoVoice', {get:function(){ return ttsLS('kh_tts_db_voice') || TTS.doubaoVoiceDef; }});
+Object.defineProperty(TTS, 'elevenKey',   {get:function(){ return ttsLS('kh_tts_el_key'); }});
+Object.defineProperty(TTS, 'elevenVoice', {get:function(){ return ttsLS('kh_tts_el_voice') || 'XrExE9yKIg1WjnnlVkGX'; }});
+/* ElevenLabs（英文） */
+function ttsEleven(text, key, next){
+  if(!TTS.elevenKey || TTS._elevenDown || typeof fetch === 'undefined' || ttsPref().en !== 'auto'){ next(); return; }
+  const g0 = TTS.gen;
+  let t = String(text).trim();
+  if(/^[A-Za-z][A-Za-z'-]*$/.test(t)) t = t + '.';
+  try{
+  fetch(TTS.elevenBase+'/v1/text-to-speech/'+encodeURIComponent(TTS.elevenVoice)+'/stream?output_format=mp3_44100_128',{
+    method:'POST',
+    headers:{'xi-api-key':TTS.elevenKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
+    body:JSON.stringify({text: t, model_id: TTS.elevenModel,
+      voice_settings:{stability:.45, similarity_boost:.85, style:.10, use_speaker_boost:true}})
+  })
+  .then(r => {
+    if(!r.ok){
+      const hint = r.status===401 ? 'Key 不对或已停用' : r.status===429 ? '额度用完或太频繁' : r.status===422 ? '音色 ID 不对' : '';
+      throw new Error('ElevenLabs '+r.status+(hint?'（'+hint+'）':''));
+    }
+    return r.blob();
+  })
+  .then(b => { TTS._elevenFail = 0; const u = URL.createObjectURL(b); TTS.cache.set(key, u); if(g0 !== TTS.gen) return; playUrl(u, key); })
+  .catch(e => {
+    if(g0 !== TTS.gen) return;
+    TTS._elevenFail = (TTS._elevenFail || 0) + 1;
+    if(TTS._elevenFail >= 2) TTS._elevenDown = true;      // 连续两次失败，这次打开页面就不再试
+    console.warn('[英文语音] '+e.message);
+    if(!TTS._elWarned){ TTS._elWarned = true; try{ toast('英文语音 ElevenLabs 用不了，先用网页声音（'+e.message.slice(0,40)+'）'); }catch(_){} }
+    next();
+  });
+  }catch(e){ next(); }
+}
 function ttsWarn(msg){
   if(TTS._warned) return; TTS._warned = true;
   try{ toast('中文语音服务连不上，先用系统语音（' + msg + '）'); }catch(e){}
@@ -4883,8 +4928,8 @@ function ttsVoicePanel(){
   var p = ttsPref(), vs = ttsVoices();
   function opts(isEn){
     var cur = isEn ? p.en : p.zh;
-    var base = isEn ? [['auto','自动（词典真人发音 → 网页声音）'],['system','跟随系统设置（iPhone / iPad 用）']]
-                    : [['doubao','豆包语音（最自然，会用豆包 API）'],['system','跟随系统设置（iPhone / iPad 用，不用 API）']];
+    var base = isEn ? [['auto','自动（ElevenLabs，没填 Key 用网页声音）'],['system','跟随系统设置（iPhone / iPad 用）']]
+                    : [['doubao','豆包语音（最自然，要在下面填豆包 API Key）'],['system','跟随系统设置（iPhone / iPad 用，不用 API）']];
     var list = vs.filter(function(v){ return isEn ? /^en/i.test(v.lang) : /^(zh|cmn|yue)/i.test(v.lang); })
       .map(function(v){ return [v.name, v.name + ' · ' + v.lang]; });
     var seen = {};
@@ -4895,6 +4940,17 @@ function ttsVoicePanel(){
     + '<div style="font-size:13px;color:var(--ink-soft);line-height:1.6;margin-bottom:12px">选「跟随系统设置」或某个网页声音时，不会用豆包 API。iPad 上的系统声音在「设置 → 辅助功能 → 朗读内容 → 声音」里换，下载「增强」或「优化」版本会更自然。</div>'
     + '<label style="display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:12px">中文声音<select id="ttsZh" style="font-size:15px;padding:9px;border-radius:12px;border:2px solid var(--cream-2)">' + opts(false) + '</select></label>'
     + '<label style="display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:14px">英文声音<select id="ttsEn" style="font-size:15px;padding:9px;border-radius:12px;border:2px solid var(--cream-2)">' + opts(true) + '</select></label>'
+    + '<details class="tts-api"' + (TTS.doubaoKey || TTS.elevenKey ? '' : ' open') + '><summary>🔑 语音 API Key（只存在这台设备上）</summary>'
+    + '<div class="tts-api-b"><div class="tts-api-n">Key 只保存在这台设备的浏览器里，不会写进网页、也不会同步到云端。换了设备或浏览器要重新填一次。不填就用网页声音。</div>'
+    + '<b>豆包（中文）</b>'
+    + '<label>API Key<input id="ttsDbKey" type="password" autocomplete="off" placeholder="火山引擎豆包语音的 API Key" value="' + htmlEsc(TTS.doubaoKey) + '"></label>'
+    + '<label>音色<input id="ttsDbVoice" autocomplete="off" placeholder="' + htmlEsc(TTS.doubaoVoiceDef) + '" value="' + htmlEsc(ttsLS('kh_tts_db_voice')) + '"></label>'
+    + '<small>在火山引擎控制台「豆包语音 → API Key 管理」里创建。音色不填就用儿童绘本声音。</small>'
+    + '<b>ElevenLabs（英文）</b>'
+    + '<label>API Key<input id="ttsElKey" type="password" autocomplete="off" placeholder="sk_…" value="' + htmlEsc(TTS.elevenKey) + '"></label>'
+    + '<label>音色 ID<input id="ttsElVoice" autocomplete="off" placeholder="XrExE9yKIg1WjnnlVkGX" value="' + htmlEsc(ttsLS('kh_tts_el_voice')) + '"></label>'
+    + '<small>在 elevenlabs.io 右下角头像 → API Keys 里创建（要勾选「文字转语音」权限）。音色 ID 不填就用原来那个声音。</small>'
+    + '</div></details>'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
     + '<button class="dk-btn p" onclick="ttsSavePref()">保存</button>'
     + '<button class="dk-btn y" onclick="ttsSavePref(true);speak(\'小兔子乖乖，把门开开。\',\'zh-CN\')">试听中文</button>'
@@ -4905,6 +4961,9 @@ function ttsVoicePanel(){
 function ttsSavePref(keepOpen){
   var p = ttsPref(), z = $('ttsZh'), e = $('ttsEn');
   if(z) p.zh = z.value; if(e) p.en = e.value;
+  var ks = [['ttsDbKey','kh_tts_db_key'],['ttsDbVoice','kh_tts_db_voice'],['ttsElKey','kh_tts_el_key'],['ttsElVoice','kh_tts_el_voice']], ch = false;
+  ks.forEach(function(k){ var el = $(k[0]); if(!el) return; var v = el.value.trim(); if(v !== ttsLS(k[1])){ ttsLS(k[1], v); ch = true; } });
+  if(ch){ try{ TTS.cache.clear(); }catch(_){} TTS._dbFail = 0; TTS._warned = false; TTS._elevenFail = 0; TTS._elevenDown = false; TTS._elWarned = false; }
   save(); if(!keepOpen){ closeModal(); toast('已保存朗读声音'); }
 }
 function ttsBrowser(text, isEn){
@@ -4949,7 +5008,7 @@ function ttsDict(text, isEn, key, next, force){
     .catch(()=>{ clearTimeout(kill); if(g0 !== TTS.gen) return; next(); });
 }
 
-/* 主入口：英文有道词典 → 浏览器 / 中文豆包 → 浏览器 */
+/* 主入口：英文有道词典 → ElevenLabs → 浏览器 / 中文豆包 → 浏览器 */
 function speak(text, lang){
   if(!text || !String(text).trim()) return;
   const isEn = String(lang||'zh-CN').startsWith('en');
@@ -4962,7 +5021,7 @@ function speak(text, lang){
   TTS.busy = true;
 
   const toBrowser = () => ttsBrowser(text, isEn);
-  if(isEn){ ttsDict(text, true, key, toBrowser); return; }
+  if(isEn){ ttsDict(text, true, key, () => ttsEleven(text, key, toBrowser)); return; }
   if(TTS._dbFail >= 5){ toBrowser(); return; }
   ttsDoubao(text, key, toBrowser);
 }
