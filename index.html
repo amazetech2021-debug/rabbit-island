@@ -1107,6 +1107,15 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-src .dk-wave{border:1px solid #e3daf0;border-radius:12px;padding:14px 16px}
 .dk-src .dk-wave span{font-size:13px;color:#5b5476;line-height:1.7}
 .dk-src .dk-foot{margin-top:auto;padding-top:4px}
+.dk-stage:has(.dk-one){min-width:0}
+.dk-one{min-width:0;max-width:100%}
+.dk-one .dk-sent{flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;scrollbar-width:thin;min-width:0;max-width:100%;box-sizing:border-box}
+.dk-one .dk-sent>*{flex:none}
+.dk-tyin{margin-top:10px}
+.dk-tyin.bad{border-color:#e5443c!important;border-left-color:#e5443c!important}
+.dk-tyin.ok{border-color:#3cb371!important;border-left-color:#3cb371!important;background:#f0fbf4}
+#dkAns .dk-c.ok b{background:#d8f3e2;border-radius:6px}
+#dkAns .dk-c.bad b{background:#ffdcd6;border-radius:6px}
 .dk-tune{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--ink-soft)}
 .dk-tune select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid #d6cbe6;border-radius:8px;background:#fff;color:var(--ink)}
 .dk-tune .dk-btn{background:#fff;border:1px solid #d6cbe6;box-shadow:none;font-weight:600;padding:6px 10px;border-radius:8px}
@@ -7090,14 +7099,14 @@ function dkCells(text, opt){
       var cls2 = opt.marks ? (opt.marks[k] || '') : '';
       cur.push('<span class="dk-w ' + cls2 + '" data-w="' + htmlEsc(t) + '" onclick="dkSayEl(this)"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>');
       k++; curT += t;
-    } else if(t === '\n'){ flush(); out.push('<span class="dk-br"></span>'); }
+    } else if(t === '\n'){ if(opt.one){ if(cur.length){ cur.push('<span class="dk-sp"></span>'); curT += ' '; } } else { flush(); out.push('<span class="dk-br"></span>'); } }
     else if(/^\s+$/.test(t)){ if(cur.length){ cur.push('<span class="dk-sp"></span>'); curT += ' '; } }
     else {
       var pu = '<span class="dk-p"><i>&nbsp;</i><b>' + htmlEsc(t) + '</b></span>';
       if(cur.length && cur[cur.length-1].indexOf('dk-sp') < 0) cur[cur.length-1] = '<span class="dk-glue">' + cur[cur.length-1] + pu + '</span>';
       else cur.push(pu);
       curT += t;
-      if(/^[。！？!?.；;…]$/.test(t)) flush();
+      if(/^[。！？!?.；;…]$/.test(t) && !opt.one) flush();
     }
   });
   flush();
@@ -7899,14 +7908,14 @@ function dkUseBookForDict(){
   var d = dkCfg(); dkTextSave('pages');
   var t = dkBookPages().join('\n');
   if(!t.trim()){ toast('先填绘本的文字'); render(); return; }
-  d.subs = t; d.di = 0; d.done = {}; d.going = false; save(); render(); toast('已放进字幕框，点「开始听写」');
+  d.subs = t; d.di = 0; d.done = {}; d.going = false; save(); render(); toast('已放进字幕框，点「开始跟打」');
 }
 function dkDictHtml(){
   var d = dkCfg(), cues = DK.cues = dkCues();
   if(d.going && cues.length){
     if(d.di >= cues.length) d.di = cues.length - 1; if(d.di < 0) d.di = 0;
     var c = cues[d.di], timed = c.s != null && (DK.media || dkExtInfo());
-    var showTx = d.mode === 'read' || d.reveal;
+    d.mode = 'read'; var showTx = true;
     var list = '<div class="dk-side"><div class="dk-list" id="dkList">' + cues.map(function(x, i){
       if(DK.editCue === i) return '<div class="dk-li edit"><em>' + (i+1) + '</em><div style="flex:1;display:flex;flex-direction:column;gap:6px"><textarea class="dk-ta" id="dkCueEd" style="min-height:70px">' + htmlEsc(x.t) + '</textarea>'
         + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSaveCue(' + i + ')">💾 保存</button><button class="dk-btn" onclick="DK.editCue=null;render()">取消</button></div></div></div>';
@@ -7920,8 +7929,7 @@ function dkDictHtml(){
     + '</div></div>';
     return '<div class="dk-full dk-fulld" id="dkFullD"><div class="dk-fbar"><button class="dk-btn" onclick="DK.editAll=false;DK.editCue=null;dkCfg().going=false;dkStopMedia();save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span><span style="flex:1"></span>'
-      + '<div class="dk-tools"><button class="tab ' + (d.mode==='dict'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'dict\';dkCfg().reveal=false;save();render()">✍️ 听写</button>'
-      + '<button class="tab ' + (d.mode==='read'?'on':'') + '" style="padding:7px 12px" onclick="dkCfg().mode=\'read\';save();render()">👀 跟读</button>' + dkSizeBtns() + '</div></div>'
+      + '<div class="dk-tools">' + dkSizeBtns() + '</div></div>'
       + '<div class="dk-play dk-dbody"><div class="dk-stage">'
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline onclick="dkVidTap(this)" src="' + DK.mediaUrl + '"></video>' : (dkExtInfo() ? '<div class="dk-vid dk-extph" id="dkExt"></div>' : ''))
       + (!DK.media && dkExtInfo() && !cues.some(function(q){ return q.s != null; }) ? '<div class="dk-note" style="text-align:center;color:#b45309">现在的字幕没有时间点，按钮只能用语音读，视频不会跟着跳。<a href="javascript:void 0" onclick="dkCfg().going=false;dkStopMedia();save();render()">返回</a>用 Wave 取带时间的字幕就能一句一句放视频了。</div>' : '')
@@ -7931,12 +7939,8 @@ function dkDictHtml(){
       + '<button class="dk-btn g" id="dkContBtn" style="font-size:15px;padding:10px 20px" onclick="dkCont()">' + (DK.cont ? '⏸ 停止' : '▶ 播放') + '</button>'
       + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button></div>'
       + dkTuneHtml()
-      + (d.mode === 'dict'
-        ? '<input class="dk-in" id="dkIn" style="--dkcs:' + d.cs + 'px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="" onkeydown="if(event.key===\'Enter\')dkCheck()">'
-          + '<div class="dk-tools" style="justify-content:center"><button class="dk-btn p" onclick="dkCheck()">✅ 对一对</button><button class="dk-btn" onclick="dkCfg().reveal=true;dkCfg().done[dkCfg().di]=1;save();render()">👀 看答案</button></div>'
-          + '<div class="dk-res" id="dkRes"></div>'
-        : '')
-      + '<div class="dk-words ' + (d.py?'':'dk-nopy') + '" id="dkAns" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px;' + (showTx?'':'display:none') + '">' + dkCells(c.t) + '</div>'
+      + '<div class="dk-words dk-one ' + (d.py?'':'dk-nopy') + '" id="dkAns" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">' + dkCells(c.t, {one:1}) + '</div>'
+      + '<input class="dk-in dk-tyin" id="dkTy" style="--dkcs:' + d.cs + 'px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="">'
       + '</div>' + list + '</div></div>';
   }
   return '<div class="card"><div class="secthead"><h3>✍️ 听写</h3><em>视频/音频 + 字幕，或者只用文字</em></div>'
@@ -7955,7 +7959,7 @@ function dkDictHtml(){
     + '<div class="dk-tools dk-foot"><label class="dk-btn" for="dkSubIn">选择字幕文件</label><input type="file" id="dkSubIn" class="dk-vh" accept=".srt,.vtt,.txt,text/plain" onchange="dkPickText(this,\'subs\')"><span class="sp"></span>'
     + '<button class="dk-btn" onclick="dkUseBookForDict()">用绘本的文字</button><button class="dk-btn" onclick="dkExport(\'subs\')">导出</button><button class="dk-btn" onclick="dkCfg().subs=\'\';save();render()">清除</button></div></div>'
     + '</div>'
-    + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'dict\')">✍️ 开始听写</button>'
+    + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'read\')">⌨️ 开始跟打</button>'
     + '</div>'
     + '</div>';
 }
@@ -8146,7 +8150,7 @@ function dkStartDict(mode){
   setTimeout(dkPlay, 300);
 }
 function dkAfterDict(){
-  dkExtMount();
+  dkExtMount(); dkFitAns(); dkTyBind();
   var l = $('dkList'), on = l && l.querySelector('.dk-li.on');
   if(on){ l.scrollTop = on.offsetTop - l.offsetTop - 60; }
   var v = $('dkVid');
@@ -8176,8 +8180,8 @@ function dkSync(i){
   var lis = document.querySelectorAll('#dkList .dk-li');
   [].forEach.call(lis, function(li, k){ li.classList.toggle('on', k === i); if(k < i){ var sp = li.querySelector('span'); if(sp) sp.textContent = DK.cues[k].t; } });
   var l = $('dkList'), on = lis[i]; if(l && on) l.scrollTop = on.offsetTop - l.offsetTop - 60;
-  var ans = $('dkAns'); if(ans) ans.innerHTML = dkCells(DK.cues[i].t);
-  var inp = $('dkIn'); if(inp) inp.value = ''; var res = $('dkRes'); if(res) res.innerHTML = '';
+  var ans = $('dkAns'); if(ans){ ans.innerHTML = dkCells(DK.cues[i].t, {one:1}); dkFitAns(); }
+  var inp = $('dkIn'); if(inp) inp.value = ''; var ty = $('dkTy'); if(ty){ ty.value = ''; ty.classList.remove('ok', 'bad'); } var res = $('dkRes'); if(res) res.innerHTML = '';
   var bp = document.querySelector('[onclick="dkGo(dkCfg().di-1)"]'), bn = document.querySelector('[onclick="dkGo(dkCfg().di+1)"]');
   if(bp) bp.disabled = i <= 0; if(bn) bn.disabled = i >= n - 1;
 }
@@ -8234,6 +8238,52 @@ function dkPlay(){
   }
   if(!v && c.s != null && dkExtInfo()){ try{ stopSpeak && stopSpeak(); }catch(e){} if(dkExtPlay(c)) return; }
   dkSpeakHL(c.t, [].slice.call(document.querySelectorAll('#dkAns .dk-c,#dkAns .dk-w')));
+}
+/* 视频下面的字幕只占一行：放不下就把字缩小，太长就左右滑 */
+function dkFitAns(){
+  var a = $('dkAns'); if(!a) return; var sent = a.querySelector('.dk-sent'); if(!sent) return;
+  var cs = +dkCfg().cs || 52; a.style.setProperty('--dkcs', cs + 'px');
+  for(var k=0; k<14 && sent.scrollWidth > sent.clientWidth + 1 && cs > 34; k++){ cs = Math.round(cs * 0.92); a.style.setProperty('--dkcs', cs + 'px'); }
+}
+if(!window._dkFitR){ window._dkFitR = 1; window.addEventListener('resize', function(){ if($('dkAns')) dkFitAns(); }); }
+/* ⌨️ 跟打：在字幕下面打这一句，打对的词变绿，打错变红；整句打对自动到下一句 */
+var DKTY = {comp:false, t:0};
+function dkTyBind(){
+  var el = $('dkTy'); if(!el || el._b) return; el._b = 1;
+  el.addEventListener('compositionstart', function(){ DKTY.comp = true; });
+  el.addEventListener('compositionend', function(){ DKTY.comp = false; dkTyCheck(); });
+  el.addEventListener('input', function(){ if(!DKTY.comp) dkTyCheck(); });
+  el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); dkTyCheck(true); } });
+  if(DK.tyFocus){ DK.tyFocus = false; try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
+}
+function dkTyCheck(enter){
+  var d = dkCfg(), c = DK.cues[d.di], el = $('dkTy'); if(!c || !el) return;
+  var re = /[\u3400-\u9fff]|[A-Za-z][A-Za-z'’\-]*|\d+(?:[.,]\d+)?/g;
+  var units = String(c.t).match(re) || [], typed = el.value, tu = typed.match(re) || [];
+  var open = tu.length && /[A-Za-z0-9'’\-]$/.test(typed);
+  var cells = [].slice.call(document.querySelectorAll('#dkAns .dk-c,#dkAns .dk-w')), right = 0, bad = false;
+  cells.forEach(function(x, i){
+    x.classList.remove('ok', 'bad', 'on');
+    if(i >= tu.length) return;
+    var a = dkNorm(tu[i]), b = dkNorm(units[i] || '');
+    if(a === b){ x.classList.add('ok'); right++; }
+    else if(i === tu.length - 1 && open && b.indexOf(a) === 0) x.classList.add('on');
+    else { x.classList.add('bad'); bad = true; }
+  });
+  if(tu.length > units.length) bad = true;
+  el.classList.toggle('bad', bad);
+  var all = units.length && right === units.length && tu.length === units.length;
+  if(all){
+    d.done[d.di] = 1; save();
+    var li = document.querySelectorAll('.dk-li')[d.di]; if(li) li.classList.add('done');
+    el.classList.add('ok'); clearTimeout(DKTY.t);
+    var i0 = d.di;
+    DKTY.t = setTimeout(function(){
+      if(dkCfg().di !== i0) return;
+      if(i0 < DK.cues.length - 1){ DK.tyFocus = true; dkGo(i0 + 1); }
+      else toast('🎉 全部打完啦！');
+    }, 700);
+  } else el.classList.remove('ok');
 }
 function dkNorm(s){ return String(s || '').toLowerCase().replace(/[^\u3400-\u9fffa-z0-9]/g, ''); }
 function dkCheck(){
