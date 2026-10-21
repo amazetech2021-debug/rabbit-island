@@ -4929,7 +4929,7 @@ function ttsPref(){
 }
 function ttsVoices(){ try{ var v = _voicesCache.length ? _voicesCache : speechSynthesis.getVoices(); return v || []; }catch(e){ return []; } }
 function ttsVoicePanel(){
-  var p = ttsPref(), vs = ttsVoices();
+  var p = ttsPref(), vs = ttsVoices(); TTS._dbKey0 = TTS.doubaoKey;
   function opts(isEn){
     var cur = isEn ? p.en : p.zh;
     var base = isEn ? [['auto','自动（ElevenLabs，没填 Key 用网页声音）'],['system','跟随系统设置（iPhone / iPad 用）']]
@@ -4950,6 +4950,7 @@ function ttsVoicePanel(){
     + '<label>API Key<input id="ttsDbKey" type="password" autocomplete="off" placeholder="火山引擎豆包语音的 API Key" value="' + htmlEsc(TTS.doubaoKey) + '"></label>'
     + '<label>音色<input id="ttsDbVoice" autocomplete="off" placeholder="' + htmlEsc(TTS.doubaoVoiceDef) + '" value="' + htmlEsc(ttsLS('kh_tts_db_voice')) + '"></label>'
     + '<small>在火山引擎控制台「豆包语音 → API Key 管理」里创建。音色不填就用儿童绘本声音。</small>'
+    + '<button class="dk-btn" style="align-self:flex-start" onclick="ttsDbTest()">🩺 检查豆包能不能用</button><div id="ttsDbRes" class="tts-api-n"></div>'
     + '<b>ElevenLabs（英文）</b>'
     + '<label>API Key<input id="ttsElKey" type="password" autocomplete="off" placeholder="sk_…" value="' + htmlEsc(TTS.elevenKey) + '"></label>'
     + '<label>音色 ID<input id="ttsElVoice" autocomplete="off" placeholder="XrExE9yKIg1WjnnlVkGX" value="' + htmlEsc(ttsLS('kh_tts_el_voice')) + '"></label>'
@@ -4962,11 +4963,45 @@ function ttsVoicePanel(){
     + '<button class="dk-btn" onclick="closeModal()">关闭</button></div>');
   if(!vs.length){ try{ speechSynthesis.onvoiceschanged = function(){ _voicesCache = speechSynthesis.getVoices(); }; }catch(e){} }
 }
+/* 一步一步检查豆包：设置、Key、网络、返回结果、能不能出声，把原因直接写出来 */
+function ttsDbTest(){
+  var out = $('ttsDbRes'), say = function(h){ if(out) out.innerHTML = h; };
+  var kEl = $('ttsDbKey'), key = kEl ? kEl.value.trim() : TTS.doubaoKey, vEl = $('ttsDbVoice'), voice = (vEl && vEl.value.trim()) || TTS.doubaoVoiceDef, z = $('ttsZh');
+  if(!key){ say('<b style="color:#dc2626">❌ 还没填豆包 API Key。</b>'); return; }
+  if(/^\d{6,}$/.test(key)){ say('<b style="color:#dc2626">❌ 这串全是数字，像是「应用管理」里的 APP ID，不是 API Key。</b>要在「API Key 管理」里复制，一般是 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 这种带横线的样子。'); return; }
+  var warn = (z && z.value !== 'doubao') ? '<div style="color:#b45309">⚠️ 上面「中文声音」现在选的不是豆包，保存后也不会用豆包。请改成「豆包语音」。</div>' : '';
+  say(warn + '正在连接豆包…');
+  var t0 = Date.now();
+  fetch('https://openspeech.bytedance.com/api/v3/tts/unidirectional?api_key=' + encodeURIComponent(key), {method:'POST',
+    headers:{'Content-Type':'application/json', 'X-Api-Resource-Id': TTS.doubaoResourceId},
+    body:JSON.stringify({user:{uid:'study-island'}, req_params:{text:'小兔子乖乖，把门开开。', speaker:voice, audio_params:{format:'mp3', sample_rate:24000}}})})
+  .then(function(r){ return r.text().then(function(t){ return {r:r, t:t}; }); })
+  .then(function(x){
+    var b64 = '', msg = '';
+    x.t.split('\n').forEach(function(l){ l = l.replace(/^data:\s*/, ''); try{ var j = JSON.parse(l); if(j.code === 0 && j.data) b64 += j.data; else if(j.code && j.code !== 20000000 && !msg) msg = j.code + ' ' + (j.message || ''); }catch(e){} });
+    if(!x.r.ok || !b64){
+      var m = msg || (x.t || '').slice(0, 200), tip = '';
+      if(x.r.status === 401 || /auth|key|token|unauthor|invalid/i.test(m)) tip = 'Key 不对、已经作废，或者不是「API Key 管理」里的那种 Key。';
+      else if(x.r.status === 403 || /permission|resource|grant|not.*activ|access denied/i.test(m)) tip = '这个 Key 没有开通「语音合成大模型 2.0」，或者额度用完了。到控制台看看服务开通和余量。';
+      else if(/speaker|voice/i.test(m)) tip = '音色 ID 不对，或者这个音色不支持 2.0。先把音色栏清空再试。';
+      say(warn + '<b style="color:#dc2626">❌ 豆包没有返回声音</b>（状态 ' + x.r.status + '）<br>' + (tip ? tip + '<br>' : '') + '<small>原话：' + htmlEsc(m) + '</small>');
+      return;
+    }
+    var raw = atob(b64), bytes = new Uint8Array(raw.length); for(var i=0;i<raw.length;i++) bytes[i] = raw.charCodeAt(i);
+    var a = ttsEl(); a.src = URL.createObjectURL(new Blob([bytes], {type:'audio/mpeg'}));
+    a.play().then(function(){ say(warn + '<b style="color:#16a34a">✅ 豆包能用！</b>（' + ((Date.now()-t0)/1000).toFixed(1) + ' 秒）听到声音了就点「保存」。'); })
+     .catch(function(e){ say(warn + '<b style="color:#b45309">⚠️ 豆包返回了声音，但这台设备没让它播放（' + htmlEsc(e && e.name || '') + '）。</b>iPad 请关掉侧边的静音开关、把音量调大，再点一次检查。'); });
+  })
+  .catch(function(e){
+    say(warn + '<b style="color:#dc2626">❌ 连不上豆包</b>（' + htmlEsc(e && e.message || '') + '）<br>可能是网络问题，或者浏览器拦住了：iPad 上看看「设置 → Safari」里有没有开内容拦截器 / VPN / 「限制 IP 地址跟踪」，关掉再试；也可以换 Chrome 试试。');
+  });
+}
 function ttsSavePref(keepOpen){
   var p = ttsPref(), z = $('ttsZh'), e = $('ttsEn');
   if(z) p.zh = z.value; if(e) p.en = e.value;
   var ks = [['ttsDbKey','kh_tts_db_key'],['ttsDbVoice','kh_tts_db_voice'],['ttsElKey','kh_tts_el_key'],['ttsElVoice','kh_tts_el_voice']], ch = false;
   ks.forEach(function(k){ var el = $(k[0]); if(!el) return; var v = el.value.trim(); if(v !== ttsLS(k[1])){ ttsLS(k[1], v); ch = true; } });
+  if(ch && $('ttsDbKey') && $('ttsDbKey').value.trim() && p.zh === 'system' && z && z.value === 'system' && $('ttsDbKey').value.trim() !== (TTS._dbKey0 || '')){ p.zh = 'doubao'; }
   if(ch){ try{ TTS.cache.clear(); }catch(_){} TTS._dbFail = 0; TTS._warned = false; TTS._elevenFail = 0; TTS._elevenDown = false; TTS._elWarned = false; }
   save(); if(!keepOpen){ closeModal(); toast('已保存朗读声音'); }
 }
