@@ -1116,7 +1116,8 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-tyin.ok{border-color:#3cb371!important;border-left-color:#3cb371!important;background:#f0fbf4}
 #dkAns .dk-c.ok b{background:#d8f3e2;border-radius:6px}
 #dkAns .dk-c.bad b{background:#ffdcd6;border-radius:6px}
-.dk-tune{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--ink-soft)}
+.dk-tune{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;font-size:13px;color:var(--ink-soft);margin-left:6px;padding-left:12px;border-left:1px solid #e3daf0}
+@media (max-width:700px){.dk-tune{margin-left:0;padding-left:0;border-left:none}}
 .dk-tune select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid #d6cbe6;border-radius:8px;background:#fff;color:var(--ink)}
 .dk-tune .dk-btn{background:#fff;border:1px solid #d6cbe6;box-shadow:none;font-weight:600;padding:6px 10px;border-radius:8px}
 .dk-tune code{font:13px ui-monospace,Menlo,monospace;color:var(--ink);cursor:pointer;min-width:3.4em}
@@ -7056,7 +7057,7 @@ function dkTuneHtml(){
   if(!DK.cues.some(function(q){ return q.s != null; })) return '';
   var rate = (!x || x.kind === 'yt') ? '<span>速度</span><select onchange="dkCfg().rate=+this.value;save();dkRateApply()">'
     + [0.5, 0.75, 0.9, 1, 1.25, 1.5].map(function(r){ return '<option value="'+r+'"'+((+d.rate||1) === r ? ' selected' : '')+'>'+r+'×</option>'; }).join('') + '</select>' : '';
-  return '<div class="dk-tune">' + rate + '<span>对不上时微调</span>'
+  return '<div class="dk-tune">' + rate + '<span title="视频和字幕对不上时，整体提早或推后">微调</span>'
     + '<button class="dk-btn" onclick="dkOff(-0.5)">早 0.5s</button><button class="dk-btn" onclick="dkOff(0.5)">晚 0.5s</button>'
     + '<code id="dkOffV" title="点一下归零" onclick="dkOff(0)">' + (off > 0 ? '+' : '') + off.toFixed(1) + 's</code></div>';
 }
@@ -7937,8 +7938,7 @@ function dkDictHtml(){
       + '<button class="dk-btn p" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
       + '<button class="dk-btn y" style="font-size:15px;padding:10px 20px" onclick="dkPlay()">🔊 ' + (timed ? '播放这一句' : '读这一句') + '</button>'
       + '<button class="dk-btn g" id="dkContBtn" style="font-size:15px;padding:10px 20px" onclick="dkCont()">' + (DK.cont ? '⏸ 停止' : '▶ 播放') + '</button>'
-      + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button></div>'
-      + dkTuneHtml()
+      + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button>' + dkTuneHtml() + '</div>'
       + '<div class="dk-words dk-one ' + (d.py?'':'dk-nopy') + '" id="dkAns" style="--dkcs:' + d.cs + 'px;--dkpy:' + Math.round(d.cs*.26) + 'px">' + dkCells(c.t, {one:1}) + '</div>'
       + '<input class="dk-in dk-tyin" id="dkTy" style="--dkcs:' + d.cs + 'px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="">'
       + '</div>' + list + '</div></div>';
