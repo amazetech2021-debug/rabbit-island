@@ -6522,6 +6522,9 @@ function dkSetMedia(m, quiet){
 function dkPickBook(inp){
   var fs = [].slice.call(inp.files || []); inp.value = '';
   if(!fs.length) return;
+  var ppt = fs.find(function(f){ return /\.pptx$/i.test(f.name); });
+  if(ppt){ dkPptx(ppt); return; }
+  if(fs.some(function(f){ return /\.ppt$/i.test(f.name); })){ toast('老版的 .ppt 打不开，请在 PowerPoint 或 Keynote 里另存为 .pptx'); return; }
   var pdf = fs.find(function(f){ return /\.pdf$/i.test(f.name) || f.type === 'application/pdf'; });
   var b;
   if(pdf) b = {type:'pdf', name:pdf.name, blob:pdf};
@@ -6535,6 +6538,127 @@ function dkPickBook(inp){
   dkPut('book', b).catch(function(){ toast('文件太大，这台设备存不下，只能这次用'); });
   dkSetBook(b);
 }
+/* —— PPT（.pptx）绘本：把每一页幻灯片画成一张图（图片按原来的位置摆好，文字框也画上），每页的文字自动填进右边 —— */
+function dkNeedZip(cb){
+  if(window.JSZip){ cb(); return; }
+  dkScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', cb, function(){ toast('读取 PPT 的工具加载失败，请检查网络'); });
+}
+function dkPptx(file){
+  toast('正在打开 PPT…');
+  DK.pdfLoading = true; render();
+  dkNeedZip(function(){
+    JSZip.loadAsync(file).then(function(zip){ return dkPptxRead(zip, file.name); })
+      .then(function(r){
+        DK.pdfLoading = false;
+        if(!r.blobs.length){ toast('这个 PPT 里没有找到幻灯片'); render(); return; }
+        var b = {type:'img', name:file.name.replace(/\.pptx$/i, '')+'（PPT '+r.blobs.length+' 页）', blobs:r.blobs};
+        dkCfg().pi = 0;
+        var d = dkCfg(), hasText = r.texts.some(function(t){ return t; });
+        if(hasText && !String(d.pages || '').trim()){ d.pages = r.texts.map(function(t, i){ return '=== 第 '+(i+1)+' 页 ===\n'+t; }).join('\n\n'); d.pagesName = ''; }
+        else if(hasText) DK.pptTexts = r.texts;
+        save();
+        dkPut('book', b).catch(function(){ toast('文件太大，这台设备存不下，只能这次用'); });
+        dkSetBook(b);
+        toast('PPT 已打开，共 '+r.blobs.length+' 页'+(hasText ? (DK.pptTexts ? '。右边已经有文字，PPT 的文字没覆盖，可以点「用 PPT 的文字」' : '，PPT 里的文字已经填到右边') : ''));
+      })
+      .catch(function(e){ DK.pdfLoading = false; render(); toast('这个 PPT 打不开：'+((e && e.message) || '')); });
+  });
+}
+function dkPptUseText(){
+  if(!DK.pptTexts) return;
+  var d = dkCfg(); d.pages = DK.pptTexts.map(function(t, i){ return '=== 第 '+(i+1)+' 页 ===\n'+t; }).join('\n\n'); DK.pptTexts = null; save(); render(); toast('已换成 PPT 里的文字');
+}
+function dkPptxRead(zip, name){
+  var X = function(path){ var f = zip.file(path); return f ? f.async('string').then(function(s){ return new DOMParser().parseFromString(s, 'application/xml'); }) : Promise.resolve(null); };
+  var rels = function(path){
+    var p = path.replace(/([^\/]+)$/, '_rels/$1.rels'), dir = path.replace(/[^\/]+$/, '');
+    return X(p).then(function(doc){
+      var m = {}; if(!doc) return m;
+      [].forEach.call(doc.getElementsByTagName('Relationship'), function(r){
+        var t = r.getAttribute('Target') || ''; if(r.getAttribute('TargetMode') === 'External') return;
+        var full = t.charAt(0) === '/' ? t.slice(1) : dkPathJoin(dir, t); m[r.getAttribute('Id')] = full;
+      });
+      return m;
+    });
+  };
+  return Promise.all([X('ppt/presentation.xml'), rels('ppt/presentation.xml')]).then(function(a){
+    var pres = a[0], prel = a[1]; if(!pres) throw new Error('不是 PPTX 文件');
+    var sz = pres.getElementsByTagNameNS('*', 'sldSz')[0], cx = +(sz && sz.getAttribute('cx')) || 9144000, cy = +(sz && sz.getAttribute('cy')) || 6858000;
+    var ids = [].map.call(pres.getElementsByTagNameNS('*', 'sldId'), function(n){ return n.getAttribute('r:id') || n.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'); });
+    var paths = ids.map(function(id){ return prel[id]; }).filter(Boolean);
+    var blobs = [], texts = [];
+    return paths.reduce(function(pr, path, i){
+      return pr.then(function(){ return dkPptxSlide(zip, X, rels, path, cx, cy); }).then(function(r){ if(r.blob){ blobs.push(r.blob); texts.push(r.text); } });
+    }, Promise.resolve()).then(function(){ return {blobs:blobs, texts:texts}; });
+  });
+}
+function dkPathJoin(dir, t){
+  var parts = (dir + t).split('/'), out = [];
+  parts.forEach(function(p){ if(p === '..') out.pop(); else if(p && p !== '.') out.push(p); });
+  return out.join('/');
+}
+function dkPptxSlide(zip, X, rels, path, cx, cy){
+  var W = 1600, k = W / cx, H = Math.round(cy * k);
+  return Promise.all([X(path), rels(path)]).then(function(a){
+    var doc = a[0], rm = a[1], cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+    var lines = [], jobs = [];
+    var A = function(n, tag){ return n ? n.getElementsByTagNameNS('*', tag) : []; };
+    var xfrm = function(n){
+      var x = A(n, 'xfrm')[0]; if(!x) return null;
+      var off = A(x, 'off')[0], ext = A(x, 'ext')[0]; if(!off || !ext) return null;
+      return {x:+off.getAttribute('x')*k, y:+off.getAttribute('y')*k, w:+ext.getAttribute('cx')*k, h:+ext.getAttribute('cy')*k};
+    };
+    var img = function(rid, box){
+      var p = rm[rid]; if(!p || !/\.(png|jpe?g|gif|bmp|webp)$/i.test(p)) return;
+      var f = zip.file(p); if(!f) return;
+      jobs.push(f.async('blob').then(function(bl){ return createImageBitmap(bl).then(function(bm){ return {bm:bm, box:box}; }); }).catch(function(){ return null; }));
+    };
+    if(!doc) return {blob:null, text:''};
+    // 背景图
+    var bg = A(doc, 'bg')[0]; if(bg){ var bb = A(bg, 'blip')[0]; if(bb) img(bb.getAttribute('r:embed'), {x:0, y:0, w:W, h:H}); }
+    var tree = A(doc, 'spTree')[0], order = [];
+    (function walk(n){
+      [].forEach.call(n.children || [], function(c){
+        var ln = c.localName;
+        if(ln === 'grpSp'){ walk(c); return; }
+        if(ln === 'pic' || ln === 'sp'){
+          var box = xfrm(c), blip = A(c, 'blip')[0];
+          if(blip && box) order.push({kind:'img', rid:blip.getAttribute('r:embed'), box:box});
+          var tb = A(c, 'txBody')[0];
+          if(tb){
+            var paras = [].map.call(A(tb, 'p'), function(p){
+              var t = [].map.call(A(p, 't'), function(x){ return x.textContent; }).join('');
+              var rp = A(p, 'rPr')[0] || A(p, 'defRPr')[0], sz = rp && rp.getAttribute('sz') ? +rp.getAttribute('sz') : 1800;
+              var col = A(rp, 'srgbClr')[0];
+              return {t:t, sz:sz, b:rp && rp.getAttribute('b') === '1', col:col ? '#'+col.getAttribute('val') : '#222'};
+            }).filter(function(p){ return p.t.trim(); });
+            paras.forEach(function(p){ if(!/^\s*\d+\s*$/.test(p.t)) lines.push(p.t.trim()); });
+            if(paras.length && box) order.push({kind:'txt', paras:paras, box:box});
+          }
+        }
+      });
+    })(tree || doc);
+    order.forEach(function(o){ if(o.kind === 'img') img(o.rid, o.box); else jobs.push(Promise.resolve(o)); });
+    return Promise.all(jobs).then(function(items){
+      items.forEach(function(it){
+        if(!it) return;
+        if(it.bm){ g.drawImage(it.bm, it.box.x, it.box.y, it.box.w, it.box.h); return; }
+        var y = it.box.y + 4;
+        it.paras.forEach(function(p){
+          var fs = Math.max(12, p.sz/100 * 12700 * k);              // 磅 → 像素
+          g.font = (p.b ? '700 ' : '400 ') + Math.round(fs) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+          g.fillStyle = p.col; g.textBaseline = 'top';
+          var line = '', wrap = function(ch){ if(g.measureText(line + ch).width > it.box.w - 8 && line){ g.fillText(line, it.box.x + 4, y); y += fs*1.25; line = ch; } else line += ch; };
+          (/[一-鿿]/.test(p.t) ? p.t.split('') : p.t.split(/(?=\s)/)).forEach(wrap);
+          if(line){ g.fillText(line, it.box.x + 4, y); y += fs*1.25; }
+        });
+      });
+      return new Promise(function(res){ cv.toBlob(function(bl){ res({blob:bl, text:lines.join('\n')}); }, 'image/jpeg', .9); });
+    });
+  });
+}
+
 function dkClearBook(){ dkPut('book', null).catch(function(){}); dkSetBook(null); }
 function dkExport(field){
   var d = dkCfg(), t = String(d[field] || '');
@@ -7590,14 +7714,15 @@ function dkBookHtml(){
   var bk = DK.book;
   return '<div class="card"><div class="secthead"><h3>📖 绘本阅读</h3><em>PDF / 图片 + 每页的文字</em></div>'
     + '<div class="dk-src">'
-    + '<div class="dk-box"><h4>① 绘本或图片（可以不选）</h4><div class="dk-note">选一个 PDF，或一次选几张图片（按文件名排序，每张一页）。保存在这台设备上，下次打开还在。</div>'
+    + '<div class="dk-box"><h4>① 绘本或图片（可以不选）</h4><div class="dk-note">选一个 PDF 或 PPT（.pptx），或一次选几张图片（按文件名排序，每张一页）。PPT 每一页幻灯片就是一页，里面的文字会自动填到右边。保存在这台设备上，下次打开还在。</div>'
     + (bk ? '<div class="dk-file">📘 ' + htmlEsc(bk.name) + (dkPicCount() ? '（' + dkPicCount() + ' 页）' : '') + '</div>' : '')
-    + '<div class="dk-tools"><label class="dk-btn p" for="dkBookIn">选择文件</label><input type="file" id="dkBookIn" class="dk-vh" multiple accept=".pdf,application/pdf,image/*" onchange="dkPickBook(this)">'
+    + '<div class="dk-tools"><label class="dk-btn p" for="dkBookIn">选择文件</label><input type="file" id="dkBookIn" class="dk-vh" multiple accept=".pdf,application/pdf,.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/*" onchange="dkPickBook(this)">'
     + (bk ? '<button class="dk-btn" onclick="dkClearBook()">清除</button>' : '') + '</div></div>'
     + '<div class="dk-box"><h4>② 每页的文字（中文、英文都可以）</h4><div class="dk-note">用「=== 第 1 页 ===」分页；没有分页的话，有绘本时按空行分页，没有绘本就是一整页。可以选终端命令认出来的「.pages.txt」。</div>'
     + '<textarea class="dk-ta" id="dkT_pages" placeholder="=== 第 1 页 ===&#10;两元钱！&#10;=== 第 2 页 ===&#10;十颗豆豆两人分。&#10;=== 第 3 页 ===&#10;I see a red apple." oninput="dkTextSave(\'pages\')">' + htmlEsc(d.pages) + '</textarea>'
     + '<div class="dk-tools"><label class="dk-btn" for="dkPgIn">选择文字文件</label><input type="file" id="dkPgIn" class="dk-vh" accept=".txt,text/plain" onchange="dkPickText(this,\'pages\')">'
     + '<button class="dk-btn p" onclick="dkAiOpen()">🤖 AI 识别</button>'
+    + (DK.pptTexts ? '<button class="dk-btn y" onclick="dkPptUseText()">📑 用 PPT 的文字</button>' : '')
     + '<button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkExport(\'pages\')">⬇️ 导出</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartRead()">▶ 开始阅读</button>'
