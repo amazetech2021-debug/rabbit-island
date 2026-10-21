@@ -1023,6 +1023,7 @@ html.vp-max #vpWrap.vp-web .vp-frame{height:100vh}
 .dk-btn{border:none;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--paper);color:var(--ink);box-shadow:0 2px 5px rgba(100,80,160,.12)}
 .dk-btn.p{background:var(--purple);color:#fff}
 .dk-btn.y{background:#ffd54f;color:#5a3c00}
+.dk-btn.g{background:#22c55e;color:#fff}
 .dk-btn:disabled{opacity:.4;cursor:default}
 .dk-ta{width:100%;box-sizing:border-box;min-height:150px;border:2px solid var(--cream-2);border-radius:14px;padding:12px;font-size:13.5px;line-height:1.6;font-family:inherit;background:#fff;color:var(--ink);resize:vertical}
 .dk-src{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
@@ -7822,8 +7823,9 @@ function dkDictHtml(){
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline controls src="' + DK.mediaUrl + '"></video>' : (dkExtInfo() ? '<div class="dk-vid dk-extph" id="dkExt"></div>' : ''))
       + (!DK.media && dkExtInfo() && !cues.some(function(q){ return q.s != null; }) ? '<div class="dk-note" style="text-align:center;color:#b45309">现在的字幕没有时间点，按钮只能用语音读，视频不会跟着跳。<a href="javascript:void 0" onclick="dkCfg().going=false;dkStopMedia();save();render()">返回</a>用 Wave 取带时间的字幕就能一句一句放视频了。</div>' : '')
       + '<div class="dk-tools" style="justify-content:center">'
-      + '<button class="dk-btn" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
+      + '<button class="dk-btn p" ' + (d.di<=0?'disabled':'') + ' onclick="dkGo(dkCfg().di-1)">⏮ 上一句</button>'
       + '<button class="dk-btn y" style="font-size:15px;padding:10px 20px" onclick="dkPlay()">🔊 ' + (timed ? '播放这一句' : '读这一句') + '</button>'
+      + '<button class="dk-btn g" id="dkContBtn" style="font-size:15px;padding:10px 20px" onclick="dkCont()">' + (DK.cont ? '⏸ 停止' : '▶ 播放') + '</button>'
       + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button></div>'
       + (d.mode === 'dict'
         ? '<input class="dk-in" id="dkIn" style="--dkcs:' + d.cs + 'px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="" onkeydown="if(event.key===\'Enter\')dkCheck()">'
@@ -8036,12 +8038,73 @@ function dkVidHL(v){
   if(v.currentTime < c.s || v.currentTime > c.e + 0.2){ return; }
   dkHLSet(els, dkHLWeights(els), (v.currentTime - c.s) / Math.max(0.3, c.e - c.s));
 }
-function dkStopMedia(){ var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; dkExtStop(); }
+function dkStopMedia(){ dkContStop(); var v = $('dkVid'); if(v) try{ v.pause(); }catch(e){} DK.stopAt = null; dkExtStop(); }
+/* ▶ 播放：从当前这一句开始一直往下放，中间不停；字幕和右边的列表跟着走，不重画页面（重画会打断视频） */
+function dkContStop(){
+  if(!DK.cont) return;
+  DK.cont = false; clearInterval(DK.contT); DK.contT = 0; clearTimeout(DK.contTO);
+  try{ var v = $('dkVid'); if(v) v.pause(); }catch(e){}
+  try{ if(DKX.kind === 'yt' && DKX.yt && DKX.ytReady) DKX.yt.pauseVideo(); }catch(e){}
+  if(DKX.kind === 'bili' && DKX.box){ var c = DK.cues[dkCfg().di]; if(c && c.e != null) dkBiliSrc(c.e, false); }
+  try{ stopSpeak(); }catch(e){}
+  var b = $('dkContBtn'); if(b) b.textContent = '▶ 播放';
+}
+function dkSync(i){
+  var d = dkCfg(), n = DK.cues.length; if(i < 0 || i >= n || i === d.di) return;
+  d.di = i; d.reveal = false; save();
+  var pos = document.querySelector('#dkFullD .dk-pos'); if(pos) pos.textContent = '第 ' + (i+1) + ' / ' + n + ' 句';
+  var lis = document.querySelectorAll('#dkList .dk-li');
+  [].forEach.call(lis, function(li, k){ li.classList.toggle('on', k === i); if(k < i){ var sp = li.querySelector('span'); if(sp) sp.textContent = DK.cues[k].t; } });
+  var l = $('dkList'), on = lis[i]; if(l && on) l.scrollTop = on.offsetTop - l.offsetTop - 60;
+  var ans = $('dkAns'); if(ans) ans.innerHTML = dkCells(DK.cues[i].t);
+  var inp = $('dkIn'); if(inp) inp.value = ''; var res = $('dkRes'); if(res) res.innerHTML = '';
+  var bp = document.querySelector('[onclick="dkGo(dkCfg().di-1)"]'), bn = document.querySelector('[onclick="dkGo(dkCfg().di+1)"]');
+  if(bp) bp.disabled = i <= 0; if(bn) bn.disabled = i >= n - 1;
+}
+function dkCueAt(t){ var cs = DK.cues, k = -1; for(var i=0;i<cs.length;i++){ if(cs[i].s != null && cs[i].s <= t + 0.05) k = i; } return k; }
+function dkCont(){
+  if(DK.cont){ dkContStop(); return; }
+  var d = dkCfg(), c = DK.cues[d.di]; if(!c) return;
+  DK.stopAt = null; dkExtStop(); try{ stopSpeak(); }catch(e){}
+  DK.cont = true; var b = $('dkContBtn'); if(b) b.textContent = '⏸ 停止';
+  var v = $('dkVid'), x = dkExtInfo(), timed = c.s != null;
+  var follow = function(getT){ DK.contT = setInterval(function(){ var t = getT(); if(t == null) return; var k = dkCueAt(t); if(k >= 0) dkSync(k); }, 250); };
+  if(v && timed){
+    try{ v.currentTime = c.s; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    follow(function(){ if(v.ended){ dkContStop(); return null; } return v.currentTime; });
+    return;
+  }
+  if(!v && x && timed){
+    if(x.kind === 'yt'){
+      var go = function(){ try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){} };
+      if(DKX.ytReady && DKX.yt) go(); else { var w = setInterval(function(){ if(!DK.cont){ clearInterval(w); return; } if(DKX.ytReady && DKX.yt){ clearInterval(w); go(); } }, 200); }
+      follow(function(){ try{ if(DKX.yt.getPlayerState && DKX.yt.getPlayerState() === 0){ dkContStop(); return null; } return DKX.yt.getCurrentTime(); }catch(e){ return null; } });
+      return;
+    }
+    var f = dkBiliSrc(c.s, true), t0 = 0;                     // 哔哩哔哩读不到进度，只能按打开后过了多久来估算
+    f.onload = function(){ f.onload = null; t0 = Date.now() + 1200; };
+    follow(function(){ return t0 ? Math.floor(c.s) + Math.max(0, Date.now() - t0)/1000 : null; });
+    return;
+  }
+  /* 没有视频：用语音一句接一句读 */
+  var i = d.di, started = 0;
+  var busy = function(){ return TTS.busy || (window.speechSynthesis && speechSynthesis.speaking) || (TTS.cur && !TTS.cur.paused && !TTS.cur.ended); };
+  var say = function(){ if(!DK.cont) return; dkSync(i); var q = DK.cues[i]; speak(q.t, dkLang(q.t)); started = Date.now(); };
+  say();
+  DK.contT = setInterval(function(){
+    if(!DK.cont) return;
+    if(Date.now() - started < 600 || busy()) return;
+    if(i >= DK.cues.length - 1){ dkContStop(); return; }
+    i++; say();
+  }, 200);
+}
 function dkGo(i){
+  dkContStop();
   var d = dkCfg(), n = DK.cues.length; if(i < 0 || i >= n) return;
   d.di = i; d.reveal = false; save(); render(); setTimeout(dkPlay, 200);
 }
 function dkPlay(){
+  dkContStop();
   var d = dkCfg(), c = DK.cues[d.di]; if(!c) return;
   var v = $('dkVid');
   if(v && c.s != null && !(c.e != null && c.e - c.s < 0.3)){
