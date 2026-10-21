@@ -1107,6 +1107,10 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-src .dk-wave{border:1px solid #e3daf0;border-radius:12px;padding:14px 16px}
 .dk-src .dk-wave span{font-size:13px;color:#5b5476;line-height:1.7}
 .dk-src .dk-foot{margin-top:auto;padding-top:4px}
+.dk-tune{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--ink-soft)}
+.dk-tune select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid #d6cbe6;border-radius:8px;background:#fff;color:var(--ink)}
+.dk-tune .dk-btn{background:#fff;border:1px solid #d6cbe6;box-shadow:none;font-weight:600;padding:6px 10px;border-radius:8px}
+.dk-tune code{font:13px ui-monospace,Menlo,monospace;color:var(--ink);cursor:pointer;min-width:3.4em}
 .tts-api{margin:0 0 14px;border:1px solid var(--cream-2);border-radius:12px;background:var(--paper)}
 .tts-api summary{cursor:pointer;padding:10px 12px;font-weight:800;font-size:14px}
 .tts-api-b{display:flex;flex-direction:column;gap:8px;padding:0 12px 12px}
@@ -6992,7 +6996,31 @@ function dkCues(){
       });
     });
   }
+  var off = +dkCfg().off || 0;                                     // 对不上时的微调：整体提早/推后
+  if(off) cues.forEach(function(c){ if(c.s != null) c.s = Math.max(0, c.s + off); if(c.e != null) c.e = Math.max(0, c.e + off); });
   return cues;
+}
+/* 速度、微调 */
+function dkRateApply(){
+  var r = +dkCfg().rate || 1, v = $('dkVid');
+  if(v) try{ v.playbackRate = r; }catch(e){}
+  try{ if(DKX.kind === 'yt' && DKX.yt && DKX.ytReady) DKX.yt.setPlaybackRate(r); }catch(e){}
+}
+function dkTuneHtml(){
+  var d = dkCfg(), x = dkExtInfo(), off = +d.off || 0;
+  if(!DK.media && !x) return '';
+  if(!DK.cues.some(function(q){ return q.s != null; })) return '';
+  var rate = (!x || x.kind === 'yt') ? '<span>速度</span><select onchange="dkCfg().rate=+this.value;save();dkRateApply()">'
+    + [0.5, 0.75, 0.9, 1, 1.25, 1.5].map(function(r){ return '<option value="'+r+'"'+((+d.rate||1) === r ? ' selected' : '')+'>'+r+'×</option>'; }).join('') + '</select>' : '';
+  return '<div class="dk-tune">' + rate + '<span>对不上时微调</span>'
+    + '<button class="dk-btn" onclick="dkOff(-0.5)">早 0.5s</button><button class="dk-btn" onclick="dkOff(0.5)">晚 0.5s</button>'
+    + '<code id="dkOffV" title="点一下归零" onclick="dkOff(0)">' + (off > 0 ? '+' : '') + off.toFixed(1) + 's</code></div>';
+}
+function dkOff(delta){
+  var d = dkCfg(); d.off = delta ? Math.round(((+d.off || 0) + delta) * 10) / 10 : 0; save();
+  DK.cues = dkCues();
+  var e = $('dkOffV'); if(e) e.textContent = (d.off > 0 ? '+' : '') + d.off.toFixed(1) + 's';
+  dkPlay();                                                        // 马上重放这一句，听听对不对
 }
 
 /* —— 单字格 —— */
@@ -7867,6 +7895,7 @@ function dkDictHtml(){
       + '<button class="dk-btn y" style="font-size:15px;padding:10px 20px" onclick="dkPlay()">🔊 ' + (timed ? '播放这一句' : '读这一句') + '</button>'
       + '<button class="dk-btn g" id="dkContBtn" style="font-size:15px;padding:10px 20px" onclick="dkCont()">' + (DK.cont ? '⏸ 停止' : '▶ 播放') + '</button>'
       + '<button class="dk-btn p" ' + (d.di>=cues.length-1?'disabled':'') + ' onclick="dkGo(dkCfg().di+1)">下一句 ⏭</button></div>'
+      + dkTuneHtml()
       + (d.mode === 'dict'
         ? '<input class="dk-in" id="dkIn" style="--dkcs:' + d.cs + 'px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="" onkeydown="if(event.key===\'Enter\')dkCheck()">'
           + '<div class="dk-tools" style="justify-content:center"><button class="dk-btn p" onclick="dkCheck()">✅ 对一对</button><button class="dk-btn" onclick="dkCfg().reveal=true;dkCfg().done[dkCfg().di]=1;save();render()">👀 看答案</button></div>'
@@ -8016,7 +8045,7 @@ function dkExtPlay(c){
   var stop = c.e != null ? c.e + 0.15 : null;
   if(DKX.kind === 'yt'){
     if(!DKX.ytReady || !DKX.yt){ DKX.pending = c; return true; }
-    dkYTLock(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){}
+    dkYTLock(); dkRateApply(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){}
     DKX.stopAt = stop;
     if(stop != null) DKX.poll = setInterval(function(){
       try{ if(DKX.yt.getCurrentTime() >= DKX.stopAt){ DKX.yt.pauseVideo(); clearInterval(DKX.poll); DKX.poll = 0; DKX.stopAt = null; } }catch(e){}
@@ -8126,13 +8155,13 @@ function dkCont(){
   var v = $('dkVid'), x = dkExtInfo(), timed = c.s != null;
   var follow = function(getT){ DK.contT = setInterval(function(){ var t = getT(); if(t == null) return; var k = dkCueAt(t); if(k >= 0) dkSync(k); }, 250); };
   if(v && timed){
-    try{ v.currentTime = c.s; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    try{ dkRateApply(); v.currentTime = c.s; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
     follow(function(){ if(v.ended){ dkContStop(); return null; } return v.currentTime; });
     return;
   }
   if(!v && x && timed){
     if(x.kind === 'yt'){
-      var go = function(){ dkYTLock(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){} };
+      var go = function(){ dkYTLock(); dkRateApply(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){} };
       if(DKX.ytReady && DKX.yt) go(); else { var w = setInterval(function(){ if(!DK.cont){ clearInterval(w); return; } if(DKX.ytReady && DKX.yt){ clearInterval(w); go(); } }, 200); }
       follow(function(){ try{ if(DKX.yt.getPlayerState && DKX.yt.getPlayerState() === 0){ dkContStop(); return null; } return DKX.yt.getCurrentTime(); }catch(e){ return null; } });
       return;
@@ -8165,7 +8194,7 @@ function dkPlay(){
   var v = $('dkVid');
   if(v && c.s != null && !(c.e != null && c.e - c.s < 0.3)){
     stopSpeak && stopSpeak();
-    try{ v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    try{ dkRateApply(); v.currentTime = c.s; DK.stopAt = c.e != null ? c.e + 0.15 : null; var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
     return;
   }
   if(!v && c.s != null && dkExtInfo()){ try{ stopSpeak && stopSpeak(); }catch(e){} if(dkExtPlay(c)) return; }
