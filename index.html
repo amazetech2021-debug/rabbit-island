@@ -1086,6 +1086,28 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-wave span{font-size:13px;color:var(--ink-soft);line-height:1.6}
 .dk-or{font-size:13.5px;font-weight:800;color:var(--ink);margin:14px 0 6px}
 .dk-in2{width:100%;box-sizing:border-box;border:2px solid var(--cream-2);border-radius:12px;padding:9px 12px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+/* 素材页：和英文学习工具一样的排版 */
+.dk-src{align-items:stretch;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
+@media (max-width:560px){.dk-src .dk-wave{flex-direction:column;align-items:stretch}}
+.dk-src .dk-box{background:#ece6f6;border:1px solid #dcd1ec;border-radius:14px;padding:16px 18px;gap:12px}
+.dk-src .dk-box h4{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800}
+.dk-src .dk-box h4 i{flex:none;width:24px;height:24px;border-radius:50%;background:#7c3aed;color:#fff;font-style:normal;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.dk-src .dk-box h4 small{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.dk-src .dk-note{font-size:13px;line-height:1.75;color:#5b5476}
+.dk-src .dk-or{font-size:13.5px;font-weight:600;color:var(--ink-soft);margin:2px 0 -4px}
+.dk-src .dk-or b{color:var(--ink);font-weight:800}
+.dk-src .dk-btn,.dk-src .dk-btn.p,.dk-src .dk-btn.y{background:#fff;color:var(--ink);border:1px solid #d6cbe6;border-radius:10px;padding:9px 15px;font-size:14px;font-weight:600;box-shadow:0 1px 0 rgba(60,40,110,.06)}
+.dk-src .dk-btn:hover{border-color:#a78bfa}
+.dk-src .dk-btn.ai{color:#6d28d9;font-weight:700}
+.dk-src .dk-in2{border:1px solid #d6cbe6;border-radius:8px;padding:10px 12px;font-size:15px}
+.dk-src .dk-in2:focus,.dk-src .dk-ta:focus{outline:none;border-color:#a78bfa}
+.dk-src .dk-ta{border:1px solid #d6cbe6;border-radius:8px;flex:1;min-height:250px;font-size:14px;line-height:1.75;padding:12px 14px}
+.dk-src .dk-file{font-size:13.5px;font-weight:600}
+.dk-src .dk-subhelp{margin-top:0;font-size:13.5px;color:var(--ink-soft)}
+.dk-src .dk-wave{border:1px solid #e3daf0;border-radius:12px;padding:14px 16px}
+.dk-src .dk-wave span{font-size:13px;color:#5b5476;line-height:1.7}
+.dk-src .dk-foot{margin-top:auto;padding-top:4px}
+.dk-src .dk-foot .sp{flex:1}
 @media (min-width:1100px){
   .dk-play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 }
@@ -7674,16 +7696,16 @@ function dkBookHtml(){
   var bk = DK.book;
   return '<div class="card"><div class="secthead"><h3>📖 绘本阅读</h3><em>PDF / 图片 + 每页的文字</em></div>'
     + '<div class="dk-src">'
-    + '<div class="dk-box"><h4>① 绘本或图片（可以不选）</h4><div class="dk-note">选一个 PDF 或 PPT（.pptx），或一次选几张图片（按文件名排序，每张一页）。PPT 每一页幻灯片就是一页，里面的文字会自动填到右边。保存在这台设备上，下次打开还在。</div>'
+    + '<div class="dk-box"><h4><i>1</i>绘本或图片 <small>可以不选</small></h4><div class="dk-note">选一个 PDF 或 PPT（.pptx），或一次选几张图片（按文件名排序，每张一页）。PPT 每一页幻灯片就是一页，里面的文字会自动填到右边。保存在这台设备上，下次打开还在。</div>'
     + (bk ? '<div class="dk-file">📘 ' + htmlEsc(bk.name) + (dkPicCount() ? '（' + dkPicCount() + ' 页）' : '') + '</div>' : '')
-    + '<div class="dk-tools"><label class="dk-btn p" for="dkBookIn">选择文件</label><input type="file" id="dkBookIn" class="dk-vh" multiple accept=".pdf,application/pdf,.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/*" onchange="dkPickBook(this)">'
+    + '<div class="dk-tools dk-foot"><label class="dk-btn p" for="dkBookIn">选择文件</label><span class="sp"></span><input type="file" id="dkBookIn" class="dk-vh" multiple accept=".pdf,application/pdf,.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/*" onchange="dkPickBook(this)">'
     + (bk ? '<button class="dk-btn" onclick="dkClearBook()">清除</button>' : '') + '</div></div>'
-    + '<div class="dk-box"><h4>② 每页的文字（中文、英文都可以）</h4><div class="dk-note">用「=== 第 1 页 ===」分页；没有分页的话，有绘本时按空行分页，没有绘本就是一整页。可以选终端命令认出来的「.pages.txt」。</div>'
+    + '<div class="dk-box"><h4><i>2</i>每页的文字 <small>中文、英文都可以</small></h4><div class="dk-note">用「=== 第 1 页 ===」分页；没有分页的话，有绘本时按空行分页，没有绘本就是一整页。可以选终端命令认出来的「.pages.txt」。</div>'
     + '<textarea class="dk-ta" id="dkT_pages" placeholder="=== 第 1 页 ===&#10;两元钱！&#10;=== 第 2 页 ===&#10;十颗豆豆两人分。&#10;=== 第 3 页 ===&#10;I see a red apple." oninput="dkTextSave(\'pages\')">' + htmlEsc(d.pages) + '</textarea>'
-    + '<div class="dk-tools"><label class="dk-btn" for="dkPgIn">选择文字文件</label><input type="file" id="dkPgIn" class="dk-vh" accept=".txt,text/plain" onchange="dkPickText(this,\'pages\')">'
-    + '<button class="dk-btn p" onclick="dkAiOpen()">🤖 AI 识别</button>'
+    + '<div class="dk-tools dk-foot"><label class="dk-btn" for="dkPgIn">选择文字文件</label><input type="file" id="dkPgIn" class="dk-vh" accept=".txt,text/plain" onchange="dkPickText(this,\'pages\')">'
+    + '<button class="dk-btn ai" onclick="dkAiOpen()">🤖 AI 识别</button><span class="sp"></span>'
     + (DK.pptTexts ? '<button class="dk-btn y" onclick="dkPptUseText()">📑 用 PPT 的文字</button>' : '')
-    + '<button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkExport(\'pages\')">⬇️ 导出</button></div></div>'
+    + '<button class="dk-btn" onclick="dkExport(\'pages\')">导出</button><button class="dk-btn" onclick="dkCfg().pages=\'\';save();render()">清除</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartRead()">▶ 开始阅读</button>'
     + '</div>'
@@ -7796,20 +7818,19 @@ function dkDictHtml(){
   }
   return '<div class="card"><div class="secthead"><h3>✍️ 听写</h3><em>视频/音频 + 字幕，或者只用文字</em></div>'
     + '<div class="dk-src">'
-    + '<div class="dk-box"><h4>① 视频或音频（可以不选）</h4><div class="dk-note">mp4、mov、mp3、m4a 等，在这里播放，一句放完自动停。RMVB、AVI 先用「终端命令 → 格式转换」转成 mp4。不选的话，就用语音一句一句读给孩子听。</div>'
+    + '<div class="dk-box"><h4><i>1</i>视频或音频 <small>可以不选</small></h4><div class="dk-note">mp4、mov、mp3、m4a 等（RMVB、AVI 先用「终端命令 → 格式转换」转成 mp4），在这里播放，一句放完自动停。都不选的话，就用语音一句一句读给孩子听。</div>'
     + (DK.media ? '<div class="dk-file">🎬 ' + htmlEsc(DK.media.name) + '</div>' : '')
-    + '<div class="dk-tools"><label class="dk-btn p" for="dkMedIn">选择文件</label><input type="file" id="dkMedIn" class="dk-vh" accept="video/*,audio/*" onchange="dkPickMedia(this)">'
-    + (DK.media ? '<button class="dk-btn" onclick="dkClearMedia()">清除</button>' : '') + '</div>'
-    + '<div class="dk-or">或者粘贴视频链接（YouTube、哔哩哔哩）</div>'
-    + '<div class="dk-tools" style="flex-wrap:nowrap"><input class="dk-in2" id="dkLink" placeholder="https://www.bilibili.com/video/BV…　或　https://www.youtube.com/watch?v=…" value="' + htmlEsc(d.link || '') + '" onchange="dkCfg().link=this.value.trim();save();render()" spellcheck="false" autocapitalize="off">'
-    + (d.link ? '<button class="dk-btn" style="flex:none;white-space:nowrap" onclick="dkCfg().link=\'\';save();render()">清除</button>' : '') + '</div>'
+    + '<div class="dk-or"><b>或者用视频链接</b> · YouTube、哔哩哔哩，听写时会跳到每一句</div>'
+    + '<input class="dk-in2" id="dkLink" placeholder="https://www.youtube.com/watch?v=…　或　https://www.bilibili.com/video/BV…" value="' + htmlEsc(d.link || '') + '" onchange="dkCfg().link=this.value.trim();save();render()" spellcheck="false" autocapitalize="off">'
     + dkExtLinkNote()
     + dkSubHelp()
+    + '<div class="dk-tools dk-foot"><label class="dk-btn" for="dkMedIn">选择文件</label><input type="file" id="dkMedIn" class="dk-vh" accept="video/*,audio/*" onchange="dkPickMedia(this)"><span class="sp"></span>'
+    + (DK.media || d.link ? '<button class="dk-btn" onclick="if(DK.media)dkClearMedia();dkCfg().link=\'\';save();render()">清除</button>' : '') + '</div>'
     + '</div>'
-    + '<div class="dk-box"><h4>② 字幕或文字</h4><div class="dk-note">选 .srt、.vtt、.txt 文件，或直接粘贴。带时间点的会跟着视频一句一句放；普通文字按句号、问号分句。</div>'
+    + '<div class="dk-box"><h4><i>2</i>字幕或文字</h4><div class="dk-note">选 .srt、.vtt、.txt 文件，或直接粘贴。带时间点的会跟着视频一句一句放；普通文字按句号、问号分句。</div>'
     + '<textarea class="dk-ta" id="dkT_subs" placeholder="小兔子乖乖，把门开开。&#10;I like apples. I like bananas." oninput="dkTextSave(\'subs\')">' + htmlEsc(d.subs) + '</textarea>'
-    + '<div class="dk-tools"><label class="dk-btn" for="dkSubIn">选择字幕文件</label><input type="file" id="dkSubIn" class="dk-vh" accept=".srt,.vtt,.txt,text/plain" onchange="dkPickText(this,\'subs\')">'
-    + '<button class="dk-btn" onclick="dkCfg().subs=\'\';save();render()">清除</button><button class="dk-btn" onclick="dkExport(\'subs\')">⬇️ 导出</button><button class="dk-btn" onclick="dkUseBookForDict()">用绘本的文字</button></div></div>'
+    + '<div class="dk-tools dk-foot"><label class="dk-btn" for="dkSubIn">选择字幕文件</label><input type="file" id="dkSubIn" class="dk-vh" accept=".srt,.vtt,.txt,text/plain" onchange="dkPickText(this,\'subs\')"><span class="sp"></span>'
+    + '<button class="dk-btn" onclick="dkUseBookForDict()">用绘本的文字</button><button class="dk-btn" onclick="dkExport(\'subs\')">导出</button><button class="dk-btn" onclick="dkCfg().subs=\'\';save();render()">清除</button></div></div>'
     + '</div>'
     + '<div class="dk-tools" style="margin-top:14px;justify-content:center"><button class="dk-btn p" style="font-size:15px;padding:11px 24px" onclick="dkStartDict(\'dict\')">✍️ 开始听写</button>'
     + '</div>'
@@ -7832,8 +7853,8 @@ function dkExtInfo(){
 /* 字幕怎么来：YouTube 用 Wave 取（iPad 也能用），或者显示文字记录、终端命令；哔哩哔哩用终端命令 */
 function dkSubHelp(){
   var x = dkExtInfo(); if(!x) return '';
-  if(x.kind === 'yt') return '<div class="dk-subhelp"><b>字幕怎么来（iPad 也能用）：</b>'
-    + '<div class="dk-wave"><button class="dk-btn p" onclick="dkWave()">打开 Wave 取字幕</button>'
+  if(x.kind === 'yt') return '<div class="dk-subhelp">✓ 找到视频。字幕怎么来（iPad 也能用）：'
+    + '<div class="dk-wave"><button class="dk-btn" onclick="dkWave()">打开 Wave 取字幕</button>'
     + '<span>点了会先复制好视频链接。在 Wave 里粘贴链接、点「提取字幕」，下载 SRT，回来在右边「选择字幕文件」选它；或者打开时间戳后一键复制，粘贴到右边字幕框。Wave 每天可以免费取 30 次。</span></div>'
     + '<div class="dk-note">其他办法：在 YouTube 视频下面点「…更多 → 显示文字记录」，全选复制，粘贴到右边；或者在 Mac 上 <a href="javascript:void 0" onclick="dkGoCmd()">复制下载字幕的终端命令</a>。</div></div>';
   return '<div class="dk-subhelp"><b>字幕怎么来：</b><div class="dk-note">哔哩哔哩的字幕要在 Mac 上用 <a href="javascript:void 0" onclick="dkGoCmd()">终端命令</a> 取：「下载视频，并识别出字幕」最稳（视频没有字幕也能认出来），或者「只下载字幕」（要视频本身带字幕）。拿到的 .srt 在右边「选择字幕文件」选上。</div></div>';
@@ -7853,7 +7874,8 @@ function dkExtLinkNote(){
   var x = dkExtInfo();
   if(DK.media) return '<div class="dk-note" style="color:#b45309">已经选了本地文件，会优先用本地文件；要用链接，先点「清除」。</div>';
   if(!x) return '<div class="dk-note" style="color:#dc2626">认不出这个链接，请粘贴 YouTube 或哔哩哔哩的视频网址。</div>';
-  return '<div class="dk-file">'+(x.kind === 'yt' ? '▶️ YouTube 视频 '+x.id : '📺 哔哩哔哩 '+x.id+(x.p > 1 ? ' 第 '+x.p+' 集' : ''))+'</div>'
+  if(x.kind === 'yt') return '';   // YouTube 的提示在下面「字幕怎么来」里
+  return '<div class="dk-file">📺 哔哩哔哩 '+x.id+(x.p > 1 ? ' 第 '+x.p+' 集' : '')+'</div>'
     + (x.kind === 'bili' ? '<div class="dk-note">哔哩哔哩的播放器不让网页控制，只能大概跳到那一句、放完大概停住，可能会多放或少放一点。想要准，就用「终端命令」把视频下载下来再选文件。</div>' : '');
 }
 function dkExtBox(){
