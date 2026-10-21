@@ -1077,11 +1077,8 @@ label.dk-btn{display:inline-flex;align-items:center}
 .dk-extbox{position:fixed;z-index:56;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.2)}
 .dk-extbox iframe,.dk-extbox #dkYT{width:100%;height:100%;border:0;display:block}
 .dk-ytlayer{position:absolute;inset:0;z-index:2;cursor:pointer}
-.dk-ytbar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:14px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s}
-.dk-ytbar.on{opacity:1;pointer-events:auto}
-.dk-ytpp{flex:none;width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,.9);font-size:18px;cursor:pointer}
-.dk-ytr{flex:1;accent-color:#ef4444}
-.dk-ytt,.dk-ytd{font-variant-numeric:tabular-nums;flex:none}
+/* 平时把 YouTube 自己的标题栏和进度条裁到框外面；点一下视频再放出来 */
+.dk-extbox.crop #dkYT{position:absolute;left:0;top:-90px;height:calc(100% + 180px)!important}
 .dk-extph{aspect-ratio:16/9;background:#111}
 .dk-subhelp{margin-top:10px;font-size:13.5px;color:var(--ink)}
 .dk-wave{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--cream-2);border-radius:14px;padding:12px 14px;margin:8px 0}
@@ -7899,18 +7896,12 @@ function dkVidTap(v){
 }
 function dkYTBar(box){
   var layer = document.createElement('div'); layer.className = 'dk-ytlayer';
-  var bar = document.createElement('div'); bar.className = 'dk-ytbar';
-  bar.innerHTML = '<button class="dk-ytpp">▶</button><span class="dk-ytt">0:00</span><input class="dk-ytr" type="range" min="0" max="100" step="0.1" value="0"><span class="dk-ytd">0:00</span>';
-  box.appendChild(layer); box.appendChild(bar);
-  var pp = bar.querySelector('.dk-ytpp'), rg = bar.querySelector('.dk-ytr'), tt = bar.querySelector('.dk-ytt'), td = bar.querySelector('.dk-ytd'), hideT = 0, upT = 0, drag = false;
-  var playing = function(){ try{ return DKX.yt.getPlayerState() === 1; }catch(e){ return false; } };
-  var upd = function(){ try{ var d = DKX.yt.getDuration() || 0, c = DKX.yt.getCurrentTime() || 0; pp.textContent = playing() ? '⏸' : '▶'; tt.textContent = dkMS(c); td.textContent = dkMS(d); if(!drag){ rg.max = d || 100; rg.value = c; } }catch(e){} };
-  var hide = function(){ bar.classList.remove('on'); clearInterval(upT); upT = 0; };
-  var show = function(){ bar.classList.add('on'); upd(); if(!upT) upT = setInterval(upd, 250); clearTimeout(hideT); hideT = setTimeout(hide, 3500); };
-  layer.addEventListener('click', function(){ if(bar.classList.contains('on')) hide(); else show(); });
-  pp.addEventListener('click', function(){ if(!DKX.yt) return; DKX.stopAt = null; clearInterval(DKX.poll); if(playing()) DKX.yt.pauseVideo(); else DKX.yt.playVideo(); setTimeout(upd, 200); show(); });
-  rg.addEventListener('input', function(){ drag = true; tt.textContent = dkMS(+rg.value); show(); });
-  rg.addEventListener('change', function(){ drag = false; try{ DKX.stopAt = null; clearInterval(DKX.poll); DKX.yt.seekTo(+rg.value, true); }catch(e){} show(); });
+  box.appendChild(layer); box.classList.add('crop');
+  layer.addEventListener('click', function(){ box.classList.remove('crop'); layer.style.display = 'none'; });   // 点视频：露出 YouTube 自己的进度条、设置
+}
+function dkYTLock(){   // 点上一句/下一句/播放时，再把控制条收起来
+  if(!DKX.box || DKX.kind !== 'yt') return;
+  DKX.box.classList.add('crop'); var l = DKX.box.querySelector('.dk-ytlayer'); if(l) l.style.display = '';
 }
 /* —— YouTube —— */
 function dkYTLoad(cb){
@@ -7927,7 +7918,7 @@ function dkYTCreate(){
   dkYTLoad(function(){
     if(!$('dkYT') || DKX.kind !== 'yt') return;
     DKX.yt = new YT.Player('dkYT', {width:'100%', height:'100%', videoId:DKX.id,
-      playerVars:{playsinline:1, rel:0, modestbranding:1, controls:0, fs:0, disablekb:1, iv_load_policy:3},
+      playerVars:{playsinline:1, rel:0, modestbranding:1, controls:1, fs:1, iv_load_policy:3},
       events:{onReady:function(){ DKX.ytReady = true; if(DKX.pending){ var c = DKX.pending; DKX.pending = null; dkExtPlay(c); } }}});
   });
 }
@@ -7944,7 +7935,7 @@ function dkExtPlay(c){
   var stop = c.e != null ? c.e + 0.15 : null;
   if(DKX.kind === 'yt'){
     if(!DKX.ytReady || !DKX.yt){ DKX.pending = c; return true; }
-    try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){}
+    dkYTLock(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){}
     DKX.stopAt = stop;
     if(stop != null) DKX.poll = setInterval(function(){
       try{ if(DKX.yt.getCurrentTime() >= DKX.stopAt){ DKX.yt.pauseVideo(); clearInterval(DKX.poll); DKX.poll = 0; DKX.stopAt = null; } }catch(e){}
@@ -8060,7 +8051,7 @@ function dkCont(){
   }
   if(!v && x && timed){
     if(x.kind === 'yt'){
-      var go = function(){ try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){} };
+      var go = function(){ dkYTLock(); try{ DKX.yt.seekTo(c.s, true); DKX.yt.playVideo(); }catch(e){} };
       if(DKX.ytReady && DKX.yt) go(); else { var w = setInterval(function(){ if(!DK.cont){ clearInterval(w); return; } if(DKX.ytReady && DKX.yt){ clearInterval(w); go(); } }, 200); }
       follow(function(){ try{ if(DKX.yt.getPlayerState && DKX.yt.getPlayerState() === 0){ dkContStop(); return null; } return DKX.yt.getCurrentTime(); }catch(e){ return null; } });
       return;
