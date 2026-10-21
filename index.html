@@ -7922,15 +7922,13 @@ function dkDictHtml(){
         + '<div class="dk-tools"><button class="dk-btn p" onclick="dkSaveCue(' + i + ')">💾 保存</button><button class="dk-btn" onclick="DK.editCue=null;render()">取消</button></div></div></div>';
       return '<div class="dk-li ' + (i===d.di?'on ':'') + (d.done[i]?'done':'') + '" onclick="dkGo(' + i + ')"><em>' + (i+1) + (x.s != null ? ' · ' + dkMS(x.s) + (x.e != null ? ' – ' + dkMS(x.e) : '') : '') + '</em><span>' + (DK.editAll || d.mode==='read' || d.done[i] || i < d.di ? htmlEsc(x.t) : '· · ·') + '</span>'
         + (DK.editAll ? '<button class="dk-ib" title="改" onclick="event.stopPropagation();DK.editCue=' + i + ';render()">✏️</button><button class="dk-ib" title="删掉" onclick="event.stopPropagation();dkDelCue(' + i + ')">🗑</button>' : '') + '</div>';
-    }).join('') + '</div>'
-    + '<div class="dk-tools" style="margin-top:8px">'
-    + (DK.editAll ? '<button class="dk-btn" onclick="dkAddCue()">＋ 在第 ' + (d.di+1) + ' 句后面加一句</button><button class="dk-btn p" onclick="DK.editAll=false;DK.editCue=null;render()">✓ 改好了</button>'
+    }).join('') + '</div></div>';
+    var subBtns = (DK.editAll ? '<button class="dk-btn" onclick="dkAddCue()">＋ 在第 ' + (d.di+1) + ' 句后面加一句</button><button class="dk-btn p" onclick="DK.editAll=false;DK.editCue=null;render()">✓ 改好了</button>'
                   : '<button class="dk-btn" onclick="DK.editAll=true;render()">✏️ 修改字幕 / 文字</button>')
-    + '<button class="dk-btn" onclick="dkExport(\'subs\')">⬇️ 导出字幕</button>'
-    + '</div></div>';
+    + '<button class="dk-btn" onclick="dkExport(\'subs\')">⬇️ 导出字幕</button>';
     return '<div class="dk-full dk-fulld" id="dkFullD"><div class="dk-fbar"><button class="dk-btn" onclick="DK.editAll=false;DK.editCue=null;dkCfg().going=false;dkStopMedia();save();render()">← 返回</button>'
       + '<span class="dk-pos">第 ' + (d.di+1) + ' / ' + cues.length + ' 句</span><span style="flex:1"></span>'
-      + '<div class="dk-tools">' + dkSizeBtns() + '</div></div>'
+      + '<div class="dk-tools">' + subBtns + dkSizeBtns() + '</div></div>'
       + '<div class="dk-play dk-dbody"><div class="dk-stage">'
       + (DK.media ? '<video class="dk-vid" id="dkVid" playsinline onclick="dkVidTap(this)" src="' + DK.mediaUrl + '"></video>' : (dkExtInfo() ? '<div class="dk-vid dk-extph" id="dkExt"></div>' : ''))
       + (!DK.media && dkExtInfo() && !cues.some(function(q){ return q.s != null; }) ? '<div class="dk-note" style="text-align:center;color:#b45309">现在的字幕没有时间点，按钮只能用语音读，视频不会跟着跳。<a href="javascript:void 0" onclick="dkCfg().going=false;dkStopMedia();save();render()">返回</a>用 Wave 取带时间的字幕就能一句一句放视频了。</div>' : '')
